@@ -1,0 +1,238 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+enum Role {
+  ADMIN       // System admin
+  LANDLORD    // Property owner / landlord
+  TENANT      // Renter / tenant
+}
+
+enum RoomStatus {
+  VACANT
+  OCCUPIED
+  MAINTENANCE
+}
+
+enum ContractStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+enum InvoiceStatus {
+  UNPAID
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum RentRequestStatus {
+  PENDING
+  CONTACTED
+  CANCELLED
+}
+
+model User {
+  id             String     @id @default(uuid())
+  email          String     @unique
+  password       String
+  name           String
+  phone          String?
+  role           Role       @default(TENANT)
+  
+  // Relates to the landlord they belong to (null for System Admins and Landlords themselves)
+  landlordId     String?
+  landlord       Landlord?  @relation("LandlordToUsers", fields: [landlordId], references: [id])
+  
+  // If the User is a LANDLORD, they own these landlord business profile(s)
+  ownedLandlords Landlord[] @relation("LandlordOwner")
+  
+  // Contracts where this user is the Tenant
+  contracts      Contract[] @relation("TenantContracts")
+  
+  // Incidents reported by this user
+  reportedIncidents Incident[] @relation("TenantIncidents")
+  
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([landlordId])
+  @@index([email])
+}
+
+model Landlord {
+  id           String        @id @default(uuid())
+  name         String
+  phone        String?
+  address      String?
+  bankName          String?
+  bankAccountNumber String?
+  bankAccountName   String?
+  
+  // The owner user who created this landlord profile
+  ownerId      String
+  owner        User          @relation("LandlordOwner", fields: [ownerId], references: [id])
+  
+  // Multi-tenant scoped relations
+  users        User[]        @relation("LandlordToUsers")
+  rooms        Room[]
+  contracts    Contract[]
+  invoices     Invoice[]
+  rentRequests RentRequest[] // New relation for consultation requests
+  incidents    Incident[]
+  
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([ownerId])
+}
+
+model Room {
+  id           String        @id @default(uuid())
+  roomNumber   String
+  floor        Int?
+  description  String?
+  price        Decimal
+  status       RoomStatus    @default(VACANT)
+  imageUrls    String[]      @default([])
+  
+  // Multi-tenant scoped relation
+  landlordId   String
+  landlord     Landlord      @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+  
+  contracts    Contract[]
+  rentRequests RentRequest[] // New relation for room-specific consultations
+  incidents    Incident[]
+  
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([landlordId])
+  @@index([status])
+}
+
+model Contract {
+  id             String         @id @default(uuid())
+  contractNumber String         @unique
+  
+  tenantId       String
+  tenant         User           @relation("TenantContracts", fields: [tenantId], references: [id])
+  
+  roomId         String
+  room           Room           @relation(fields: [roomId], references: [id])
+  
+  startDate      DateTime
+  endDate        DateTime
+  deposit        Decimal
+  rentalPrice    Decimal
+  status         ContractStatus @default(ACTIVE)
+  
+  // Multi-tenant scoped relation
+  landlordId     String
+  landlord       Landlord       @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+  
+  invoices       Invoice[]
+  
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([landlordId])
+  @@index([tenantId])
+  @@index([roomId])
+  @@index([status])
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  invoiceNumber String        @unique
+  
+  contractId    String
+  contract      Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  
+  amount        Decimal
+  dueDate       DateTime
+  paidDate      DateTime?
+  status        InvoiceStatus @default(UNPAID)
+  
+  // Multi-tenant scoped relation
+  landlordId    String
+  landlord      Landlord      @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([landlordId])
+  @@index([contractId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model RentRequest {
+  id         String            @id @default(uuid())
+  name       String
+  email      String
+  phone      String
+  message    String?
+  status     RentRequestStatus @default(PENDING)
+  
+  // Multi-tenant relation
+  landlordId String
+  landlord   Landlord          @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+  
+  // Room relationship (optional, if they ask about a specific room)
+  roomId     String?
+  room       Room?             @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@index([landlordId])
+  @@index([status])
+}
+
+enum IncidentStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum IncidentPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Incident {
+  id          String           @id @default(uuid())
+  title       String
+  description String
+  status      IncidentStatus   @default(PENDING)
+  priority    IncidentPriority @default(LOW)
+  
+  // Reported by tenant
+  reporterId  String
+  reporter    User             @relation("TenantIncidents", fields: [reporterId], references: [id])
+  
+  // Associated room
+  roomId      String
+  room        Room             @relation(fields: [roomId], references: [id])
+  
+  // Multi-tenant scoped relation
+  landlordId  String
+  landlord    Landlord         @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([landlordId])
+  @@index([reporterId])
+  @@index([roomId])
+  @@index([status])
+}
