@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Patch, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, UseGuards, Req, Delete } from '@nestjs/common';
 import { ContractService } from './contract.service';
 import { CreateContractDto } from '../../../presentation/dtos/contract/create-contract.dto';
 import { UpdateContractStatusDto } from '../../../presentation/dtos/contract/update-contract-status.dto';
@@ -33,5 +33,20 @@ export class ContractController {
   ) {
     const landlordId = req.user.landlordId || req.user.sub;
     return this.contractService.updateStatus(id, landlordId, dto);
+  }
+
+  @Patch(':id/autopay')
+  async toggleAutoPay(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body('autoPayEnabled') autoPayEnabled: boolean,
+  ) {
+    return this.contractService.toggleAutoPay(id, req.user.sub, req.user.role, autoPayEnabled);
+  }
+
+  @Delete(':id')
+  async deleteContract(@Req() req: any, @Param('id') id: string) {
+    const landlordId = req.user.landlordId || req.user.sub;
+    return this.contractService.delete(id, landlordId);
   }
 }

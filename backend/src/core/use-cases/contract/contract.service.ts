@@ -54,7 +54,7 @@ export class ContractService {
     return this.prisma.contract.findMany({
       where: { landlordId },
       include: {
-        tenant: { select: { name: true, email: true, phone: true } },
+        tenant: { select: { id: true, name: true, email: true, phone: true } },
         room: { select: { roomNumber: true } },
       },
       orderBy: { createdAt: 'desc' },
@@ -64,7 +64,7 @@ export class ContractService {
   async findAllByTenant(tenantId: string) {
     return this.prisma.contract.findMany({
       where: { tenantId },
-      include: { room: { select: { roomNumber: true, price: true } } },
+      include: { room: { select: { id: true, roomNumber: true, price: true } } },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -89,5 +89,43 @@ export class ContractService {
     }
 
     return updated;
+  }
+
+  async toggleAutoPay(id: string, userId: string, role: string, autoPayEnabled: boolean) {
+    const contract = await this.prisma.contract.findUnique({
+      where: { id },
+    });
+    if (!contract) throw new NotFoundException('Hợp đồng không tồn tại');
+
+    if (role === 'TENANT' && contract.tenantId !== userId) {
+      throw new BadRequestException('Không có quyền thay đổi');
+    }
+    if (role !== 'TENANT' && contract.landlordId !== userId && contract.landlordId !== (await this.prisma.user.findUnique({where: {id: userId}}))?.landlordId) {
+      throw new BadRequestException('Không có quyền thay đổi');
+    }
+
+    return this.prisma.contract.update({
+      where: { id },
+      data: { autoPayEnabled },
+    });
+  }
+
+  async delete(id: string, landlordId: string) {
+    const contract = await this.prisma.contract.findFirst({
+      where: { id, landlordId },
+    });
+    if (!contract) throw new NotFoundException('Hợp đồng không tồn tại');
+
+    return await this.prisma.$transaction(async (tx) => {
+      // Luôn trả phòng về VACANT khi xóa hợp đồng
+      await tx.room.update({
+        where: { id: contract.roomId },
+        data: { status: 'VACANT' },
+      });
+
+      return tx.contract.delete({
+        where: { id },
+      });
+    });
   }
 }

@@ -34,10 +34,52 @@ export default function LandingPage() {
   const roomsRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
+  // ── AI Chat Widget State ──────────────────────────────────────────
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([
+    { role: 'ai', text: 'Xin chào! 👋 Tôi là **RentBot**, trợ lý AI của Smart Boarding House.\n\nTôi có thể giúp bạn tìm phòng phù hợp, tư vấn giá cả và thời gian thuê tốt nhất. Bạn muốn hỏi gì?' },
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const QUICK_QUESTIONS = [
+    '🏠 Phòng nào còn trống?',
+    '💰 Giá thuê bao nhiêu?',
+    '🎓 Phòng nào cho sinh viên?',
+    '📅 Nên thuê bao lâu?',
+  ];
+
+  const handleSendChat = async (text?: string) => {
+    const message = text || chatInput.trim();
+    if (!message || isChatLoading) return;
+    setChatMessages(prev => [...prev, { role: 'user', text: message }]);
+    setChatInput('');
+    setIsChatLoading(true);
+    try {
+      const res = await fetch('http://localhost:3000/ai/public-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      const data = await res.json();
+      setChatMessages(prev => [...prev, { role: 'ai', text: data.text || 'Xin lỗi, tôi không thể trả lời lúc này.' }]);
+    } catch {
+      setChatMessages(prev => [...prev, { role: 'ai', text: '⚠️ Lỗi kết nối. Vui lòng thử lại.' }]);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
+  // ─────────────────────────────────────────────────────────────────
+
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/rooms?landlordId=${landlordId}`);
+        const response = await fetch(`http://localhost:3000/rooms/public`);
         if (response.ok) {
           const data = await response.json();
           setRooms(data);
@@ -50,6 +92,7 @@ export default function LandingPage() {
     };
     fetchRooms();
   }, []);
+
 
   const handleSelectRoom = (roomId: string) => {
     setFormData(prev => ({ ...prev, roomId }));
@@ -114,31 +157,38 @@ export default function LandingPage() {
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       
       {/* Navbar */}
-      <header style={{
-        position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50,
+      <header className="glass-header" style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '20px 40px', background: 'transparent'
+        padding: '16px 40px', transition: 'all 0.3s ease'
       }}>
-        <div style={{ fontWeight: '800', fontSize: '1.25rem', color: 'white' }}>
-          Smart Boarding House
+        <div style={{ fontWeight: '800', fontSize: '1.5rem', letterSpacing: '-0.02em' }} className="text-gradient">
+          SaaS Rent
         </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           {user ? (
             <>
-              <span style={{ color: 'white', opacity: 0.8 }}>Xin chào, {user.name}</span>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Hi, <strong style={{ color: 'white' }}>{user.name}</strong></span>
               {(user.role === 'ADMIN' || user.role === 'LANDLORD') && (
-                <Link href="/admin" className="glass-panel" style={{ padding: '8px 16px', border: '1px solid rgba(255,255,255,0.2)', color: 'white', textDecoration: 'none' }}>
-                  Vào Dashboard
+                <Link href="/admin" className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.95rem' }}>
+                  Dashboard
                 </Link>
               )}
-              <button onClick={logout} style={{ padding: '8px 16px', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.4)', borderRadius: '8px', cursor: 'pointer' }}>
+              {user.role === 'TENANT' && (
+                <Link href="/tenant" className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.95rem' }}>
+                  Phòng Của Tôi
+                </Link>
+              )}
+              <button onClick={logout} style={{ padding: '10px 20px', background: 'rgba(255,255,255,0.05)', color: 'white', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s', cursor: 'pointer' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
                 Đăng Xuất
               </button>
             </>
           ) : (
             <>
-              <Link href="/login" style={{ color: 'white', textDecoration: 'none', fontWeight: '500' }}>Đăng Nhập</Link>
-              <Link href="/register" className="btn-primary" style={{ padding: '8px 16px', textDecoration: 'none' }}>Đăng Ký</Link>
+              <Link href="/login" style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: '500', fontSize: '0.95rem', padding: '10px' }}>Đăng Nhập</Link>
+              <button onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} className="btn-primary" style={{ padding: '10px 24px', fontSize: '0.95rem' }}>
+                Đăng Ký Thuê
+              </button>
             </>
           )}
         </div>
@@ -154,6 +204,10 @@ export default function LandingPage() {
         padding: '20px',
         overflow: 'hidden'
       }}>
+        {/* Abstract Glow Background */}
+        <div style={{ position: 'absolute', width: '600px', height: '600px', background: 'var(--primary)', filter: 'blur(150px)', opacity: 0.15, borderRadius: '50%', top: '-10%', left: '-10%', zIndex: -1 }}></div>
+        <div style={{ position: 'absolute', width: '500px', height: '500px', background: 'var(--accent)', filter: 'blur(150px)', opacity: 0.15, borderRadius: '50%', bottom: '-10%', right: '-10%', zIndex: -1 }}></div>
+        
         {/* Background Image / Overlay */}
         <div style={{
           position: 'absolute',
@@ -161,42 +215,41 @@ export default function LandingPage() {
           backgroundImage: 'url(/images/rooms/656430816_1617182629530479_8502833815304260238_n.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          opacity: 0.3,
-          zIndex: -2
-        }} />
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(to bottom, rgba(15,23,42,0.8) 0%, rgba(15,23,42,1) 100%)',
-          zIndex: -1
+          opacity: 0.1,
+          zIndex: -2,
+          mixBlendMode: 'luminosity'
         }} />
 
-        <div style={{ textAlign: 'center', maxWidth: '800px', zIndex: 1 }} className="animate-fade-in animate-float">
-          <span style={{ 
-            display: 'inline-block', 
-            padding: '8px 16px', 
-            background: 'rgba(168, 85, 247, 0.1)', 
-            color: '#c084fc',
+        <div style={{ textAlign: 'center', maxWidth: '800px', zIndex: 1, marginTop: '60px' }} className="animate-fade-in animate-float">
+          <div style={{ 
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '8px 20px', 
+            background: 'rgba(255,255,255,0.03)', 
+            backdropFilter: 'blur(10px)',
+            color: 'var(--text-main)',
             borderRadius: '999px',
-            fontWeight: '600',
+            fontWeight: '500',
             fontSize: '0.875rem',
-            marginBottom: '24px',
-            border: '1px solid rgba(168, 85, 247, 0.2)'
+            marginBottom: '32px',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
           }}>
-            🌟 Hệ thống quản lý nhà trọ số 1
-          </span>
-          <h1 style={{ fontSize: '4.5rem', fontWeight: '800', marginBottom: '24px', lineHeight: '1.1' }}>
+            <span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#22c55e', borderRadius: '50%', boxShadow: '0 0 10px #22c55e' }}></span>
+            Hệ thống quản lý nhà trọ thông minh
+          </div>
+          
+          <h1 style={{ fontSize: '5rem', fontWeight: '800', marginBottom: '24px', lineHeight: '1.05', letterSpacing: '-0.03em' }}>
             Trải nghiệm sống <br />
             <span className="text-gradient">Đẳng cấp & Tiện nghi</span>
           </h1>
-          <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '40px', lineHeight: '1.6' }}>
-            Môi trường sống an ninh, sạch sẽ và hiện đại. Khám phá ngay các phòng đang còn trống và đặt chỗ chỉ với vài thao tác đơn giản.
+          <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '48px', lineHeight: '1.6', maxWidth: '600px', margin: '0 auto 48px auto' }}>
+            Nền tảng quản lý và thuê phòng trọ tự động hóa 100%. Môi trường sống an ninh, thủ tục nhanh gọn, hỗ trợ 24/7.
           </p>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <button onClick={handleExploreRooms} className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem' }}>
-              Khám Phá Phòng Ngay
+            <button onClick={handleExploreRooms} className="btn-primary" style={{ padding: '18px 40px', fontSize: '1.1rem', borderRadius: '14px' }}>
+              Xem Phòng Trống
             </button>
-            <button onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} className="glass-panel" style={{ padding: '16px 32px', fontSize: '1.1rem', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.05)' }}>
+            <button onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} className="glass-panel" style={{ padding: '18px 40px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: '600', transition: 'all 0.3s' }}>
               Liên Hệ Tư Vấn
             </button>
           </div>
@@ -348,6 +401,136 @@ export default function LandingPage() {
       <footer style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-muted)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <p>© 2026 Smart Boarding House. All rights reserved.</p>
       </footer>
+      {/* AI Chat Widget */}
+      <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+        
+        {/* Chat Panel */}
+        {isChatOpen && (
+          <div
+            style={{
+              width: '360px',
+              height: '500px',
+              marginBottom: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              borderRadius: '20px',
+              border: '1px solid rgba(168,85,247,0.4)',
+              background: 'rgba(15,23,42,0.95)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(168,85,247,0.1)',
+              animation: 'fadeIn 0.3s ease-out',
+            }}
+          >
+            {/* Chat Header */}
+            <div style={{ padding: '16px 20px', background: 'linear-gradient(135deg, rgba(168,85,247,0.4), rgba(59,130,246,0.3))', borderBottom: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', flexShrink: 0 }}>🤖</div>
+                  <div>
+                    <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'white' }}>RentBot AI</div>
+                    <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+                      Trực tuyến • Tư vấn thuê phòng
+                    </div>
+                  </div>
+                </div>
+                <button onClick={() => setIsChatOpen(false)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '1.1rem', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+              </div>
+            </div>
+
+            {/* Messages */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {chatMessages.map((msg, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', gap: '8px', alignItems: 'flex-end' }}>
+                  {msg.role === 'ai' && (
+                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', flexShrink: 0 }}>🤖</div>
+                  )}
+                  <div style={{
+                    maxWidth: '78%',
+                    padding: '10px 14px',
+                    borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '4px 16px 16px 16px',
+                    background: msg.role === 'user' ? 'linear-gradient(135deg, #a855f7, #3b82f6)' : 'rgba(255,255,255,0.07)',
+                    fontSize: '0.82rem',
+                    lineHeight: '1.6',
+                    color: 'white',
+                    border: msg.role === 'ai' ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                  }}>
+                    {msg.text.replace(/\*\*(.*?)\*\*/g, '$1')}
+                  </div>
+                </div>
+              ))}
+              {isChatLoading && (
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>🤖</div>
+                  <div style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.07)', borderRadius: '4px 16px 16px 16px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {[0,1,2].map(i => <span key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#a855f7', display: 'inline-block', animation: `bounce 1.2s ${i*0.2}s infinite` }} />)}
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Quick Questions - chỉ hiện lúc đầu */}
+            {chatMessages.length <= 1 && (
+              <div style={{ padding: '8px 16px', display: 'flex', flexWrap: 'wrap', gap: '6px', borderTop: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
+                {QUICK_QUESTIONS.map(q => (
+                  <button
+                    key={q}
+                    onClick={() => handleSendChat(q)}
+                    style={{ padding: '5px 11px', borderRadius: '999px', fontSize: '0.72rem', cursor: 'pointer', background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.3)', color: '#c084fc', transition: 'all 0.2s', whiteSpace: 'nowrap' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.25)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.12)'; }}
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Input */}
+            <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: '8px', flexShrink: 0 }}>
+              <input
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendChat(); } }}
+                placeholder="Hỏi tôi bất kỳ điều gì..."
+                disabled={isChatLoading}
+                style={{ flex: 1, padding: '10px 14px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', color: 'white', fontSize: '0.82rem', outline: 'none' }}
+              />
+              <button
+                onClick={() => handleSendChat()}
+                disabled={isChatLoading || !chatInput.trim()}
+                style={{ padding: '10px 14px', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', border: 'none', borderRadius: '10px', color: 'white', cursor: 'pointer', fontSize: '1rem', opacity: (!chatInput.trim() || isChatLoading) ? 0.4 : 1, transition: 'opacity 0.2s' }}
+              >
+                ➤
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsChatOpen(prev => !prev)}
+          style={{
+            width: '58px', height: '58px', borderRadius: '50%', border: 'none', cursor: 'pointer',
+            background: 'linear-gradient(135deg, #a855f7, #3b82f6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: isChatOpen ? '1.5rem' : '1.75rem',
+            boxShadow: '0 8px 30px rgba(168,85,247,0.5)',
+            transition: 'all 0.3s ease',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.12)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(168,85,247,0.7)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(168,85,247,0.5)'; }}
+          title={isChatOpen ? 'Đóng chat' : 'Chat với RentBot AI'}
+        >
+          {isChatOpen ? '✕' : '🤖'}
+        </button>
+      </div>
     </div>
   );
 }

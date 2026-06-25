@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, IsNumber } from 'class-validator';
 
 export class RegisterDto {
   @IsEmail({}, { message: 'Email không hợp lệ' })
@@ -18,32 +18,11 @@ export class RegisterDto {
   @IsOptional()
   phone?: string;
 
-  @IsString({ message: 'Vai trò không hợp lệ' })
+  @IsString({ message: 'ID Phòng không hợp lệ' })
   @IsOptional()
-  role?: 'TENANT' | 'LANDLORD' | 'ADMIN';
+  desiredRoomId?: string;
 
-  // Landlord Business Entity Info (Chỉ bắt buộc nếu role là LANDLORD)
-  @IsString({ message: 'Tên nhà trọ / Thương hiệu phải là chuỗi ký tự' })
+  @IsNumber({}, { message: 'Số lượng thành viên phải là số' })
   @IsOptional()
-  landlordName?: string;
-
-  @IsString({ message: 'Số điện thoại nhà trọ phải là chuỗi ký tự' })
-  @IsOptional()
-  landlordPhone?: string;
-
-  @IsString({ message: 'Địa chỉ nhà trọ phải là chuỗi ký tự' })
-  @IsOptional()
-  landlordAddress?: string;
-
-  @IsString({ message: 'Tên Ngân hàng phải là chuỗi ký tự (VD: MBBank)' })
-  @IsOptional()
-  bankName?: string;
-
-  @IsString({ message: 'Số tài khoản phải là chuỗi ký tự' })
-  @IsOptional()
-  bankAccountNumber?: string;
-
-  @IsString({ message: 'Tên tài khoản phải là chuỗi ký tự' })
-  @IsOptional()
-  bankAccountName?: string;
+  memberCount?: number;
 }

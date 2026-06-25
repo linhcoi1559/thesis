@@ -56,18 +56,69 @@ export class RentRequestService {
    * Retrieve all requests for a specific landlord (Dashboard query)
    */
   async findAllByLandlord(landlordId: string) {
-    return this.prisma.rentRequest.findMany({
+    const requests = await this.prisma.rentRequest.findMany({
       where: { landlordId },
-      include: {
-        room: {
-          select: {
-            roomNumber: true,
-          },
-        },
+      include: { room: { select: { roomNumber: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (requests.length === 0) return requests;
+
+    const emails = requests.map(req => req.email.toLowerCase());
+    
+    // Find all matching tenants under this landlord
+    const existingUsers = await this.prisma.user.findMany({
+      where: {
+        email: { in: emails },
+        role: 'TENANT',
+        // In a true SaaS, emails might be unique globally. But let's verify context.
+        // The unique constraint is on `email` globally.
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      select: {
+        email: true,
+        status: true,
+      }
+    });
+
+    const userMap = new Map();
+    existingUsers.forEach(user => {
+      userMap.set(user.email.toLowerCase(), user.status);
+    });
+
+    return requests.map(req => {
+      const emailLower = req.email.toLowerCase();
+      if (userMap.has(emailLower)) {
+        return {
+          ...req,
+          hasExistingAccount: true,
+          existingUserStatus: userMap.get(emailLower),
+        };
+      }
+      return {
+        ...req,
+        hasExistingAccount: false,
+        existingUserStatus: null,
+      };
+    });
+  }
+
+  async updateStatus(landlordId: string, id: string, status: any) {
+    return this.prisma.rentRequest.updateMany({
+      where: { id, landlordId },
+      data: { status }
+    });
+  }
+
+  async update(landlordId: string, id: string, data: any) {
+    return this.prisma.rentRequest.updateMany({
+      where: { id, landlordId },
+      data
+    });
+  }
+
+  async remove(landlordId: string, id: string) {
+    return this.prisma.rentRequest.deleteMany({
+      where: { id, landlordId }
     });
   }
 }

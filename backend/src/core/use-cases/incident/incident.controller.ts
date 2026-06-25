@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Patch, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, UseGuards, Req, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { IncidentService } from './incident.service';
 import { CreateIncidentDto } from '../../../presentation/dtos/incident/create-incident.dto';
 import { UpdateIncidentStatusDto } from '../../../presentation/dtos/incident/update-incident-status.dto';
@@ -11,7 +11,16 @@ export class IncidentController {
 
   @Post()
   async create(@Req() req: any, @Body() dto: CreateIncidentDto) {
-    return this.incidentService.create(req.user.sub, dto);
+    try {
+      const tenantId = req.user.sub; 
+      return await this.incidentService.create(tenantId, dto);
+    } catch (err: any) {
+      console.error('TEST ERROR:', err);
+      if (err.name === 'NotFoundException' || err.status === 404) {
+        throw err;
+      }
+      throw new BadRequestException('BẮT LỖI: ' + (err.stack || err.message));
+    }
   }
 
   @Get()

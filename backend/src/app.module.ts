@@ -14,6 +14,7 @@ import { OcrModule } from './core/use-cases/ocr/ocr.module';
 import { UploadModule } from './core/use-cases/upload/upload.module';
 import { PdfModule } from './core/use-cases/pdf/pdf.module';
 import { AiModule } from './core/use-cases/ai/ai.module';
+import { ViolationModule } from './core/use-cases/violation/violation.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { AiModule } from './core/use-cases/ai/ai.module';
     UploadModule,
     PdfModule,
     AiModule,
+    ViolationModule,
   ],
   providers: [NotificationGateway],
 })

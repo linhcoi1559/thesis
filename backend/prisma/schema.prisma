@@ -39,6 +39,13 @@ enum RentRequestStatus {
   CANCELLED
 }
 
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  BANNED
+}
+
 model User {
   id             String     @id @default(uuid())
   email          String     @unique
@@ -46,6 +53,7 @@ model User {
   name           String
   phone          String?
   role           Role       @default(TENANT)
+  status         UserStatus @default(PENDING)
   
   // Relates to the landlord they belong to (null for System Admins and Landlords themselves)
   landlordId     String?
@@ -54,11 +62,19 @@ model User {
   // If the User is a LANDLORD, they own these landlord business profile(s)
   ownedLandlords Landlord[] @relation("LandlordOwner")
   
+  // Registration preferences
+  desiredRoomId  String?
+  desiredRoom    Room?      @relation("DesiredRoom", fields: [desiredRoomId], references: [id], onDelete: SetNull)
+  memberCount    Int?
+  
   // Contracts where this user is the Tenant
   contracts      Contract[] @relation("TenantContracts")
   
   // Incidents reported by this user
   reportedIncidents Incident[] @relation("TenantIncidents")
+  
+  // Violations reported against this tenant
+  violations     Violation[] @relation("TenantViolations")
   
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
@@ -87,6 +103,7 @@ model Landlord {
   invoices     Invoice[]
   rentRequests RentRequest[] // New relation for consultation requests
   incidents    Incident[]
+  violations   Violation[]   @relation("LandlordViolations")
   
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -110,6 +127,7 @@ model Room {
   contracts    Contract[]
   rentRequests RentRequest[] // New relation for room-specific consultations
   incidents    Incident[]
+  desiredByUsers User[]      @relation("DesiredRoom")
   
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -132,7 +150,11 @@ model Contract {
   endDate        DateTime
   deposit        Decimal
   rentalPrice    Decimal
+  electricityPrice Decimal      @default(3000)
+  waterPrice     Decimal        @default(20000)
+  memberCount    Int            @default(1)
   status         ContractStatus @default(ACTIVE)
+  autoPayEnabled Boolean        @default(false)
   
   // Multi-tenant scoped relation
   landlordId     String
@@ -157,6 +179,9 @@ model Invoice {
   contract      Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
   
   amount        Decimal
+  electricityCost Decimal?
+  waterCost     Decimal?
+  otherCost     Decimal?
   dueDate       DateTime
   paidDate      DateTime?
   status        InvoiceStatus @default(UNPAID)
@@ -235,4 +260,22 @@ model Incident {
   @@index([reporterId])
   @@index([roomId])
   @@index([status])
+}
+
+model Violation {
+  id          String   @id @default(uuid())
+  description String
+  status      String   @default("PENDING") // PENDING, RESOLVED
+  
+  tenantId    String
+  tenant      User     @relation("TenantViolations", fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  landlordId  String
+  landlord    Landlord @relation("LandlordViolations", fields: [landlordId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([landlordId])
 }

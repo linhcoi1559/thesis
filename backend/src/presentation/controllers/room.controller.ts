@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseInterceptors, UploadedFile, BadRequestException, UseGuards, Req } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RoomService } from '../../core/use-cases/room/room.service';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 
@@ -21,10 +22,20 @@ const storage = diskStorage({
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
+  @Get('public')
+  async getPublicRooms() {
+    return this.roomService.getPublicRooms();
+  }
+
   @Get()
-  async getRooms(@Query('landlordId') landlordId: string) {
+  @UseGuards(JwtAuthGuard)
+  async getRooms(@Query('landlordId') queryLandlordId: string, @Req() req: any) {
+    const landlordId = req.user?.landlordId || req.user?.sub || queryLandlordId;
+    console.log('GET /rooms - landlordId:', landlordId);
     if (!landlordId) return [];
-    return this.roomService.getRoomsByLandlord(landlordId);
+    const rooms = await this.roomService.getRoomsByLandlord(landlordId);
+    console.log('Found rooms:', rooms.length);
+    return rooms;
   }
 
   @Post()

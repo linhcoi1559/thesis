@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../../../infrastructure/database/prisma/prisma.service';
 import { CreateIncidentDto } from '../../../presentation/dtos/incident/create-incident.dto';
 import { UpdateIncidentStatusDto } from '../../../presentation/dtos/incident/update-incident-status.dto';
@@ -17,27 +17,44 @@ export class IncidentService {
       select: { landlordId: true, name: true },
     });
 
-    if (!tenant || !tenant.landlordId) {
+    let landlordId = tenant?.landlordId;
+    if (!landlordId) {
+       const contract = await this.prisma.contract.findFirst({
+          where: { tenantId, roomId: dto.roomId }
+       });
+       landlordId = contract?.landlordId;
+    }
+
+    if (!landlordId) {
       throw new NotFoundException('Khách thuê không hợp lệ hoặc chưa thuộc nhà trọ nào');
     }
 
-    const incident = await this.prisma.incident.create({
-      data: {
-        title: dto.title,
-        description: dto.description,
-        priority: dto.priority || 'LOW',
-        roomId: dto.roomId,
-        reporterId: tenantId,
-        landlordId: tenant.landlordId,
-      },
-    });
+    let incident;
+    try {
+      incident = await this.prisma.incident.create({
+        data: {
+          title: dto.title,
+          description: dto.description,
+          priority: dto.priority || 'LOW',
+          roomId: dto.roomId,
+          reporterId: tenantId,
+          landlordId: landlordId,
+        },
+      });
+    } catch (err: any) {
+      throw new InternalServerErrorException('Lỗi CSDL: ' + err.message);
+    }
 
     // Phát thông báo Real-time cho Chủ trọ
-    this.notificationGateway.sendNotificationToLandlord(
-      tenant.landlordId,
-      'Sự cố mới được báo cáo',
-      `Khách thuê ${tenant.name} vừa báo sự cố mới: ${dto.title}`,
-    );
+    try {
+      this.notificationGateway.sendNotificationToLandlord(
+        landlordId,
+        'Sự cố mới được báo cáo',
+        `Khách thuê ${tenant?.name || 'Vô danh'} vừa báo sự cố mới: ${dto.title}`,
+      );
+    } catch (err) {
+      console.error('Failed to send notification to landlord', err);
+    }
 
     return incident;
   }

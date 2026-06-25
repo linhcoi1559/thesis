@@ -13,7 +13,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { toast } = useToast();
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -27,7 +27,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     }
   }, [user, loading, router, toast]);
 
-  const token = (typeof window !== 'undefined' ? localStorage.getItem('admin_access_token') : '') || 'demo-token';
+  const { token: authToken } = useAuth();
+  const token = authToken || 'demo-token';
 
   const { on, isConnected } = useSocket({
     token,
@@ -35,7 +36,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   });
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !user) return;
+
+    const landlordId = user.landlordId || user.id;
 
     const unsubscribe = on('new-rent-request', (newRequest: any) => {
       toast({
@@ -45,90 +48,114 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       });
     });
 
+    const unsubscribePayment = on(`notification-landlord-${landlordId}`, (notification: any) => {
+      toast({
+        title: notification.title || '💰 Thông báo',
+        description: notification.message,
+        duration: 8000,
+      });
+    });
+
     return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
+      if (unsubscribe) unsubscribe();
+      if (unsubscribePayment) unsubscribePayment();
     };
-  }, [on, token, toast]);
+  }, [on, token, user, toast]);
 
   if (loading || !user || user.role === 'TENANT') {
-    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)' }}>Đang kiểm tra quyền truy cập...</div>;
+    return <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-light-base)' }}>Đang kiểm tra quyền truy cập...</div>;
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-base)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-light-base)', color: 'var(--text-light-main)', fontFamily: 'Outfit, sans-serif' }}>
       {/* Sidebar Navigation */}
       <aside 
-        className="glass-panel" 
+        className="neo-sidebar" 
         style={{ 
           width: 'var(--sidebar-width)', 
-          margin: '20px', 
-          marginRight: '0',
-          padding: '24px',
           display: 'flex',
           flexDirection: 'column',
           position: 'sticky',
-          top: '20px',
-          height: 'calc(100vh - 40px)'
+          top: 0,
+          height: '100vh',
+          padding: '24px'
         }}
       >
-        <div style={{ fontWeight: '800', fontSize: '1.25rem', marginBottom: '40px' }} className="text-gradient">
-          Smart Boarding House
+        <div style={{ fontWeight: '800', fontSize: '1.5rem', marginBottom: '40px', color: 'var(--primary)', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ background: 'var(--primary)', color: 'white', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px' }}>S</span>
+          SaaS Rent
         </div>
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <a href="/admin" style={{ padding: '12px 16px', borderRadius: '8px', fontWeight: '500', transition: 'all 0.2s', background: 'rgba(255,255,255,0.05)' }}>
+          <a href="/admin" style={{ padding: '12px 16px', borderRadius: '12px', fontWeight: '600', transition: 'all 0.2s', background: 'rgba(79, 70, 229, 0.1)', color: 'var(--primary)' }}>
             Dashboard
           </a>
-          <a href="/admin/rooms" style={{ padding: '12px 16px', borderRadius: '8px', fontWeight: '500', transition: 'all 0.2s', opacity: 0.7 }}>
+          <a href="/admin/rooms" style={{ padding: '12px 16px', borderRadius: '12px', fontWeight: '500', transition: 'all 0.2s', color: 'var(--text-light-muted)' }} onMouseOver={e => { e.currentTarget.style.background = 'var(--bg-light-surface-alt)'; e.currentTarget.style.color = 'var(--text-light-main)' }} onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-light-muted)' }}>
             Quản lý phòng
           </a>
-          <a href="/admin/tenants" style={{ padding: '12px 16px', borderRadius: '8px', fontWeight: '500', transition: 'all 0.2s', opacity: 0.7 }}>
+          <a href="/admin/tenants" style={{ padding: '12px 16px', borderRadius: '12px', fontWeight: '500', transition: 'all 0.2s', color: 'var(--text-light-muted)' }} onMouseOver={e => { e.currentTarget.style.background = 'var(--bg-light-surface-alt)'; e.currentTarget.style.color = 'var(--text-light-main)' }} onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-light-muted)' }}>
             Khách thuê
           </a>
-          <a href="/admin/contracts" style={{ padding: '12px 16px', borderRadius: '8px', fontWeight: '500', transition: 'all 0.2s', opacity: 0.7 }}>
+          <a href="/admin/contracts" style={{ padding: '12px 16px', borderRadius: '12px', fontWeight: '500', transition: 'all 0.2s', color: 'var(--text-light-muted)' }} onMouseOver={e => { e.currentTarget.style.background = 'var(--bg-light-surface-alt)'; e.currentTarget.style.color = 'var(--text-light-main)' }} onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-light-muted)' }}>
             Hợp đồng
           </a>
-          <a href="/admin/invoices" style={{ padding: '12px 16px', borderRadius: '8px', fontWeight: '500', transition: 'all 0.2s', opacity: 0.7 }}>
+          <a href="/admin/invoices" style={{ padding: '12px 16px', borderRadius: '12px', fontWeight: '500', transition: 'all 0.2s', color: 'var(--text-light-muted)' }} onMouseOver={e => { e.currentTarget.style.background = 'var(--bg-light-surface-alt)'; e.currentTarget.style.color = 'var(--text-light-main)' }} onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-light-muted)' }}>
             Hóa đơn
           </a>
         </nav>
+        
+        <div style={{ marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid var(--border-light)' }}>
+          <button 
+            onClick={logout}
+            style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontWeight: '600', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+          >
+            Đăng xuất
+          </button>
+        </div>
       </aside>
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '20px' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <header 
-          className="glass-header"
+          className="neo-header"
           style={{ 
             height: 'var(--header-height)', 
-            borderRadius: '16px',
-            padding: '0 24px',
+            padding: '0 32px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '20px'
+            position: 'sticky',
+            top: 0,
+            zIndex: 10
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.875rem' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Trạng thái kết nối:</span>
+            <span style={{ color: 'var(--text-light-muted)', fontWeight: '500' }}>Trạng thái:</span>
             {isConnected ? (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '999px', background: 'var(--status-success-bg)', color: 'var(--status-success-text)', fontWeight: '500' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: 'var(--status-success-bg)', color: 'var(--status-success-text)', fontWeight: '600' }}>
                 <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px #22c55e' }}></span>
-                Đang trực tuyến
+                Trực tuyến
               </span>
             ) : (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '999px', background: 'var(--status-error-bg)', color: 'var(--status-error-text)', fontWeight: '500' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: 'var(--status-error-bg)', color: 'var(--status-error-text)', fontWeight: '600' }}>
                 <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ef4444' }}></span>
                 Mất kết nối
               </span>
             )}
           </div>
-          <div style={{ fontWeight: '600', fontSize: '0.95rem' }}>
-            Chủ trọ Dashboard
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-light-main)' }}>{user.name}</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-light-muted)' }}>Quản trị viên</div>
+            </div>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+              {user.name ? user.name.charAt(0).toUpperCase() : 'A'}
+            </div>
           </div>
         </header>
 
-        <main style={{ flex: 1, overflowY: 'auto' }}>
+        <main style={{ flex: 1, padding: '32px', overflowY: 'auto' }}>
           {children}
         </main>
       </div>

@@ -14,7 +14,7 @@ export class AuthService {
   ) {}
 
   /**
-   * Registers a new Landlord account and sets up their Tenant/Landlord business entity
+   * Registers a new Tenant account
    */
   async register(dto: RegisterDto) {
     const existingUser = await this.prisma.user.findUnique({
@@ -27,73 +27,25 @@ export class AuthService {
 
     try {
       const hashedPassword = await bcrypt.hash(dto.password, 10);
-      const role = dto.role === 'LANDLORD' || dto.role === 'ADMIN' ? dto.role : Role.TENANT;
+      
+      // Find the default mock landlord to assign globally registered tenants
+      const defaultLandlord = await this.prisma.landlord.findFirst();
 
-      if (role === Role.TENANT) {
-        // Find the default mock landlord to assign globally registered tenants
-        const defaultLandlord = await this.prisma.landlord.findFirst();
-
-        // Create user as Tenant
-        const user = await this.prisma.user.create({
-          data: {
-            email: dto.email.toLowerCase(),
-            password: hashedPassword,
-            name: dto.name,
-            phone: dto.phone,
-            role,
-            landlordId: defaultLandlord?.id || null, // Auto assign to default landlord
-          },
-        });
-        return { message: 'Đăng ký tài khoản khách thuê thành công', data: { user } };
-      }
-
-      // Run transactional queries to resolve the mutual link: User <-> Landlord
-      const result = await this.prisma.$transaction(async (tx) => {
-        // Step 1: Create the User account with role LANDLORD (without landlordId temporarily)
-        const user = await tx.user.create({
-          data: {
-            email: dto.email.toLowerCase(),
-            password: hashedPassword,
-            name: dto.name,
-            phone: dto.phone,
-            role,
-          },
-        });
-
-        // Step 2: Create the Landlord business profile owned by the created User
-        const landlord = await tx.landlord.create({
-          data: {
-            name: dto.landlordName || 'Chủ Trọ Mới',
-            phone: dto.landlordPhone || dto.phone,
-            address: dto.landlordAddress,
-            bankName: dto.bankName,
-            bankAccountNumber: dto.bankAccountNumber,
-            bankAccountName: dto.bankAccountName,
-            ownerId: user.id,
-          },
-        });
-
-        // Step 3: Update the User account to associate it with the Landlord tenancy ID
-        const updatedUser = await tx.user.update({
-          where: { id: user.id },
-          data: { landlordId: landlord.id },
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            role: true,
-            landlordId: true,
-            createdAt: true,
-          },
-        });
-
-        return { user: updatedUser, landlord };
+      // Create user as Tenant
+      const user = await this.prisma.user.create({
+        data: {
+          email: dto.email.toLowerCase(),
+          password: hashedPassword,
+          name: dto.name,
+          phone: dto.phone,
+          role: Role.TENANT,
+          landlordId: defaultLandlord?.id || null, // Auto assign to default landlord
+          desiredRoomId: dto.desiredRoomId,
+          memberCount: dto.memberCount,
+        },
       });
+      return { message: 'Đăng ký tài khoản khách thuê thành công', data: { user } };
 
-      return {
-        message: 'Đăng ký tài khoản chủ trọ thành công',
-        data: result,
-      };
     } catch (error) {
       throw new InternalServerErrorException(
         'Đã xảy ra lỗi trong quá trình tạo tài khoản, vui lòng thử lại sau',
@@ -118,12 +70,24 @@ export class AuthService {
       throw new UnauthorizedException('Email hoặc mật khẩu không chính xác');
     }
 
+    // If the user is a LANDLORD, they own a landlord profile. We need to inject that ID.
+    let actualLandlordId = user.landlordId;
+    if (user.role === 'LANDLORD') {
+      const landlordProfile = await this.prisma.landlord.findFirst({
+        where: { ownerId: user.id }
+      });
+      if (landlordProfile) {
+        actualLandlordId = landlordProfile.id;
+      }
+    }
+
     // JWT payload construction
     const payload = {
       sub: user.id,
       email: user.email,
       role: user.role,
-      landlordId: user.landlordId, // Injected to authorize multi-tenant requests
+      status: user.status,
+      landlordId: actualLandlordId, // Injected to authorize multi-tenant requests
     };
 
     return {
@@ -135,7 +99,8 @@ export class AuthService {
           email: user.email,
           name: user.name,
           role: user.role,
-          landlordId: user.landlordId,
+          status: user.status,
+          landlordId: actualLandlordId,
         },
       },
     };

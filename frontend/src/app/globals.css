@@ -2,14 +2,14 @@
 @import "tailwindcss";
 
 :root {
-  /* Color Palette */
-  --bg-base: #0B0A10;
-  --bg-surface: rgba(22, 20, 31, 0.6);
-  --bg-surface-hover: rgba(35, 32, 48, 0.8);
+  /* Dark Theme Palette (Landing Page) */
+  --bg-base: #030014;
+  --bg-surface: rgba(13, 10, 31, 0.4);
+  --bg-surface-hover: rgba(35, 32, 48, 0.6);
   
-  --primary-glow: rgba(99, 102, 241, 0.5);
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
+  --primary-glow: rgba(79, 70, 229, 0.3);
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
   
   --accent: #a855f7;
   --accent-hover: #9333ea;
@@ -18,22 +18,33 @@
   --text-muted: #94a3b8;
   
   --border-color: rgba(255, 255, 255, 0.08);
+
+  /* Light Theme Palette (Dashboards) */
+  --bg-light-base: #F8FAFC;
+  --bg-light-surface: #FFFFFF;
+  --bg-light-surface-alt: #F1F5F9;
+  
+  --text-light-main: #0F172A;
+  --text-light-muted: #64748B;
+  
+  --border-light: #E2E8F0;
   
   /* Status Colors */
   --status-pending-bg: rgba(234, 179, 8, 0.15);
-  --status-pending-text: #fde047;
+  --status-pending-text: #eab308;
   --status-success-bg: rgba(34, 197, 94, 0.15);
-  --status-success-text: #86efac;
+  --status-success-text: #22c55e;
   --status-error-bg: rgba(239, 68, 68, 0.15);
-  --status-error-text: #fca5a5;
+  --status-error-text: #ef4444;
 
-  /* Glassmorphism */
-  --glass-blur: 16px;
-  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  /* Glassmorphism & Shadow */
+  --glass-blur: 24px;
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.5);
+  --neo-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   
   /* Layout */
-  --sidebar-width: 280px;
+  --sidebar-width: 260px;
   --header-height: 72px;
 }
 
@@ -74,21 +85,55 @@ input, textarea {
   font-family: inherit;
 }
 
-/* Glassmorphism Utilities */
+/* Glassmorphism Utilities (Dark Theme) */
 .glass-panel {
   background: var(--bg-surface);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: var(--glass-border);
-  border-radius: 16px;
+  border-radius: 20px;
   box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+  background: var(--bg-surface-hover);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .glass-header {
-  background: rgba(11, 10, 16, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(3, 0, 20, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-bottom: var(--glass-border);
+}
+
+/* Neo SaaS Utilities (Light Theme) */
+.neo-card {
+  background: var(--bg-light-surface);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  box-shadow: var(--neo-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.neo-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+  transform: translateY(-2px);
+  border-color: #CBD5E1;
+}
+
+.neo-header {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Sidebar Specific */
+.neo-sidebar {
+  background: var(--bg-light-surface);
+  border-right: 1px solid var(--border-light);
 }
 
 /* Typography */
@@ -104,39 +149,49 @@ input, textarea {
   background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
   color: white;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   display: inline-flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
-}
-
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%; width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: all 0.5s ease;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px -10px var(--primary);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
 }
 
-.btn-primary:hover::before {
-  left: 100%;
+.btn-primary:active {
+  transform: translateY(1px);
 }
 
 .btn-primary:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+.btn-light {
+  background: #FFFFFF;
+  color: var(--text-light-main);
+  border: 1px solid var(--border-light);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.btn-light:hover {
+  background: var(--bg-light-surface-alt);
+  border-color: #CBD5E1;
 }
 
 /* Form Controls */

@@ -24,6 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // The object returned here is automatically attached to the Request as req.user
     return {
       userId: payload.sub,
+      sub: payload.sub,
       email: payload.email,
       role: payload.role,
       landlordId: payload.landlordId, // Injected for multi-tenancy filters

@@ -4,6 +4,7 @@ export interface ToastOptions {
   title: string;
   description: string;
   duration?: number;
+  variant?: string;
 }
 
 // Simple pub/sub toast bus for demo purposes

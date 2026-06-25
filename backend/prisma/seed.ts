@@ -12,15 +12,20 @@ async function main() {
   const landlordId = 'e29d665b-efbe-40b3-bb66-df30bd5e8bf8';
 
   // Create an owner user if we don't have one
+  const bcrypt = require('bcrypt');
+  const hashedPassword = await bcrypt.hash('password123', 10);
   const owner = await prisma.user.upsert({
-    where: { email: 'landlord@demo.com' },
-    update: {},
+    where: { email: 'admin' },
+    update: {
+      password: hashedPassword
+    },
     create: {
-      email: 'landlord@demo.com',
-      password: 'hashedpassword',
-      name: 'Demo Landlord User',
+      email: 'admin',
+      password: hashedPassword,
+      name: 'Admin',
       role: 'LANDLORD',
     },
+
   });
 
   // Upsert the specific landlord

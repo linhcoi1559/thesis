@@ -1,8 +1,8 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class LoginDto {
-  @IsEmail({}, { message: 'Email không hợp lệ' })
-  @IsNotEmpty({ message: 'Email không được để trống' })
+  @IsString({ message: 'Tài khoản phải là chuỗi ký tự' })
+  @IsNotEmpty({ message: 'Tài khoản không được để trống' })
   email: string;
 
   @IsString({ message: 'Mật khẩu phải là chuỗi ký tự' })

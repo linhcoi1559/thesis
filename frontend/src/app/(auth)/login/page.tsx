@@ -9,6 +9,7 @@ import Link from 'next/link';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
@@ -29,11 +30,11 @@ export default function LoginPage() {
 
       if (response.ok) {
         toast({ title: 'Thành công', description: 'Đăng nhập thành công!', duration: 3000 });
-        login(data.data.access_token, data.data.user);
+        login(data.data.access_token, data.data.user, rememberMe);
         
         // Redirect based on role
         if (data.data.user.role === 'ADMIN' || data.data.user.role === 'LANDLORD') {
-          router.push('/dashboard');
+          router.push('/admin');
         } else {
           router.push('/tenant');
         }
@@ -61,12 +62,12 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
-            <label className="form-label">Email</label>
+            <label className="form-label">Tài khoản / Email</label>
             <input 
               required 
-              type="email" 
+              type="text" 
               className="form-input" 
-              placeholder="email@example.com"
+              placeholder="admin hoặc email@example.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
@@ -83,15 +84,25 @@ export default function LoginPage() {
             />
           </div>
 
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '-8px' }}>
+            <input 
+              type="checkbox" 
+              id="rememberMe" 
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }}
+            />
+            <label htmlFor="rememberMe" style={{ fontSize: '0.85rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
+              Ghi nhớ đăng nhập
+            </label>
+          </div>
+
           <button type="submit" disabled={loading} className="btn-primary" style={{ padding: '14px', marginTop: '10px' }}>
             {loading ? 'Đang xác thực...' : 'Đăng Nhập'}
           </button>
         </form>
 
-        <div style={{ marginTop: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          Chưa có tài khoản?{' '}
-          <Link href="/register" style={{ color: 'var(--primary)', fontWeight: '600' }}>Đăng ký ngay</Link>
-        </div>
+
         <div style={{ marginTop: '16px', textAlign: 'center' }}>
           <Link href="/" style={{ color: 'var(--text-muted)', textDecoration: 'underline', fontSize: '0.85rem' }}>Quay về trang chủ</Link>
         </div>

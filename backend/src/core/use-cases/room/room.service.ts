@@ -5,10 +5,27 @@ import { PrismaService } from '../../../infrastructure/database/prisma/prisma.se
 export class RoomService {
   constructor(private prisma: PrismaService) {}
 
-  async getRoomsByLandlord(landlordId: string) {
+  async getRoomsByLandlord(landlordIdOrOwnerId: string) {
+    // Try to find if the passed ID is an ownerId instead of landlordId (handles legacy tokens)
+    const landlord = await this.prisma.landlord.findFirst({
+      where: { ownerId: landlordIdOrOwnerId }
+    });
+    const actualLandlordId = landlord ? landlord.id : landlordIdOrOwnerId;
+
     return this.prisma.room.findMany({
       where: {
-        landlordId,
+        landlordId: actualLandlordId,
+      },
+      orderBy: {
+        roomNumber: 'asc',
+      },
+    });
+  }
+
+  async getPublicRooms() {
+    return this.prisma.room.findMany({
+      where: {
+        status: 'VACANT',
       },
       orderBy: {
         roomNumber: 'asc',

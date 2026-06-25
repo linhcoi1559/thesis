@@ -7,6 +7,7 @@ export const metadata = {
 };
 
 import { AuthProvider } from '../context/AuthContext';
+import { Toaster } from '../components/ui/Toaster';
 
 export default function RootLayout({
   children,
@@ -18,6 +19,7 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           {children}
+          <Toaster />
         </AuthProvider>
       </body>
     </html>

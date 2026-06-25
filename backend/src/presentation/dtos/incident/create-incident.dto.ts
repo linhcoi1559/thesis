@@ -1,5 +1,4 @@
-import { IsString, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
-import { IncidentPriority } from '@prisma/client';
+import { IsString, IsNotEmpty, IsOptional, IsIn } from 'class-validator';
 
 export class CreateIncidentDto {
   @IsString()
@@ -14,7 +13,7 @@ export class CreateIncidentDto {
   @IsNotEmpty()
   roomId: string;
 
-  @IsEnum(IncidentPriority)
   @IsOptional()
-  priority?: IncidentPriority;
+  @IsIn(['LOW', 'MEDIUM', 'HIGH'])
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH';
 }

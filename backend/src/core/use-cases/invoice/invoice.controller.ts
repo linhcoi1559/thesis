@@ -38,4 +38,10 @@ export class InvoiceController {
     const landlordId = req.user.landlordId || req.user.sub;
     return this.invoiceService.updateStatus(id, landlordId, dto);
   }
+
+  @Post(':id/pay')
+  @Roles(Role.TENANT)
+  async pay(@Req() req: any, @Param('id') id: string) {
+    return this.invoiceService.pay(id, req.user.sub);
+  }
 }

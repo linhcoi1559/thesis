@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Delete, Param, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Param, Body, UseGuards, HttpCode, HttpStatus, Patch } from '@nestjs/common';
 import { TenantService } from '../../core/use-cases/tenant/tenant.service';
 import { CreateTenantDto } from '../dtos/tenant/create-tenant.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -33,5 +33,14 @@ export class TenantController {
     @Param('id') tenantId: string,
   ) {
     return this.tenantService.remove(landlordId, tenantId);
+  }
+
+  @Patch(':id/status')
+  async updateStatus(
+    @CurrentUser('landlordId') landlordId: string,
+    @Param('id') tenantId: string,
+    @Body('status') status: string,
+  ) {
+    return this.tenantService.updateStatus(landlordId, tenantId, status);
   }
 }
