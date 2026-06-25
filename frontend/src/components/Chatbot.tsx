@@ -1,7 +1,8 @@
+
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Bot } from 'lucide-react';
+import { X, Send, Bot } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface TenantContext {
@@ -34,12 +35,16 @@ const QUICK_QUESTIONS = [
 export default function Chatbot({ tenantContext }: ChatbotProps) {
   const { token } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<{ role: 'user' | 'bot'; text: string }[]>([
+    const [messages, setMessages] = useState<{ role: 'user' | 'bot'; text: string }[]>([
     {
       role: 'bot',
       text: tenantContext?.tenantName
-        ? `Xin chào **${tenantContext.tenantName}**! 👋 Tôi là trợ lý AI cá nhân của bạn.\n\nTôi biết thông tin phòng, hóa đơn và hợp đồng của bạn — hãy hỏi tôi bất kỳ điều gì!`
-        : 'Xin chào! Tôi là Trợ lý AI của nhà trọ. Tôi có thể giúp gì cho bạn?',
+        ? `Xin chào **${tenantContext.tenantName}**! 👋 Tôi là trợ lý AI cá nhân của bạn.
+
+Tôi biết thông tin phòng, hóa đơn và hợp đồng của bạn — hãy hỏi tôi bất kỳ điều gì!`
+        : `Xin chào! 👋 Tôi là RentBot, trợ lý AI của Smart Boarding House.
+
+Tôi có thể giúp bạn tìm phòng phù hợp, tư vấn giá cả và thời gian thuê tốt nhất. Bạn muốn hỏi gì?`,
     },
   ]);
   const [input, setInput] = useState('');
@@ -59,7 +64,6 @@ export default function Chatbot({ tenantContext }: ChatbotProps) {
     setIsLoading(true);
 
     try {
-      // Dùng endpoint mới nếu có context, fallback về endpoint cũ
       const endpoint = tenantContext ? 'http://localhost:3000/ai/tenant-chat' : 'http://localhost:3000/ai/chat';
       const body = tenantContext
         ? { message: userMsg, tenantContext }
@@ -81,7 +85,7 @@ export default function Chatbot({ tenantContext }: ChatbotProps) {
         setMessages(prev => [...prev, { role: 'bot', text: data.message || 'Xin lỗi, đã có lỗi xảy ra.' }]);
       }
     } catch {
-      setMessages(prev => [...prev, { role: 'bot', text: 'Xin lỗi, không thể kết nối tới máy chủ.' }]);
+      setMessages(prev => [...prev, { role: 'bot', text: '💤 Lỗi kết nối. Vui lòng thử lại.' }]);
     } finally {
       setIsLoading(false);
     }
@@ -90,80 +94,98 @@ export default function Chatbot({ tenantContext }: ChatbotProps) {
   const hasContext = !!tenantContext;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      {/* Toggle Button */}
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="relative bg-indigo-600 hover:bg-indigo-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all transform hover:scale-105"
-          title="Chat với Trợ lý AI"
-        >
-          <MessageSquare size={24} />
-          {/* Pulse indicator nếu có context */}
-          {hasContext && (
-            <span className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse" />
-          )}
-        </button>
-      )}
-
-      {/* Chat Window */}
+    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+      {/* Chat Panel */}
       {isOpen && (
-        <div className="bg-white w-80 sm:w-96 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200">
-          {/* Header */}
-          <div className="bg-indigo-600 text-white px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bot size={20} />
-              <div>
-                <span className="font-medium block text-sm">
-                  {hasContext ? `Trợ lý cá nhân` : 'SaaS Rent Assistant'}
-                </span>
-                {hasContext && tenantContext?.contract && (
-                  <span className="text-indigo-200 text-xs">
-                    Phòng {tenantContext.contract.roomNumber} • Đang thuê
-                  </span>
-                )}
+        <div
+          style={{
+            width: '380px', height: '560px',
+            background: 'rgba(20, 20, 30, 0.65)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderRadius: '24px',
+            border: '1px solid rgba(255,255,255,0.08)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+            display: 'flex', flexDirection: 'column',
+            overflow: 'hidden',
+            marginBottom: '20px',
+            animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+        >
+          {/* Chat Header */}
+          <div style={{ padding: '16px 20px', background: 'linear-gradient(135deg, rgba(168,85,247,0.4), rgba(59,130,246,0.3))', borderBottom: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                  <Bot size={20} />
+                </div>
+                <div>
+                  <div style={{ color: 'white', fontWeight: 'bold', fontSize: '1rem', letterSpacing: '0.3px' }}>
+                    {hasContext ? 'Trợ lý cá nhân' : 'RentBot AI'}
+                  </div>
+                  <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80', display: 'inline-block' }}></span>
+                    {hasContext && tenantContext?.contract ? `Phòng ${tenantContext.contract.roomNumber} • Đang thuê` : 'Trực tuyến • Tư vấn thuê phòng'}
+                  </div>
+                </div>
               </div>
+              <button onClick={() => setIsOpen(false)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '1.1rem', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={18} /></button>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white">
-              <X size={20} />
-            </button>
           </div>
 
           {/* Messages */}
-          <div className="p-4 h-72 overflow-y-auto bg-gray-50 flex flex-col gap-3">
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {messages.map((msg, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', gap: '8px', alignItems: 'flex-end' }}>
+                {msg.role === 'bot' && (
+                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', color: 'white', flexShrink: 0 }}>
+                    <Bot size={14} />
+                  </div>
+                )}
                 <div
-                  className={`max-w-[82%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
-                    msg.role === 'user'
-                      ? 'bg-indigo-600 text-white rounded-tr-none'
-                      : 'bg-white text-gray-800 border border-gray-200 rounded-tl-none shadow-sm'
-                  }`}
+                  style={{
+                    maxWidth: '80%',
+                    padding: '10px 14px',
+                    borderRadius: '16px',
+                    borderBottomLeftRadius: msg.role === 'bot' ? '4px' : '16px',
+                    borderBottomRightRadius: msg.role === 'user' ? '4px' : '16px',
+                    background: msg.role === 'user' ? 'linear-gradient(135deg, #a855f7, #3b82f6)' : 'rgba(255,255,255,0.06)',
+                    color: 'white',
+                    fontSize: '0.88rem',
+                    lineHeight: '1.5',
+                    border: msg.role === 'user' ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                    whiteSpace: 'pre-wrap',
+                  }}
                 >
-                  {msg.text.replace(/\*\*(.*?)\*\*/g, '$1')}
+                  {msg.text.replace(/\*\*(.*?)\*\*/g, '')}
                 </div>
               </div>
             ))}
             {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-none px-4 py-3 text-sm shadow-sm flex items-center gap-1.5">
-                  <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" />
-                  <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                  <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', color: 'white' }}><Bot size={14} /></div>
+                <div style={{ padding: '10px 14px', borderRadius: '16px', borderBottomLeftRadius: '4px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <span style={{ width: '6px', height: '6px', background: 'rgba(255,255,255,0.6)', borderRadius: '50%', animation: 'pulse 1s infinite' }}></span>
+                    <span style={{ width: '6px', height: '6px', background: 'rgba(255,255,255,0.6)', borderRadius: '50%', animation: 'pulse 1s infinite 0.2s' }}></span>
+                    <span style={{ width: '6px', height: '6px', background: 'rgba(255,255,255,0.6)', borderRadius: '50%', animation: 'pulse 1s infinite 0.4s' }}></span>
+                  </div>
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Questions - chỉ hiện lúc đầu */}
+          {/* Quick Questions */}
           {messages.length <= 1 && hasContext && (
-            <div className="px-3 pb-2 pt-1 flex flex-wrap gap-1.5 bg-gray-50 border-t border-gray-100">
+            <div style={{ padding: '8px 16px', display: 'flex', flexWrap: 'wrap', gap: '6px', borderTop: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
               {QUICK_QUESTIONS.map(q => (
                 <button
                   key={q}
                   onClick={() => handleSend(q)}
-                  className="text-xs px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100 transition-colors whitespace-nowrap"
+                  style={{ padding: '5px 11px', borderRadius: '999px', fontSize: '0.72rem', cursor: 'pointer', background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.3)', color: '#c084fc', transition: 'all 0.2s', whiteSpace: 'nowrap' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.25)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.12)'; }}
                 >
                   {q}
                 </button>
@@ -172,26 +194,43 @@ export default function Chatbot({ tenantContext }: ChatbotProps) {
           )}
 
           {/* Input */}
-          <div className="p-3 bg-white border-t border-gray-100 flex items-center gap-2">
+          <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: '8px', flexShrink: 0 }}>
             <input
-              type="text"
-              placeholder={hasContext ? 'Hỏi về hóa đơn, hợp đồng...' : 'Nhập tin nhắn...'}
               value={input}
               onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-              className="flex-1 bg-gray-100 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+              placeholder={hasContext ? "Hỏi về hóa đơn, hợp đồng..." : "Hỏi tôi bất kỳ điều gì..."}
               disabled={isLoading}
+              style={{ flex: 1, padding: '10px 14px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', color: 'white', fontSize: '0.82rem', outline: 'none' }}
             />
             <button
               onClick={() => handleSend()}
               disabled={isLoading || !input.trim()}
-              className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              style={{ padding: '10px 14px', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', border: 'none', borderRadius: '10px', color: 'white', cursor: 'pointer', fontSize: '1rem', opacity: (!input.trim() || isLoading) ? 0.4 : 1, transition: 'opacity 0.2s' }}
             >
               <Send size={18} />
             </button>
           </div>
         </div>
       )}
+
+      {/* Toggle Button */}
+      <button
+        onClick={() => setIsOpen(prev => !prev)}
+        style={{
+          width: '58px', height: '58px', borderRadius: '50%', border: 'none', cursor: 'pointer',
+          background: 'linear-gradient(135deg, #a855f7, #3b82f6)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '1.5rem', color: 'white',
+          boxShadow: '0 8px 30px rgba(168,85,247,0.5)',
+          transition: 'all 0.3s ease',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.12)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(168,85,247,0.7)'; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(168,85,247,0.5)'; }}
+        title={isOpen ? 'Đóng chat' : 'Chat với RentBot AI'}
+      >
+        {isOpen ? <X size={24} /> : <Bot size={28} />}
+      </button>
     </div>
   );
 }

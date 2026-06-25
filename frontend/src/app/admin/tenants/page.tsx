@@ -37,8 +37,7 @@ export default function TenantsPage() {
   const fetchTenants = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('http://localhost:3000/tenants', {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const res = await fetch('http://localhost:3000/tenants', { cache: "no-store", headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
         const data = await res.json();
@@ -59,9 +58,7 @@ export default function TenantsPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch('http://localhost:3000/tenants', {
-        method: 'POST',
-        headers: {
+      const res = await fetch('http://localhost:3000/tenants', { method: 'POST', cache: "no-store", headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -90,9 +87,7 @@ export default function TenantsPage() {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:3000/tenants/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+      const res = await fetch(`http://localhost:3000/tenants/${id}`, { method: 'DELETE', cache: "no-store", headers: { 'Authorization': `Bearer ${token}` }
       });
       
       if (res.ok) {
@@ -109,9 +104,7 @@ export default function TenantsPage() {
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/tenants/${id}/status`, {
-        method: 'PATCH',
-        headers: {
+      const res = await fetch(`http://localhost:3000/tenants/${id}/status`, { method: 'PATCH', cache: "no-store", headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },

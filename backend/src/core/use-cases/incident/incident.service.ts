@@ -86,9 +86,19 @@ export class IncidentService {
     });
     if (!incident) throw new NotFoundException('Sự cố không tồn tại');
 
-    return this.prisma.incident.update({
+    const updated = await this.prisma.incident.update({
       where: { id },
       data: { status: dto.status },
     });
+    
+    try {
+      this.notificationGateway.sendNotificationToUser(
+        incident.reporterId,
+        'Cập nhật sự cố',
+        `Sự cố "${incident.title}" đã được cập nhật trạng thái thành ${dto.status === 'RESOLVED' ? 'đã xử lý' : 'đang xử lý'}.`
+      );
+    } catch(err) {}
+
+    return updated;
   }
 }

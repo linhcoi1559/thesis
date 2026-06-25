@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
+import { useSocket } from '../../hooks/useSocket';
 import { useToast } from '../../components/ui/use-toast';
 import Chatbot from '../../components/Chatbot';
 import { LogOut, Home, AlertCircle, FileText, CheckCircle2, Users, Zap, Droplets, CreditCard, Clock } from 'lucide-react';
@@ -30,6 +31,27 @@ export default function TenantDashboard() {
   const [incidentDescription, setIncidentDescription] = useState('');
   const [incidentError, setIncidentError] = useState('');
 
+  const { on } = useSocket({ token: token || undefined, autoConnect: !!token });
+  
+  useEffect(() => {
+    if (!token || !user) return;
+    const unsubscribe = on(`notification-${user.id}`, (notification: any) => {
+      if (notification.title === 'Cập nhật sự cố') {
+        const fetchIncidentsOnly = async () => {
+          const res = await fetch('http://localhost:3000/incidents', { cache: "no-store", headers: { Authorization: `Bearer ${token}` } });
+          if (res.ok) {
+            const data = await res.json();
+            setIncidents(Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : []);
+          }
+        };
+        fetchIncidentsOnly();
+      }
+    });
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [on, token, user]);
+
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/login');
@@ -46,12 +68,14 @@ export default function TenantDashboard() {
       return;
     }
 
-    const fetchData = async () => {
+
+
+  const fetchData = async () => {
       if (!token) return;
       try {
         const [invRes, conRes] = await Promise.all([
-          fetch('http://localhost:3000/invoices', { headers: { Authorization: `Bearer ${token}` } }),
-          fetch('http://localhost:3000/contracts', { headers: { Authorization: `Bearer ${token}` } })
+          fetch('http://localhost:3000/invoices', { cache: "no-store", headers: { Authorization: `Bearer ${token}` } }),
+          fetch('http://localhost:3000/contracts', { cache: "no-store", headers: { Authorization: `Bearer ${token}` } })
         ]);
         if (invRes.ok) {
           const data = await invRes.json();
@@ -112,9 +136,7 @@ export default function TenantDashboard() {
 
   const handlePayInvoice = async (invoiceId: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/invoices/${invoiceId}/pay`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+      const res = await fetch(`http://localhost:3000/invoices/${invoiceId}/pay`, { method: 'POST', cache: "no-store", headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
         toast({ title: 'Thành công', description: 'Đã gửi thông báo thanh toán cho chủ trọ.' });
@@ -140,9 +162,7 @@ export default function TenantDashboard() {
     }
     
     try {
-      const res = await fetch('http://localhost:3000/incidents', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      const res = await fetch('http://localhost:3000/incidents', { method: 'POST', cache: "no-store", headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title: incidentType, description: incidentDescription, roomId })
       });
       if (res.ok) {
@@ -151,7 +171,7 @@ export default function TenantDashboard() {
         setIncidentDescription('');
         
         // Refresh incidents
-        const incRes = await fetch('http://localhost:3000/incidents', { headers: { Authorization: `Bearer ${token}` } });
+        const incRes = await fetch('http://localhost:3000/incidents', { cache: "no-store", headers: { Authorization: `Bearer ${token}` } });
         if (incRes.ok) {
           const data = await incRes.json();
           setIncidents(Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : []);
@@ -173,16 +193,16 @@ export default function TenantDashboard() {
     router.push('/login');
   };
 
-  if (loading || authLoading) return <div className="flex h-screen items-center justify-center bg-gray-50 text-gray-800">Đang tải...</div>;
+  if (loading || authLoading) return <div className="flex h-screen items-center justify-center bg-gray-50 ">Đang tải...</div>;
 
   if (user?.status === 'PENDING') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: 'var(--bg-light-base)' }}>
-        <div className="neo-card p-10 text-center max-w-md w-full animate-fade-in" style={{ borderTop: '4px solid #eab308' }}>
+      <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: 'transparent' }}>
+        <div className="glass-panel p-10 text-center max-w-md w-full animate-fade-in" style={{ borderTop: '4px solid #eab308' }}>
           <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-6 animate-pulse" />
-          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-light-main)' }}>Đang Chờ Phê Duyệt</h2>
-          <p className="mb-8" style={{ color: 'var(--text-light-muted)', lineHeight: '1.6' }}>Tài khoản của bạn đã đăng ký thành công. Hệ thống đang chờ chủ trọ xác nhận hợp đồng. Vui lòng quay lại sau.</p>
-          <button onClick={logout} className="btn-light w-full py-3" style={{ fontSize: '1rem' }}>Đăng Xuất</button>
+          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-main)' }}>Đang Chờ Phê Duyệt</h2>
+          <p className="mb-8" style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>Tài khoản của bạn đã đăng ký thành công. Hệ thống đang chờ chủ trọ xác nhận hợp đồng. Vui lòng quay lại sau.</p>
+          <button onClick={logout} className="btn-primary w-full py-3" style={{ fontSize: '1rem' }}>Đăng Xuất</button>
         </div>
       </div>
     );
@@ -193,20 +213,20 @@ export default function TenantDashboard() {
 
   
   return (
-    <div className="min-h-screen font-sans pb-24" style={{ background: 'var(--bg-light-base)', color: 'var(--text-light-main)' }}>
+    <div className="min-h-screen font-sans pb-24" style={{ background: 'transparent', color: 'var(--text-main)' }}>
       {/* Navbar */}
-      <header className="neo-header sticky top-0 z-10">
+      <header className="glass-header sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3 font-extrabold text-2xl" style={{ color: 'var(--primary)' }}>
+          <div className="flex items-center gap-3 font-extrabold text-2xl" style={{ color: 'white' }}>
             <Home strokeWidth={2.5} />
             <span>SaaS Rent</span>
           </div>
           <div className="flex items-center gap-4">
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-light-muted)' }}>Khách Thuê</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Khách Thuê</div>
               <div className="font-semibold">{user?.name}</div>
             </div>
-            <div style={{ width: '1px', height: '32px', background: 'var(--border-light)', margin: '0 8px' }}></div>
+            <div style={{ width: '1px', height: '32px', background: 'var(--border-color)', margin: '0 8px' }}></div>
             <button onClick={logout} className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Đăng xuất">
               <LogOut size={22} />
             </button>
@@ -217,7 +237,7 @@ export default function TenantDashboard() {
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8 animate-fade-in">
         <div className="flex justify-between items-center mb-2">
           <h1 className="text-3xl font-bold tracking-tight">Tổng Quan</h1>
-          <div style={{ fontSize: '0.9rem', color: 'var(--text-light-muted)', fontWeight: '500' }}>
+          <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '500' }}>
             {new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </div>
         </div>
@@ -228,7 +248,7 @@ export default function TenantDashboard() {
             {/* Left Column (Bento Box 1 & 2) */}
             <div className="md:col-span-7 space-y-8">
               {/* Thông tin phòng & Hợp đồng */}
-              <div className="neo-card p-8">
+              <div className="glass-panel p-8">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold flex items-center gap-2">
                     <Home className="text-indigo-600" size={24} /> Hợp Đồng Của Tôi
@@ -237,35 +257,35 @@ export default function TenantDashboard() {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-6">
-                  <div style={{ background: 'var(--bg-light-surface-alt)', padding: '20px', borderRadius: '16px' }}>
-                    <span style={{ color: 'var(--text-light-muted)', fontSize: '0.9rem', display: 'block', marginBottom: '4px' }}>Số Phòng</span>
-                    <span style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)' }}>{currentContract.room?.roomNumber || 'N/A'}</span>
+                  <div style={{ background: 'var(--bg-surface)', backdropFilter: 'blur(24px)', padding: '20px', borderRadius: '16px' }}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', display: 'block', marginBottom: '4px' }}>Số Phòng</span>
+                    <span style={{ fontSize: '2.5rem', fontWeight: '800', color: 'white' }}>{currentContract.room?.roomNumber || 'N/A'}</span>
                   </div>
-                  <div style={{ background: 'var(--bg-light-surface-alt)', padding: '20px', borderRadius: '16px' }}>
-                    <span style={{ color: 'var(--text-light-muted)', fontSize: '0.9rem', display: 'block', marginBottom: '4px' }}>Giá Thuê/Tháng</span>
+                  <div style={{ background: 'var(--bg-surface)', backdropFilter: 'blur(24px)', padding: '20px', borderRadius: '16px' }}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', display: 'block', marginBottom: '4px' }}>Giá Thuê/Tháng</span>
                     <span style={{ fontSize: '1.75rem', fontWeight: '700' }}>{Number(currentContract.rentalPrice).toLocaleString()} đ</span>
                   </div>
                 </div>
 
-                <div className="mt-6 space-y-4 pt-6 border-t" style={{ borderColor: 'var(--border-light)' }}>
+                <div className="mt-6 space-y-4 pt-6 border-t" style={{ borderColor: 'var(--border-color)' }}>
                   <div className="flex justify-between items-center">
-                    <span className="flex items-center gap-2" style={{ color: 'var(--text-light-muted)' }}><Clock size={18}/> Thời gian thuê:</span>
+                    <span className="flex items-center gap-2" style={{ color: 'var(--text-muted)' }}><Clock size={18}/> Thời gian thuê:</span>
                     <span className="font-semibold">{new Date(currentContract.startDate).toLocaleDateString('vi-VN')} - {new Date(currentContract.endDate).toLocaleDateString('vi-VN')}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="flex items-center gap-2" style={{ color: 'var(--text-light-muted)' }}><CreditCard size={18}/> Tiền cọc:</span>
+                    <span className="flex items-center gap-2" style={{ color: 'var(--text-muted)' }}><CreditCard size={18}/> Tiền cọc:</span>
                     <span className="font-semibold">{Number(currentContract.deposit || 0).toLocaleString()} đ</span>
                   </div>
                 </div>
               </div>
 
               {/* Báo Cáo Sự Cố */}
-              <div className="neo-card p-8">
+              <div className="glass-panel p-8">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold flex items-center gap-2">
                     <AlertCircle className="text-orange-500" size={24} /> Báo Cáo Sự Cố
                   </h2>
-                  <button onClick={() => setShowIncidentModal(true)} className="btn-light text-sm">
+                  <button onClick={() => setShowIncidentModal(true)} className="btn-primary text-sm">
                     + Tạo Báo Cáo
                   </button>
                 </div>
@@ -288,7 +308,7 @@ export default function TenantDashboard() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8" style={{ color: 'var(--text-light-muted)', background: 'var(--bg-light-surface-alt)', borderRadius: '16px' }}>
+                  <div className="text-center py-8" style={{ color: 'white', background: 'var(--bg-surface)', backdropFilter: 'blur(24px)', borderRadius: '16px' }}>
                     <CheckCircle2 size={40} className="mx-auto mb-3 text-green-400" />
                     Không có sự cố nào đang mở. Mọi thứ hoạt động tốt!
                   </div>
@@ -298,7 +318,7 @@ export default function TenantDashboard() {
 
             {/* Right Column (Invoices & Payment) */}
             <div className="md:col-span-5 space-y-8">
-              <div className="neo-card p-8">
+              <div className="glass-panel p-8">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold flex items-center gap-2">
                     <FileText className="text-indigo-600" size={24} /> Hóa Đơn
@@ -307,13 +327,13 @@ export default function TenantDashboard() {
                 </div>
 
                 {invoices.length === 0 ? (
-                  <p style={{ color: 'var(--text-light-muted)' }} className="text-center py-6">Chưa có hóa đơn nào.</p>
+                  <p style={{ color: 'var(--text-muted)' }} className="text-center py-6">Chưa có hóa đơn nào.</p>
                 ) : (
                   <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                     {invoices.map((inv) => (
                       <div key={inv.id} style={{ 
-                        border: '1px solid var(--border-light)', borderRadius: '16px', overflow: 'hidden',
-                        background: inv.status === 'PAID' ? 'var(--bg-light-surface)' : 'var(--bg-light-base)',
+                        border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden',
+                        background: inv.status === 'PAID' ? 'var(--bg-surface)' : 'transparent',
                         position: 'relative'
                       }}>
                         {inv.status !== 'PAID' && <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'var(--status-error-text)' }}></div>}
@@ -322,7 +342,7 @@ export default function TenantDashboard() {
                           <div className="flex justify-between items-start mb-3">
                             <div>
                               <div className="font-bold text-lg mb-1">{inv.invoiceNumber}</div>
-                              <div style={{ color: 'var(--text-light-muted)', fontSize: '0.85rem' }}>Hạn: {new Date(inv.dueDate).toLocaleDateString('vi-VN')}</div>
+                              <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Hạn: {new Date(inv.dueDate).toLocaleDateString('vi-VN')}</div>
                             </div>
                             <span style={{ 
                               padding: '4px 10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '700',
@@ -333,7 +353,7 @@ export default function TenantDashboard() {
                             </span>
                           </div>
                           
-                          <div className="text-2xl font-extrabold mb-4" style={{ color: inv.status === 'PAID' ? 'var(--text-light-main)' : 'var(--primary)' }}>
+                          <div className="text-2xl font-extrabold mb-4" style={{ color: inv.status === 'PAID' ? 'var(--text-main)' : 'var(--primary)' }}>
                             {Number(inv.amount).toLocaleString()} đ
                           </div>
 
@@ -355,9 +375,9 @@ export default function TenantDashboard() {
             </div>
           </div>
         ) : (
-          <div className="bg-white p-8 text-center rounded-xl border border-dashed border-gray-300">
+          <div className="glass-panel p-8 text-center rounded-xl border border-dashed border-gray-300">
             <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">Bạn chưa có hợp đồng phòng nào đang hoạt động.</p>
+            <p className="text-slate-400 font-medium">Bạn chưa có hợp đồng phòng nào đang hoạt động.</p>
             <p className="text-sm text-gray-400 mt-1">Vui lòng liên hệ chủ trọ để được cấp hợp đồng.</p>
           </div>
         )}
@@ -382,32 +402,32 @@ export default function TenantDashboard() {
       {/* Payment Modal */}
       {payingInvoice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
-          <div className="neo-card p-8 max-w-md w-full animate-fade-in relative">
-            <button onClick={() => setPayingInvoice(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800">
+          <div className="glass-panel p-8 max-w-md w-full animate-fade-in relative">
+            <button onClick={() => setPayingInvoice(null)} className="absolute top-4 right-4 text-gray-400 hover:">
               <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <h2 className="text-2xl font-bold mb-6 text-center">Thanh Toán Hóa Đơn</h2>
             
-            <div style={{ background: 'var(--bg-light-surface-alt)', padding: '24px', borderRadius: '16px', textAlign: 'center', marginBottom: '24px' }}>
-              <div style={{ fontSize: '0.9rem', color: 'var(--text-light-muted)', marginBottom: '8px' }}>Số tiền cần thanh toán</div>
-              <div className="text-4xl font-extrabold" style={{ color: 'var(--primary)' }}>{Number(payingInvoice.amount).toLocaleString()} đ</div>
+            <div style={{ background: 'var(--bg-surface)', backdropFilter: 'blur(24px)', padding: '24px', borderRadius: '16px', textAlign: 'center', marginBottom: '24px' }}>
+              <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Số tiền cần thanh toán</div>
+              <div className="text-4xl font-extrabold" style={{ color: 'white' }}>{Number(payingInvoice.amount).toLocaleString()} đ</div>
             </div>
 
             <div className="space-y-4 mb-6">
-              <div className="flex justify-between border-b pb-2" style={{ borderColor: 'var(--border-light)' }}>
-                <span style={{ color: 'var(--text-light-muted)' }}>Ngân hàng</span>
+              <div className="flex justify-between border-b pb-2" style={{ borderColor: 'var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Ngân hàng</span>
                 <span className="font-bold">{BANK_ID}</span>
               </div>
-              <div className="flex justify-between border-b pb-2" style={{ borderColor: 'var(--border-light)' }}>
-                <span style={{ color: 'var(--text-light-muted)' }}>Số tài khoản</span>
+              <div className="flex justify-between border-b pb-2" style={{ borderColor: 'var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Số tài khoản</span>
                 <span className="font-bold">{ACCOUNT_NO}</span>
               </div>
-              <div className="flex justify-between border-b pb-2" style={{ borderColor: 'var(--border-light)' }}>
-                <span style={{ color: 'var(--text-light-muted)' }}>Chủ tài khoản</span>
+              <div className="flex justify-between border-b pb-2" style={{ borderColor: 'var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Chủ tài khoản</span>
                 <span className="font-bold">{ACCOUNT_NAME}</span>
               </div>
-              <div className="flex justify-between border-b pb-2" style={{ borderColor: 'var(--border-light)' }}>
-                <span style={{ color: 'var(--text-light-muted)' }}>Nội dung CK</span>
+              <div className="flex justify-between border-b pb-2" style={{ borderColor: 'var(--border-color)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Nội dung CK</span>
                 <span className="font-bold text-red-500 bg-red-50 px-2 rounded">{(user as any)?.phone} {payingInvoice.invoiceNumber}</span>
               </div>
             </div>
@@ -416,12 +436,12 @@ export default function TenantDashboard() {
               <img 
                 src={`https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-qr_only.png?amount=${payingInvoice.amount}&addInfo=${(user as any)?.phone}%20${payingInvoice.invoiceNumber}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`} 
                 alt="QR Code" 
-                className="mx-auto rounded-xl border p-2" style={{ borderColor: 'var(--border-light)', width: '200px', height: '200px' }}
+                className="mx-auto rounded-xl border p-2" style={{ borderColor: 'var(--border-color)', width: '200px', height: '200px' }}
               />
-              <p className="text-sm mt-4 font-medium" style={{ color: 'var(--text-light-muted)' }}>Quét mã QR để thanh toán nhanh</p>
+              <p className="text-sm mt-4 font-medium" style={{ color: 'var(--text-muted)' }}>Quét mã QR để thanh toán nhanh</p>
             </div>
             
-            <button onClick={() => setPayingInvoice(null)} className="btn-light w-full mt-6 py-3">Đóng</button>
+            <button onClick={() => setPayingInvoice(null)} className="btn-primary w-full mt-6 py-3">Đóng</button>
             <button onClick={() => handlePayInvoice(payingInvoice.id)} className="btn-primary w-full mt-2 py-3">Đã chuyển khoản</button>
           </div>
         </div>
@@ -430,15 +450,15 @@ export default function TenantDashboard() {
       {/* Incident Modal */}
       {showIncidentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
-          <div className="neo-card p-8 max-w-md w-full animate-fade-in relative">
-            <button onClick={() => setShowIncidentModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800">
+          <div className="glass-panel p-8 max-w-md w-full animate-fade-in relative">
+            <button onClick={() => setShowIncidentModal(false)} className="absolute top-4 right-4 text-gray-400 hover:">
               <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2"><AlertCircle className="text-orange-500"/> Báo Cáo Sự Cố</h2>
             <form onSubmit={handleReportIncident} className="space-y-5">
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-light-muted)' }}>Loại sự cố</label>
-                <select className="w-full p-3 rounded-lg border focus:ring-2 outline-none" style={{ background: 'var(--bg-light-base)', borderColor: 'var(--border-light)' }} value={incidentType} onChange={e => setIncidentType(e.target.value)}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-muted)' }}>Loại sự cố</label>
+                <select className="w-full p-3 rounded-lg border focus:ring-2 outline-none" style={{ background: 'rgba(0,0,0,0.3)', color: 'white', borderColor: 'var(--border-color)' }} value={incidentType} onChange={e => setIncidentType(e.target.value)}>
                   <option value="ELECTRICITY">Điện (Mất điện, chập cháy...)</option>
                   <option value="WATER">Nước (Mất nước, rò rỉ...)</option>
                   <option value="FURNITURE">Nội thất (Hỏng giường, tủ...)</option>
@@ -446,10 +466,10 @@ export default function TenantDashboard() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-light-muted)' }}>Mô tả chi tiết</label>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-muted)' }}>Mô tả chi tiết</label>
                 <textarea 
                   className="w-full p-3 rounded-lg border focus:ring-2 outline-none min-h-[100px]" 
-                  style={{ background: 'var(--bg-light-base)', borderColor: 'var(--border-light)' }}
+                  style={{ background: 'transparent', borderColor: 'var(--border-color)' }}
                   placeholder="Mô tả sự cố bạn đang gặp phải..."
                   required
                   value={incidentDescription}

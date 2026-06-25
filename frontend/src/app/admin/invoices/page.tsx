@@ -52,8 +52,7 @@ export default function InvoicesPage() {
 
   const fetchInvoices = async () => {
     try {
-      const res = await fetch('http://localhost:3000/invoices', {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const res = await fetch('http://localhost:3000/invoices', { cache: "no-store", headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
         const data = await res.json();
@@ -66,8 +65,7 @@ export default function InvoicesPage() {
 
   const fetchContracts = async () => {
     try {
-      const res = await fetch('http://localhost:3000/contracts', {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const res = await fetch('http://localhost:3000/contracts', { cache: "no-store", headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
         const data = await res.json();
@@ -102,9 +100,7 @@ export default function InvoicesPage() {
       const oCost = Number(otherCost || 0);
       const totalAmount = baseAmount + eCost + wCost + oCost;
 
-      const res = await fetch('http://localhost:3000/invoices', {
-        method: 'POST',
-        headers: { 
+      const res = await fetch('http://localhost:3000/invoices', { method: 'POST', cache: "no-store", headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` 
         },
@@ -141,9 +137,7 @@ export default function InvoicesPage() {
 
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/invoices/${id}/status`, {
-        method: 'PATCH',
-        headers: { 
+      const res = await fetch(`http://localhost:3000/invoices/${id}/status`, { method: 'PATCH', cache: "no-store", headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` 
         },
@@ -152,6 +146,7 @@ export default function InvoicesPage() {
       
       if (res.ok) {
         toast({ title: 'Thành công', description: 'Đã cập nhật trạng thái hóa đơn' });
+        setInvoices(prev => prev.map((inv: any) => inv.id === id ? { ...inv, status } : inv));
         fetchInvoices();
       }
     } catch (err) {

@@ -3,11 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../../../components/ui/use-toast';
 import { useAuth } from '../../../context/AuthContext';
+import { useSocket } from '../../../hooks/useSocket';
 
 // Interfaces
 interface Contract {
   id: string;
   contractNumber: string;
+  tenantId: string;
+  roomId: string;
   startDate: string;
   endDate: string;
   rentalPrice: number;
@@ -45,7 +48,7 @@ export default function ContractsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   
-  const { token } = useAuth();
+  const { token, user } = useAuth();
 
   // Contract Details Modal State
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -73,8 +76,8 @@ export default function ContractsPage() {
   const fetchContracts = async () => {
     try {
       const [res, incRes] = await Promise.all([
-        fetch('http://localhost:3000/contracts', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3000/incidents', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('http://localhost:3000/contracts', { cache: "no-store", headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://localhost:3000/incidents', { cache: "no-store", headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       if (res.ok) {
         const data = await res.json();
@@ -96,8 +99,8 @@ export default function ContractsPage() {
       const userStr = typeof window !== 'undefined' ? sessionStorage.getItem('user') : null;
       const landlordId = userStr ? (JSON.parse(userStr).landlordId || JSON.parse(userStr).id) : '';
       const [roomsRes, tenantsRes] = await Promise.all([
-        fetch(`http://localhost:3000/rooms?landlordId=${landlordId}`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3000/tenants', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`http://localhost:3000/rooms?landlordId=${landlordId}`, { cache: "no-store", headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://localhost:3000/tenants', { cache: "no-store", headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       if (roomsRes.ok) {
         const rd = await roomsRes.json();
@@ -134,11 +137,26 @@ export default function ContractsPage() {
     }
   }, [token, toast]);
 
+  const { on } = useSocket({ token: token || undefined, autoConnect: !!token });
+  
+  useEffect(() => {
+    if (!token || !user) return;
+    const landlordId = user.landlordId || user.id;
+    const unsubscribe = on(`notification-landlord-${landlordId}`, (notification: any) => {
+      if (notification.title === 'Sự cố mới được báo cáo') {
+        fetchContracts();
+      }
+    });
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [on, token, user]);
+
   const loadTenantData = async (contract: Contract) => {
     try {
       const [invRes, incRes] = await Promise.all([
-        fetch('http://localhost:3000/invoices', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3000/incidents', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('http://localhost:3000/invoices', { cache: "no-store", headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://localhost:3000/incidents', { cache: "no-store", headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       
       if (invRes.ok) {
@@ -167,14 +185,14 @@ export default function ContractsPage() {
 
   const handleResolveIncident = async (incidentId: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/incidents/${incidentId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      const res = await fetch(`http://localhost:3000/incidents/${incidentId}/status`, { method: 'PATCH', cache: "no-store", headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status: 'RESOLVED' })
       });
       if (res.ok) {
         toast({ title: 'Thành công', description: 'Đã đánh dấu sự cố là đã xử lý', duration: 3000 });
         if (selectedContract) loadTenantData(selectedContract);
+        setAllIncidents(prev => prev.map((inc: any) => inc.id === incidentId ? { ...inc, status: 'RESOLVED' } : inc));
+        setTenantIncidents(prev => prev.map((inc: any) => inc.id === incidentId ? { ...inc, status: 'RESOLVED' } : inc));
       }
     } catch {
       toast({ title: 'Lỗi', description: 'Không thể cập nhật trạng thái sự cố', duration: 3000 });
@@ -185,9 +203,7 @@ export default function ContractsPage() {
     e.preventDefault();
     setIsAdding(true);
     try {
-      const res = await fetch('http://localhost:3000/contracts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      const res = await fetch('http://localhost:3000/contracts', { method: 'POST', cache: "no-store", headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
           ...addFormData,
           deposit: Number(addFormData.deposit),
@@ -287,7 +303,7 @@ export default function ContractsPage() {
                       ) : (
                         <span style={{ padding: '4px 8px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>Đã Hủy</span>
                       )}
-                      {allIncidents.some(inc => inc.reporterId === c.tenant?.id && inc.status !== 'RESOLVED') && (
+                      {allIncidents.some(inc => inc.roomId === c.roomId && inc.status !== 'RESOLVED') && (
                         <div style={{ marginTop: '8px' }}>
                           <span style={{ padding: '4px 8px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>
                             ⚠️ Có sự cố
@@ -311,13 +327,11 @@ export default function ContractsPage() {
                           onClick={async () => {
                             if (window.confirm('Bạn có chắc chắn muốn xóa hợp đồng này không? Thao tác này không thể hoàn tác.')) {
                               try {
-                                const res = await fetch(`http://localhost:3000/contracts/${c.id}`, {
-                                  method: 'DELETE',
-                                  headers: { 'Authorization': `Bearer ${token}` }
+                                const res = await fetch(`http://localhost:3000/contracts/${c.id}`, { method: 'DELETE', cache: "no-store", headers: { 'Authorization': `Bearer ${token}` }
                                 });
                                 if (res.ok) {
                                   toast({ title: 'Thành công', description: 'Đã xóa hợp đồng' });
-                                  fetchContracts();
+                                  setContracts(prev => prev.filter((con: any) => con.id !== c.id));
                                 } else {
                                   toast({ title: 'Lỗi', description: 'Không thể xóa hợp đồng' });
                                 }

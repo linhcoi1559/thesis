@@ -51,11 +51,9 @@ export default function AdminRoomsPage() {
     setLoading(true);
     try {
       const [roomsRes, contractsRes] = await Promise.all([
-        fetch(`http://localhost:3000/rooms?landlordId=${landlordId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+        fetch(`http://localhost:3000/rooms?landlordId=${landlordId}`, { cache: "no-store", headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://localhost:3000/contracts', {
-          headers: { 'Authorization': `Bearer ${token}` }
+        fetch('http://localhost:3000/contracts', { cache: "no-store", headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
 
@@ -154,9 +152,7 @@ export default function AdminRoomsPage() {
   const handleDeleteRoom = async (id: string) => {
     if (!confirm('Bạn có chắc chắn muốn xóa phòng này?')) return;
     try {
-      const response = await fetch(`http://localhost:3000/rooms/${id}?landlordId=${landlordId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      const response = await fetch(`http://localhost:3000/rooms/${id}?landlordId=${landlordId}`, { method: 'DELETE', cache: "no-store", headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ landlordId }),
       });
       if (response.ok) {
@@ -181,9 +177,7 @@ export default function AdminRoomsPage() {
     fd.append('landlordId', landlordId);
     setUploadingImage(true);
     try {
-      const response = await fetch(`http://localhost:3000/rooms/${selectedRoom.id}/images`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
+      const response = await fetch(`http://localhost:3000/rooms/${selectedRoom.id}/images`, { method: 'POST', cache: "no-store", headers: { 'Authorization': `Bearer ${token}` },
         body: fd,
       });
       if (response.ok) {
@@ -204,9 +198,7 @@ export default function AdminRoomsPage() {
   const handleDeleteImage = async (imageUrl: string) => {
     if (!selectedRoom || !confirm('Xóa ảnh này?')) return;
     try {
-      const response = await fetch(`http://localhost:3000/rooms/${selectedRoom.id}/images`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      const response = await fetch(`http://localhost:3000/rooms/${selectedRoom.id}/images`, { method: 'DELETE', cache: "no-store", headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ landlordId, imageUrl }),
       });
       if (response.ok) {
