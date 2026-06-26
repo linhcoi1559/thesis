@@ -64,7 +64,7 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rooms/public`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rooms/public`, { cache: 'no-store' });
         if (response.ok) { const data = await response.json(); setRooms(data); }
       } catch (error) { console.error('Failed to fetch rooms:', error); }
       finally { setLoadingRooms(false); }

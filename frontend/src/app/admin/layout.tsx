@@ -198,6 +198,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           .admin-layout > div { margin-bottom: 65px !important; }
           .neo-header { padding: 0 16px !important; }
           main { padding: 16px 16px 40px !important; }
+          .mobile-logout-btn { display: flex !important; }
         }
       `}</style>
       {/* ====== SIDEBAR ====== */}
@@ -346,6 +347,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <div style={{ fontSize: '0.68rem', color: 'var(--text-light-muted)' }}>Chủ trọ</div>
               </div>
             </div>
+
+            {/* Logout button (Mobile only) */}
+            <button
+              onClick={logout}
+              className="mobile-logout-btn"
+              style={{
+                display: 'none',
+                padding: '8px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.2)',
+                alignItems: 'center', justifyContent: 'center'
+              }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 16, height: 16 }}>
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
           </div>
         </header>
 
