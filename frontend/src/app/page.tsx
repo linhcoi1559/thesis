@@ -15,18 +15,12 @@ interface Room {
 }
 
 export default function LandingPage() {
-  const landlordId = 'e29d665b-efbe-40b3-bb66-df30bd5e8bf8'; // Mock Landlord ID
+  const landlordId = 'e29d665b-efbe-40b3-bb66-df30bd5e8bf8';
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loadingRooms, setLoadingRooms] = useState(true);
-  
-  // Form State
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-    roomId: '',
-  });
+  const [scrolled, setScrolled] = useState(false);
+
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '', roomId: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -34,21 +28,21 @@ export default function LandingPage() {
   const roomsRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // ── AI Chat Widget State ──────────────────────────────────────────
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([
-    { role: 'ai', text: 'Xin chào! 👋 Tôi là **RentBot**, trợ lý AI của Smart Boarding House.\n\nTôi có thể giúp bạn tìm phòng phù hợp, tư vấn giá cả và thời gian thuê tốt nhất. Bạn muốn hỏi gì?' },
+    { role: 'ai', text: 'Xin chào! 👋 Tôi là **RentBot**, trợ lý AI của NestPro.\n\nTôi có thể giúp bạn tìm phòng phù hợp, tư vấn giá cả và thời gian thuê tốt nhất. Bạn muốn hỏi gì?' },
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isChatLoading, setIsChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const QUICK_QUESTIONS = [
-    '🏠 Phòng nào còn trống?',
-    '💰 Giá thuê bao nhiêu?',
-    '🎓 Phòng nào cho sinh viên?',
-    '📅 Nên thuê bao lâu?',
-  ];
+  const QUICK_QUESTIONS = ['🏠 Phòng nào còn trống?', '💰 Giá thuê bao nhiêu?', '🎓 Phòng nào cho sinh viên?', '📅 Nên thuê bao lâu?'];
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSendChat = async (text?: string) => {
     const message = text || chatInput.trim();
@@ -57,278 +51,440 @@ export default function LandingPage() {
     setChatInput('');
     setIsChatLoading(true);
     try {
-      const res = await fetch('http://localhost:3000/ai/public-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
-      });
+      const res = await fetch('http://localhost:3000/ai/public-chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message }) });
       const data = await res.json();
       setChatMessages(prev => [...prev, { role: 'ai', text: data.text || 'Xin lỗi, tôi không thể trả lời lúc này.' }]);
     } catch {
       setChatMessages(prev => [...prev, { role: 'ai', text: '⚠️ Lỗi kết nối. Vui lòng thử lại.' }]);
-    } finally {
-      setIsChatLoading(false);
-    }
+    } finally { setIsChatLoading(false); }
   };
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
-  // ─────────────────────────────────────────────────────────────────
+  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages]);
 
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/rooms/public`);
-        if (response.ok) {
-          const data = await response.json();
-          setRooms(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch rooms:", error);
-      } finally {
-        setLoadingRooms(false);
-      }
+        const response = await fetch('http://localhost:3000/rooms/public');
+        if (response.ok) { const data = await response.json(); setRooms(data); }
+      } catch (error) { console.error('Failed to fetch rooms:', error); }
+      finally { setLoadingRooms(false); }
     };
     fetchRooms();
   }, []);
 
-
   const handleSelectRoom = (roomId: string) => {
     setFormData(prev => ({ ...prev, roomId }));
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
-    toast({
-      title: "Đã chọn phòng",
-      description: "Vui lòng điền thông tin bên dưới để gửi yêu cầu thuê phòng.",
-      duration: 3000,
-    });
-  };
-
-  const handleExploreRooms = () => {
-    roomsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    toast({ title: 'Đã chọn phòng', description: 'Vui lòng điền thông tin bên dưới để gửi yêu cầu.', duration: 3000 });
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
     setErrorMessage('');
-
     try {
       const response = await fetch('http://localhost:3000/rent-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          message: formData.message || undefined,
-          landlordId,
-          roomId: formData.roomId || undefined,
-        }),
+        body: JSON.stringify({ name: formData.name, email: formData.email, phone: formData.phone, message: formData.message || undefined, landlordId, roomId: formData.roomId || undefined }),
       });
-
       const result = await response.json();
-      if (!response.ok) throw new Error(result.message || 'Đã xảy ra lỗi gửi yêu cầu');
-
+      if (!response.ok) throw new Error(result.message || 'Đã xảy ra lỗi');
       setStatus('success');
       setFormData({ name: '', email: '', phone: '', message: '', roomId: '' });
-      toast({ title: 'Thành công', description: 'Yêu cầu của bạn đã được gửi. Chúng tôi sẽ liên hệ sớm nhất!', duration: 5000 });
+      toast({ title: '✅ Gửi thành công!', description: 'Chúng tôi sẽ liên hệ bạn sớm nhất!', duration: 5000 });
     } catch (error: any) {
       setStatus('error');
       setErrorMessage(error.message || 'Kết nối server thất bại');
-      toast({ title: 'Lỗi', description: error.message || 'Lỗi hệ thống.', duration: 5000 });
     }
   };
 
-  const formatCurrency = (amount: string | number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(amount));
-  };
-
+  const formatCurrency = (amount: string | number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(amount));
   const selectedRoomDetails = rooms.find(r => r.id === formData.roomId);
-
   const { user, logout } = useAuth();
 
+  const features = [
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 28, height: 28 }}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 003 10.096a11.958 11.958 0 005.957 10.461A11.96 11.96 0 0012 21.5c2.042 0 3.97-.52 5.656-1.443A11.96 11.96 0 0021 10.095a11.955 11.955 0 00-.598-4.096A11.959 11.959 0 0015 3.464M12 4.5V3" />
+        </svg>
+      ),
+      title: 'An Ninh 24/7',
+      desc: 'Camera AI giám sát toàn bộ khuôn viên, khóa vân tay thế hệ mới đảm bảo an toàn tuyệt đối cho cư dân.',
+      gradient: 'from-blue-500 to-indigo-600',
+      glow: 'rgba(99,102,241,0.3)',
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 28, height: 28 }}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        </svg>
+      ),
+      title: 'Tiện Nghi Đầy Đủ',
+      desc: 'Nội thất cao cấp, điều hòa, tủ lạnh, máy giặt riêng — không gian sống đầy đủ như căn hộ cao cấp.',
+      gradient: 'from-violet-500 to-purple-600',
+      glow: 'rgba(139,92,246,0.3)',
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 28, height: 28 }}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+        </svg>
+      ),
+      title: 'Wifi Tốc Độ Cao',
+      desc: 'Internet cáp quang đối xứng 1Gbps, không giới hạn băng thông. Lý tưởng cho làm việc và giải trí.',
+      gradient: 'from-cyan-500 to-teal-600',
+      glow: 'rgba(6,182,212,0.3)',
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 28, height: 28 }}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+        </svg>
+      ),
+      title: 'Quản Lý Thông Minh',
+      desc: 'Thanh toán trực tuyến, báo cáo sự cố qua app, theo dõi hợp đồng 24/7 — mọi thứ trong tầm tay.',
+      gradient: 'from-rose-500 to-pink-600',
+      glow: 'rgba(244,63,94,0.3)',
+    },
+  ];
+
+  const testimonials = [
+    { name: 'Nguyễn Minh Tuấn', role: 'Kỹ sư phần mềm', text: 'Hệ thống quản lý phòng trọ tốt nhất tôi từng dùng. Thanh toán tiền nhà qua app cực kỳ tiện lợi, chủ nhà phản hồi nhanh chóng.', avatar: 'NMT', color: '#6366f1' },
+    { name: 'Trần Thị Lan Anh', role: 'Sinh viên đại học', text: 'Phòng sạch, an ninh tốt, wifi nhanh. Chủ trọ dùng app nên mọi vấn đề được giải quyết ngay, không cần đợi lâu như các nơi khác.', avatar: 'TLA', color: '#a855f7' },
+    { name: 'Lê Hoàng Phúc', role: 'Nhân viên văn phòng', text: 'Đã thuê 2 năm, hài lòng tuyệt đối. Giá cả hợp lý, tiện nghi đầy đủ. Đặc biệt thích tính năng báo cáo sự cố qua app.', avatar: 'LHP', color: '#06b6d4' },
+  ];
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      
-      {/* Navbar */}
-      <header className="glass-header" style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '16px 40px', transition: 'all 0.3s ease'
-      }}>
-        <div style={{ fontWeight: '800', fontSize: '1.5rem', letterSpacing: '-0.02em' }} className="text-gradient">
-          SaaS Rent
-        </div>
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', fontFamily: "'Plus Jakarta Sans', 'Outfit', sans-serif" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        
+        .lp-nav { transition: all 0.4s ease; }
+        .lp-nav.scrolled { background: rgba(8,12,20,0.9) !important; backdrop-filter: blur(24px) !important; box-shadow: 0 1px 0 rgba(255,255,255,0.06) !important; }
+        
+        .hero-badge { animation: fadeSlideUp 0.7s ease both; }
+        .hero-title { animation: fadeSlideUp 0.7s 0.1s ease both; }
+        .hero-sub { animation: fadeSlideUp 0.7s 0.2s ease both; }
+        .hero-btns { animation: fadeSlideUp 0.7s 0.3s ease both; }
+        .hero-stats { animation: fadeSlideUp 0.7s 0.4s ease both; }
+        .hero-img { animation: fadeSlideLeft 0.9s 0.2s ease both; }
+        
+        @keyframes fadeSlideUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeSlideLeft { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+        
+        .feat-card { transition: transform 0.35s ease, box-shadow 0.35s ease; }
+        .feat-card:hover { transform: translateY(-10px); }
+        
+        .room-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .room-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,0.5) !important; }
+        .room-card:hover .room-img { transform: scale(1.05); }
+        .room-img { transition: transform 0.5s ease; }
+        
+        .btn-lp-primary {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 16px 36px; border-radius: 14px; border: none; cursor: pointer;
+          font-family: inherit; font-weight: 700; font-size: 1rem; letter-spacing: -0.01em;
+          background: linear-gradient(135deg, #7c3aed, #4f46e5);
+          color: white; box-shadow: 0 8px 30px rgba(124,58,237,0.4);
+          transition: all 0.25s ease; text-decoration: none;
+        }
+        .btn-lp-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,58,237,0.6); background: linear-gradient(135deg, #6d28d9, #4338ca); }
+        
+        .btn-lp-ghost {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 16px 36px; border-radius: 14px; cursor: pointer;
+          font-family: inherit; font-weight: 600; font-size: 1rem;
+          background: rgba(255,255,255,0.05); color: white;
+          border: 1px solid rgba(255,255,255,0.12);
+          transition: all 0.25s ease; text-decoration: none;
+        }
+        .btn-lp-ghost:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        
+        .mesh-gradient {
+          position: absolute; inset: 0; z-index: 0;
+          background: 
+            radial-gradient(ellipse 80% 60% at 50% -20%, rgba(124,58,237,0.25) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 50% at 80% 60%, rgba(6,182,212,0.12) 0%, transparent 50%),
+            radial-gradient(ellipse 50% 40% at 10% 80%, rgba(99,102,241,0.15) 0%, transparent 50%);
+        }
+        
+        .grid-pattern {
+          position: absolute; inset: 0; z-index: 0;
+          background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+          background-size: 60px 60px;
+          mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+        }
+
+        .testimonial-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .testimonial-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.4) !important; }
+        
+        .lp-input {
+          width: 100%; padding: 14px 18px; border-radius: 12px; font-size: 0.95rem; font-family: inherit;
+          background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+          color: white; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .lp-input::placeholder { color: rgba(255,255,255,0.3); }
+        .lp-input:focus { border-color: rgba(124,58,237,0.6); box-shadow: 0 0 0 3px rgba(124,58,237,0.15); }
+        
+        .tag-badge {
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 6px 16px; border-radius: 999px;
+          background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.3);
+          color: #c4b5fd; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.02em;
+        }
+        
+        .section-label {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 6px 14px; border-radius: 999px;
+          background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+          color: rgba(255,255,255,0.5); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+          margin-bottom: 16px;
+        }
+      `}</style>
+
+      {/* ── Navbar ──────────────────────────────────────────────────── */}
+      <header
+        className={`lp-nav ${scrolled ? 'scrolled' : ''}`}
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 48px' }}
+      >
+        {/* Logo */}
+        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(124,58,237,0.5)' }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" style={{ width: 18, height: 18 }}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
+            </svg>
+          </div>
+          <span style={{ fontWeight: 800, fontSize: '1.25rem', color: 'white', letterSpacing: '-0.03em' }}>
+            SaaS<span style={{ color: '#a78bfa' }}> Rent</span>
+          </span>
+        </a>
+
+        {/* Nav Links */}
+        <nav style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {[
+            { label: 'Tính năng', href: '#features' },
+            { label: 'Phòng trống', href: '#rooms' },
+            { label: 'Liên hệ', href: '#contact' },
+          ].map(item => (
+            <a key={item.label} href={item.href} style={{ padding: '8px 14px', color: 'rgba(255,255,255,0.65)', fontSize: '0.9rem', fontWeight: 500, borderRadius: 8, textDecoration: 'none', transition: 'color 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'white'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.65)'}
+            >{item.label}</a>
+          ))}
+        </nav>
+
+        {/* CTA */}
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           {user ? (
             <>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Hi, <strong style={{ color: 'white' }}>{user.name}</strong></span>
-              {(user.role === 'ADMIN' || user.role === 'LANDLORD') && (
-                <Link href="/admin" className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.95rem' }}>
-                  Dashboard
-                </Link>
-              )}
-              {user.role === 'TENANT' && (
-                <Link href="/tenant" className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.95rem' }}>
-                  Phòng Của Tôi
-                </Link>
-              )}
-              <button onClick={logout} style={{ padding: '10px 20px', background: 'rgba(255,255,255,0.05)', color: 'white', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s', cursor: 'pointer' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
-                Đăng Xuất
-              </button>
+              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.88rem' }}>Hi, <strong style={{ color: 'white' }}>{user.name}</strong></span>
+              {(user.role === 'ADMIN' || user.role === 'LANDLORD') && <Link href="/admin" className="btn-lp-primary" style={{ padding: '9px 18px', fontSize: '0.88rem' }}>Dashboard</Link>}
+              {user.role === 'TENANT' && <Link href="/tenant" className="btn-lp-primary" style={{ padding: '9px 18px', fontSize: '0.88rem' }}>Phòng Của Tôi</Link>}
+              <button onClick={logout} style={{ padding: '9px 16px', background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, cursor: 'pointer', fontSize: '0.88rem', fontFamily: 'inherit', fontWeight: 600, transition: 'all 0.2s' }}>Đăng Xuất</button>
             </>
           ) : (
             <>
-              <Link href="/login" style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: '500', fontSize: '0.95rem', padding: '10px' }}>Đăng Nhập</Link>
-              <button onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} className="btn-primary" style={{ padding: '10px 24px', fontSize: '0.95rem' }}>
-                Đăng Ký Thuê
+              <Link href="/login" style={{ padding: '9px 18px', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none', borderRadius: 10, transition: 'color 0.2s' }}
+                onMouseEnter={e => (e.currentTarget as any).style.color = 'white'}
+                onMouseLeave={e => (e.currentTarget as any).style.color = 'rgba(255,255,255,0.7)'}
+              >Đăng Nhập</Link>
+              <button onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} className="btn-lp-primary" style={{ padding: '9px 20px', fontSize: '0.9rem' }}>
+                Đăng Ký Thuê →
               </button>
             </>
           )}
         </div>
       </header>
 
-      {/* 1. Hero Section */}
-      <section style={{ 
-        position: 'relative', 
-        minHeight: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        padding: '20px',
-        overflow: 'hidden'
-      }}>
-        {/* Abstract Glow Background */}
-        <div style={{ position: 'absolute', width: '600px', height: '600px', background: 'var(--primary)', filter: 'blur(150px)', opacity: 0.15, borderRadius: '50%', top: '-10%', left: '-10%', zIndex: -1 }}></div>
-        <div style={{ position: 'absolute', width: '500px', height: '500px', background: 'var(--accent)', filter: 'blur(150px)', opacity: 0.15, borderRadius: '50%', bottom: '-10%', right: '-10%', zIndex: -1 }}></div>
-        
-        {/* Background Image / Overlay */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'url(/images/rooms/656430816_1617182629530479_8502833815304260238_n.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.1,
-          zIndex: -2,
-          mixBlendMode: 'luminosity'
-        }} />
+      {/* ── Hero Section ─────────────────────────────────────────────── */}
+      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: '#080C14' }}>
+        <div className="mesh-gradient" />
+        <div className="grid-pattern" />
 
-        <div style={{ textAlign: 'center', maxWidth: '800px', zIndex: 1, marginTop: '60px' }} className="animate-fade-in animate-float">
-          <div style={{ 
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
-            padding: '8px 20px', 
-            background: 'rgba(255,255,255,0.03)', 
-            backdropFilter: 'blur(10px)',
-            color: 'var(--text-main)',
-            borderRadius: '999px',
-            fontWeight: '500',
-            fontSize: '0.875rem',
-            marginBottom: '32px',
-            border: '1px solid rgba(255,255,255,0.1)',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-          }}>
-            <span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#22c55e', borderRadius: '50%', boxShadow: '0 0 10px #22c55e' }}></span>
-            Hệ thống quản lý nhà trọ thông minh
-          </div>
-          
-          <h1 style={{ fontSize: '5rem', fontWeight: '800', marginBottom: '24px', lineHeight: '1.05', letterSpacing: '-0.03em' }}>
-            Trải nghiệm sống <br />
-            <span className="text-gradient">Đẳng cấp & Tiện nghi</span>
-          </h1>
-          <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '48px', lineHeight: '1.6', maxWidth: '600px', margin: '0 auto 48px auto' }}>
-            Nền tảng quản lý và thuê phòng trọ tự động hóa 100%. Môi trường sống an ninh, thủ tục nhanh gọn, hỗ trợ 24/7.
-          </p>
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <button onClick={handleExploreRooms} className="btn-primary" style={{ padding: '18px 40px', fontSize: '1.1rem', borderRadius: '14px' }}>
-              Xem Phòng Trống
-            </button>
-            <button onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} className="glass-panel" style={{ padding: '18px 40px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: '600', transition: 'all 0.3s' }}>
-              Liên Hệ Tư Vấn
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Features Section */}
-      <section style={{ padding: '80px 20px', background: 'var(--bg-base)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
-          {[
-            { icon: '🔒', title: 'An Ninh 24/7', desc: 'Hệ thống camera giám sát an toàn tuyệt đối.' },
-            { icon: '🔑', title: 'Giờ Giấc Tự Do', desc: 'Khóa vân tay cao cấp, ra vào thoải mái.' },
-            { icon: '✨', title: 'Tiện Nghi Đầy Đủ', desc: 'Nội thất hiện đại, không gian thoáng mát.' },
-            { icon: '🚀', title: 'Wifi Tốc Độ Cao', desc: 'Internet cáp quang ổn định, lướt web thả ga.' }
-          ].map((feat, i) => (
-            <div key={i} className="glass-panel" style={{ padding: '32px', textAlign: 'center', transition: 'transform 0.3s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-              <div style={{ fontSize: '3rem', marginBottom: '16px' }}>{feat.icon}</div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '8px' }}>{feat.title}</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>{feat.desc}</p>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '100px 48px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', position: 'relative', zIndex: 1, width: '100%' }}>
+          {/* Left: Text */}
+          <div>
+            <div className="hero-badge tag-badge" style={{ marginBottom: 24 }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 8px #4ade80', flexShrink: 0 }} />
+              Hệ thống quản lý nhà trọ thông minh #1
             </div>
-          ))}
+
+            <h1 className="hero-title" style={{ fontSize: '3.8rem', fontWeight: 900, lineHeight: 1.08, letterSpacing: '-0.04em', color: 'white', marginBottom: 24 }}>
+              Sống đẳng cấp,<br />
+              <span style={{ background: 'linear-gradient(135deg, #a78bfa, #60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                quản lý thông minh
+              </span>
+            </h1>
+
+            <p className="hero-sub" style={{ fontSize: '1.15rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.75, marginBottom: 40, maxWidth: 480 }}>
+              Nền tảng thuê & quản lý phòng trọ tự động hóa 100%. Thanh toán online, báo cáo sự cố, theo dõi hợp đồng — tất cả trong một app.
+            </p>
+
+            <div className="hero-btns" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 52 }}>
+              <button onClick={() => roomsRef.current?.scrollIntoView({ behavior: 'smooth' })} className="btn-lp-primary">
+                Xem phòng trống
+                <svg viewBox="0 0 20 20" fill="currentColor" style={{ width: 18, height: 18 }}><path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" /></svg>
+              </button>
+              <button onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} className="btn-lp-ghost">
+                Đăng ký tư vấn
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div className="hero-stats" style={{ display: 'flex', gap: 32, padding: '20px 0', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              {[
+                { value: '500+', label: 'Khách hài lòng' },
+                { value: '50+', label: 'Phòng quản lý' },
+                { value: '99.9%', label: 'Uptime hệ thống' },
+              ].map((s, i) => (
+                <div key={i}>
+                  <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{s.value}</div>
+                  <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', marginTop: 3, fontWeight: 500 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: Dashboard Mockup */}
+          <div className="hero-img" style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', inset: '-20%', background: 'radial-gradient(ellipse at center, rgba(124,58,237,0.2) 0%, transparent 70%)', zIndex: 0 }} />
+            <div style={{ position: 'relative', zIndex: 1, borderRadius: 20, overflow: 'hidden', boxShadow: '0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08)', transform: 'perspective(1200px) rotateY(-8deg) rotateX(3deg)', transition: 'transform 0.5s ease' }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'perspective(1200px) rotateY(-4deg) rotateX(1deg) scale(1.01)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'perspective(1200px) rotateY(-8deg) rotateX(3deg)'}
+            >
+              <img src="/dashboard-mockup.png" alt="NestPro Dashboard" style={{ width: '100%', display: 'block' }} />
+              {/* Shine overlay */}
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%)', pointerEvents: 'none' }} />
+            </div>
+            {/* Floating badge */}
+            <div style={{ position: 'absolute', bottom: -20, left: -24, background: 'rgba(8,12,20,0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 10, zIndex: 2, boxShadow: '0 10px 30px rgba(0,0,0,0.4)' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#22c55e,#16a34a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>✅</div>
+              <div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'white' }}>Hóa đơn đã thu</div>
+                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>Vừa xong · tháng 6/2026</div>
+              </div>
+            </div>
+            <div style={{ position: 'absolute', top: -16, right: -20, background: 'rgba(8,12,20,0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8, zIndex: 2, boxShadow: '0 10px 30px rgba(0,0,0,0.4)' }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
+              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'white' }}>98% Tỉ lệ thanh toán đúng hạn</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div style={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.25)', fontSize: '0.72rem', fontWeight: 500 }}>
+          <div style={{ width: 24, height: 40, border: '1.5px solid rgba(255,255,255,0.15)', borderRadius: 12, display: 'flex', justifyContent: 'center', padding: '6px 0' }}>
+            <div style={{ width: 3, height: 8, background: 'rgba(255,255,255,0.3)', borderRadius: 999, animation: 'scrollDot 2s ease infinite' }} />
+          </div>
+          Cuộn xuống
+          <style>{`@keyframes scrollDot { 0%,100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(6px); opacity: 0.3; } }`}</style>
         </div>
       </section>
 
-      {/* 3. Rooms Gallery Section */}
-      <section ref={roomsRef} style={{ padding: '100px 20px', background: 'var(--bg-card)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <h2 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '16px' }}>Phòng Đang Có Sẵn</h2>
-            <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>Tham quan các lựa chọn phù hợp nhất với nhu cầu của bạn</p>
+      {/* ── Features Section ─────────────────────────────────────────── */}
+      <section id="features" style={{ padding: '120px 48px', background: '#080C14', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 800, height: 600, background: 'radial-gradient(ellipse at center, rgba(124,58,237,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+          <div style={{ textAlign: 'center', marginBottom: 72 }}>
+            <div className="section-label" style={{ display: 'inline-flex', marginBottom: 16 }}>✦ Tính năng</div>
+            <h2 style={{ fontSize: '2.8rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', marginBottom: 16 }}>
+              Mọi thứ bạn cần<br />
+              <span style={{ background: 'linear-gradient(135deg,#a78bfa,#60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>trong một nền tảng</span>
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '1.05rem', maxWidth: 500, margin: '0 auto' }}>
+              Được thiết kế để tối ưu trải nghiệm cho cả chủ nhà lẫn người thuê
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
+            {features.map((feat, i) => (
+              <div key={i} className="feat-card" style={{ padding: '32px 28px', borderRadius: 20, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', cursor: 'default', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${feat.glow}, transparent)` }} />
+                <div style={{ width: 54, height: 54, borderRadius: 14, background: `${feat.glow.replace('0.3', '0.15')}`, border: `1px solid ${feat.glow}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', marginBottom: 20 }}>
+                  {feat.icon}
+                </div>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'white', marginBottom: 10 }}>{feat.title}</h3>
+                <p style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.7 }}>{feat.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Rooms Section ────────────────────────────────────────────── */}
+      <section id="rooms" ref={roomsRef} style={{ padding: '120px 48px', background: '#0A0F1E' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 72 }}>
+            <div className="section-label" style={{ display: 'inline-flex', marginBottom: 16 }}>🏠 Phòng cho thuê</div>
+            <h2 style={{ fontSize: '2.8rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', marginBottom: 16 }}>Phòng đang có sẵn</h2>
+            <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '1.05rem' }}>Tham quan các lựa chọn phù hợp nhất với nhu cầu của bạn</p>
           </div>
 
           {loadingRooms ? (
-            <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px' }}>Đang tải danh sách phòng...</div>
-          ) : rooms.length === 0 ? (
-            <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px' }}>
-              Hiện tại không có phòng nào trong hệ thống.
+            <div style={{ textAlign: 'center', padding: 60 }}>
+              <div style={{ width: 40, height: 40, border: '3px solid rgba(124,58,237,0.2)', borderTopColor: '#7c3aed', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
+              <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
+              <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.9rem' }}>Đang tải...</div>
             </div>
+          ) : rooms.length === 0 ? (
+            <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.3)', padding: 60, fontSize: '0.95rem' }}>Hiện tại không có phòng nào trong hệ thống.</div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '32px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 28 }}>
               {rooms.map((room) => (
-                <div key={room.id} className="glass-panel" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', transition: 'all 0.3s ease', transform: 'translateY(0)' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
-                  {/* Image Container */}
-                  <div style={{ height: '240px', position: 'relative', background: '#000' }}>
+                <div key={room.id} className="room-card" style={{ borderRadius: 20, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                  {/* Image */}
+                  <div style={{ height: 220, position: 'relative', overflow: 'hidden', background: '#0f1629' }}>
                     {room.imageUrls && room.imageUrls.length > 0 ? (
-                      <img src={room.imageUrls[0]} alt={`Phòng ${room.roomNumber}`} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: room.status === 'VACANT' ? 1 : 0.6 }} />
+                      <img className="room-img" src={room.imageUrls[0]} alt={`Phòng ${room.roomNumber}`} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: room.status === 'VACANT' ? 1 : 0.5 }} />
                     ) : (
-                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>Chưa có ảnh</div>
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.2)', fontSize: '2.5rem' }}>🏠</div>
                     )}
-                    <span style={{ 
-                      position: 'absolute', top: '16px', right: '16px', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '700',
-                      backgroundColor: room.status === 'VACANT' ? 'var(--status-success-bg)' : room.status === 'OCCUPIED' ? 'var(--status-error-bg)' : 'var(--status-pending-bg)',
-                      color: room.status === 'VACANT' ? 'var(--status-success-text)' : room.status === 'OCCUPIED' ? 'var(--status-error-text)' : 'var(--status-pending-text)',
-                      backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)'
+                    {/* Gradient overlay */}
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', background: 'linear-gradient(transparent, rgba(8,12,20,0.95))' }} />
+                    {/* Status badge */}
+                    <div style={{ position: 'absolute', top: 14, right: 14, padding: '5px 12px', borderRadius: 999, fontSize: '0.75rem', fontWeight: 700, backdropFilter: 'blur(12px)',
+                      background: room.status === 'VACANT' ? 'rgba(34,197,94,0.2)' : room.status === 'OCCUPIED' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)',
+                      color: room.status === 'VACANT' ? '#4ade80' : room.status === 'OCCUPIED' ? '#f87171' : '#fbbf24',
+                      border: `1px solid ${room.status === 'VACANT' ? 'rgba(34,197,94,0.4)' : room.status === 'OCCUPIED' ? 'rgba(239,68,68,0.4)' : 'rgba(245,158,11,0.4)'}`,
                     }}>
-                      {room.status === 'VACANT' ? 'Còn Trống' : room.status === 'OCCUPIED' ? 'Đã Thuê' : 'Bảo Trì'}
-                    </span>
+                      {room.status === 'VACANT' ? '● Còn trống' : room.status === 'OCCUPIED' ? '● Đã thuê' : '● Bảo trì'}
+                    </div>
+                    {/* Room number overlay */}
+                    <div style={{ position: 'absolute', bottom: 14, left: 18 }}>
+                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white' }}>Phòng {room.roomNumber}</div>
+                    </div>
                   </div>
 
-                  <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                      <h3 style={{ fontSize: '1.75rem', fontWeight: '800' }}>Phòng {room.roomNumber}</h3>
+                  {/* Content */}
+                  <div style={{ padding: '20px 22px 22px', display: 'flex', flexDirection: 'column', flexGrow: 1, gap: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#a78bfa', letterSpacing: '-0.02em' }}>{formatCurrency(room.price)}</div>
+                        <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>mỗi tháng</div>
+                      </div>
                     </div>
-                    
-                    <div style={{ fontSize: '1.5rem', color: 'var(--primary)', fontWeight: '700', marginBottom: '16px' }}>
-                      {formatCurrency(room.price)} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '400' }}>/tháng</span>
-                    </div>
-                    
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '32px', flexGrow: 1, lineHeight: '1.5' }}>
-                      {room.description || 'Chưa có mô tả chi tiết.'}
+                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.88rem', lineHeight: 1.65, flexGrow: 1 }}>
+                      {room.description || 'Phòng hiện đại, tiện nghi đầy đủ. Môi trường sống thoải mái và an toàn.'}
                     </p>
-
-                    <button 
+                    <button
                       onClick={() => handleSelectRoom(room.id)}
                       disabled={room.status !== 'VACANT'}
-                      className="btn-primary"
-                      style={{ padding: '14px', fontSize: '1rem', opacity: room.status !== 'VACANT' ? 0.5 : 1 }}
+                      style={{ width: '100%', padding: '13px', borderRadius: 12, border: 'none', cursor: room.status === 'VACANT' ? 'pointer' : 'not-allowed', fontFamily: 'inherit', fontWeight: 700, fontSize: '0.92rem', transition: 'all 0.25s',
+                        background: room.status === 'VACANT' ? 'linear-gradient(135deg,#7c3aed,#4f46e5)' : 'rgba(255,255,255,0.06)',
+                        color: room.status === 'VACANT' ? 'white' : 'rgba(255,255,255,0.3)',
+                        boxShadow: room.status === 'VACANT' ? '0 4px 20px rgba(124,58,237,0.35)' : 'none',
+                      }}
+                      onMouseEnter={e => { if (room.status === 'VACANT') e.currentTarget.style.boxShadow = '0 6px 28px rgba(124,58,237,0.55)'; }}
+                      onMouseLeave={e => { if (room.status === 'VACANT') e.currentTarget.style.boxShadow = '0 4px 20px rgba(124,58,237,0.35)'; }}
                     >
-                      {room.status === 'VACANT' ? 'Đăng Ký Phòng Này' : 'Không Khả Dụng'}
+                      {room.status === 'VACANT' ? 'Đăng ký phòng này →' : 'Không khả dụng'}
                     </button>
                   </div>
                 </div>
@@ -338,58 +494,113 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. Contact/Registration Form Section */}
-      <section ref={formRef} style={{ padding: '100px 20px', background: 'var(--bg-base)', position: 'relative' }}>
-        <div style={{ maxWidth: '600px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <div className="glass-panel" style={{ padding: '48px', borderRadius: '24px' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '16px', textAlign: 'center' }}>
-              Đăng Ký Tư Vấn
-            </h2>
-            
-            {selectedRoomDetails ? (
-              <div style={{ textAlign: 'center', marginBottom: '32px', padding: '16px', background: 'rgba(168, 85, 247, 0.1)', borderRadius: '12px', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '4px' }}>Bạn đang quan tâm đến:</p>
-                <p style={{ color: 'var(--primary)', fontSize: '1.25rem', fontWeight: '700' }}>
-                  Phòng {selectedRoomDetails.roomNumber} - {formatCurrency(selectedRoomDetails.price)}
-                </p>
-                <button type="button" onClick={() => setFormData(prev => ({...prev, roomId: ''}))} style={{ color: 'var(--text-muted)', textDecoration: 'underline', fontSize: '0.85rem', marginTop: '8px', cursor: 'pointer', background: 'none', border: 'none' }}>
-                  Hủy chọn
-                </button>
+      {/* ── Testimonials ─────────────────────────────────────────────── */}
+      <section style={{ padding: '120px 48px', background: '#080C14', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: '50%', right: -200, transform: 'translateY(-50%)', width: 600, height: 600, background: 'radial-gradient(ellipse at center, rgba(6,182,212,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+          <div style={{ textAlign: 'center', marginBottom: 72 }}>
+            <div className="section-label" style={{ display: 'inline-flex', marginBottom: 16 }}>💬 Khách hàng nói gì</div>
+            <h2 style={{ fontSize: '2.8rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', marginBottom: 16 }}>Được tin dùng bởi<br /><span style={{ background: 'linear-gradient(135deg,#a78bfa,#60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>hàng trăm cư dân</span></h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+            {testimonials.map((t, i) => (
+              <div key={i} className="testimonial-card" style={{ padding: '30px', borderRadius: 20, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${t.color}60, transparent)` }} />
+                {/* Stars */}
+                <div style={{ display: 'flex', gap: 3, marginBottom: 16 }}>
+                  {[...Array(5)].map((_, si) => <span key={si} style={{ color: '#fbbf24', fontSize: '0.95rem' }}>★</span>)}
+                </div>
+                <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.92rem', lineHeight: 1.75, marginBottom: 24, fontStyle: 'italic' }}>"{t.text}"</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: `${t.color}30`, border: `2px solid ${t.color}60`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.75rem', flexShrink: 0 }}>{t.avatar}</div>
+                  <div>
+                    <div style={{ fontWeight: 700, color: 'white', fontSize: '0.88rem' }}>{t.name}</div>
+                    <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.75rem' }}>{t.role}</div>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '32px', fontSize: '1.05rem' }}>
-                Để lại thông tin, chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.
-              </p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Banner ──────────────────────────────────────────────── */}
+      <section style={{ padding: '100px 48px', background: '#0A0F1E', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(6,182,212,0.08) 100%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '80%', height: 300, background: 'radial-gradient(ellipse at center, rgba(124,58,237,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <h2 style={{ fontSize: '3rem', fontWeight: 900, color: 'white', letterSpacing: '-0.04em', marginBottom: 20, lineHeight: 1.1 }}>
+            Sẵn sàng tìm<br />
+            <span style={{ background: 'linear-gradient(135deg,#a78bfa,#60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>ngôi nhà mới?</span>
+          </h2>
+          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '1.1rem', lineHeight: 1.7, marginBottom: 40 }}>
+            Đăng ký ngay hôm nay và chuyển vào phòng trong vòng 48 giờ. Quy trình nhanh gọn, minh bạch.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <button onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} className="btn-lp-primary" style={{ fontSize: '1.05rem', padding: '17px 42px' }}>
+              Đăng ký ngay — Miễn phí
+            </button>
+            <Link href="/login" className="btn-lp-ghost" style={{ fontSize: '1.05rem', padding: '17px 36px' }}>
+              Đăng nhập →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Form Section ────────────────────────────────────────────── */}
+      <section id="contact" ref={formRef} style={{ padding: '120px 48px', background: '#080C14', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: '30%', left: -100, width: 500, height: 500, background: 'radial-gradient(ellipse at center, rgba(124,58,237,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ maxWidth: 600, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <div className="section-label" style={{ display: 'inline-flex', marginBottom: 16 }}>📋 Liên hệ</div>
+            <h2 style={{ fontSize: '2.4rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', marginBottom: 12 }}>Đăng ký tư vấn</h2>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem' }}>Để lại thông tin, chúng tôi sẽ liên hệ trong vòng 15 phút</p>
+          </div>
+
+          <div style={{ padding: '48px', borderRadius: 24, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(20px)' }}>
+            {selectedRoomDetails && (
+              <div style={{ marginBottom: 24, padding: '14px 18px', background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Đang quan tâm:</div>
+                  <div style={{ color: '#a78bfa', fontWeight: 700 }}>Phòng {selectedRoomDetails.roomNumber} — {formatCurrency(selectedRoomDetails.price)}/tháng</div>
+                </div>
+                <button onClick={() => setFormData(prev => ({ ...prev, roomId: '' }))} style={{ color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', textDecoration: 'underline', fontFamily: 'inherit' }}>Hủy chọn</button>
+              </div>
             )}
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ fontSize: '0.95rem' }}>Họ và tên</label>
-                <input required name="name" type="text" value={formData.name} onChange={handleFormChange} className="form-input" style={{ padding: '14px' }} placeholder="Nguyễn Văn A" />
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Họ và tên *</label>
+                  <input required name="name" type="text" value={formData.name} onChange={handleFormChange} className="lp-input" placeholder="Nguyễn Văn A" />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Số điện thoại *</label>
+                  <input required name="phone" type="tel" value={formData.phone} onChange={handleFormChange} className="lp-input" placeholder="0901 234 567" />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Email *</label>
+                <input required name="email" type="email" value={formData.email} onChange={handleFormChange} className="lp-input" placeholder="email@example.com" />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Ghi chú (tùy chọn)</label>
+                <textarea name="message" rows={3} value={formData.message} onChange={handleFormChange} className="lp-input" placeholder="Thời gian bạn có thể xem phòng, yêu cầu đặc biệt..." style={{ resize: 'vertical' }} />
               </div>
 
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ fontSize: '0.95rem' }}>Số điện thoại</label>
-                <input required name="phone" type="tel" value={formData.phone} onChange={handleFormChange} className="form-input" style={{ padding: '14px' }} placeholder="0901234567" />
-              </div>
-
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ fontSize: '0.95rem' }}>Email</label>
-                <input required name="email" type="email" value={formData.email} onChange={handleFormChange} className="form-input" style={{ padding: '14px' }} placeholder="email@example.com" />
-              </div>
-
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ fontSize: '0.95rem' }}>Ghi chú thêm (Tùy chọn)</label>
-                <textarea name="message" rows={4} value={formData.message} onChange={handleFormChange} className="form-input" style={{ padding: '14px', resize: 'vertical' }} placeholder="Thời gian bạn có thể xem phòng..." />
-              </div>
-
-              <button type="submit" disabled={status === 'loading'} className="btn-primary animate-pulse-glow" style={{ padding: '16px', fontSize: '1.1rem', marginTop: '10px' }}>
-                {status === 'loading' ? 'Đang Xử Lý...' : 'Gửi Thông Tin Đăng Ký'}
+              <button type="submit" disabled={status === 'loading'} className="btn-lp-primary" style={{ width: '100%', justifyContent: 'center', fontSize: '1rem', padding: '16px', marginTop: 4 }}>
+                {status === 'loading' ? '⏳ Đang gửi...' : '✅ Gửi thông tin đăng ký'}
               </button>
 
               {status === 'success' && (
-                <div style={{ marginTop: '10px', padding: '16px', background: 'var(--status-success-bg)', color: 'var(--status-success-text)', borderRadius: '12px', textAlign: 'center', fontWeight: '500' }}>
-                  🎉 Gửi yêu cầu thành công! Chúng tôi sẽ gọi lại cho bạn.
+                <div style={{ padding: '14px 18px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 12, color: '#4ade80', fontWeight: 600, textAlign: 'center' }}>
+                  🎉 Yêu cầu đã gửi! Chúng tôi sẽ gọi lại bạn sớm.
+                </div>
+              )}
+              {status === 'error' && (
+                <div style={{ padding: '14px 18px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 12, color: '#f87171', fontWeight: 600, textAlign: 'center' }}>
+                  ❌ {errorMessage}
                 </div>
               )}
             </form>
@@ -397,136 +608,130 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-muted)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <p>© 2026 Smart Boarding House. All rights reserved.</p>
+      {/* ── Footer ───────────────────────────────────────────────────── */}
+      <footer style={{ background: '#060910', borderTop: '1px solid rgba(255,255,255,0.05)', padding: '60px 48px 40px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
+          {/* Brand */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 9, background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" style={{ width: 16, height: 16 }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
+                </svg>
+              </div>
+              <span style={{ fontWeight: 800, color: 'white', fontSize: '1.1rem' }}>SaaS<span style={{ color: '#a78bfa' }}> Rent</span></span>
+            </div>
+            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.88rem', lineHeight: 1.7, maxWidth: 280 }}>
+              Nền tảng quản lý nhà trọ thông minh, giúp chủ nhà và người thuê kết nối hiệu quả.
+            </p>
+          </div>
+
+          {/* Links */}
+          {[
+            { title: 'Sản phẩm', links: [
+              { label: 'Tính năng', href: '#features' }, 
+              { label: 'Giá cả', href: '#' }, 
+              { label: 'Phòng trống', href: '#rooms' }, 
+              { label: 'API', href: '#' }
+            ]},
+            { title: 'Hỗ trợ', links: [
+              { label: 'Câu hỏi thường gặp', href: '#' }, 
+              { label: 'Liên hệ', href: '#contact' }, 
+              { label: 'Điều khoản', href: '#' }, 
+              { label: 'Bảo mật', href: '#' }
+            ]},
+            { title: 'Liên kết', links: [
+              { label: 'Đăng nhập', href: '/login' }, 
+              { label: 'Đăng ký thuê', href: '#contact' }, 
+              { label: 'Tư vấn miễn phí', href: '#contact' }, 
+              { label: 'Blog', href: '#' }
+            ]},
+          ].map((col, i) => (
+            <div key={i}>
+              <div style={{ fontWeight: 700, color: 'white', fontSize: '0.88rem', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{col.title}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {col.links.map(link => (
+                  <Link key={link.label} href={link.href} style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.88rem', textDecoration: 'none', transition: 'color 0.2s' }}
+                    onMouseEnter={e => (e.currentTarget as any).style.color = 'rgba(255,255,255,0.7)'}
+                    onMouseLeave={e => (e.currentTarget as any).style.color = 'rgba(255,255,255,0.35)'}
+                  >{link.label}</Link>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'rgba(255,255,255,0.25)', fontSize: '0.82rem' }}>
+          <span>© 2026 NestPro. All rights reserved.</span>
+          <div style={{ display: 'flex', gap: 24 }}>
+            <span>Chính sách bảo mật</span>
+            <span>Điều khoản sử dụng</span>
+            <span style={{ color: 'rgba(255,255,255,0.15)' }}>Made with ♥ in Vietnam</span>
+          </div>
+        </div>
       </footer>
-      {/* AI Chat Widget */}
+
+      {/* ── AI Chat Widget ────────────────────────────────────────────── */}
       <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-        
-        {/* Chat Panel */}
         {isChatOpen && (
-          <div
-            style={{
-              width: '360px',
-              height: '500px',
-              marginBottom: '16px',
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-              borderRadius: '20px',
-              border: '1px solid rgba(168,85,247,0.4)',
-              background: 'rgba(15,23,42,0.95)',
-              backdropFilter: 'blur(20px)',
-              boxShadow: '0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(168,85,247,0.1)',
-              animation: 'fadeIn 0.3s ease-out',
-            }}
-          >
-            {/* Chat Header */}
-            <div style={{ padding: '16px 20px', background: 'linear-gradient(135deg, rgba(168,85,247,0.4), rgba(59,130,246,0.3))', borderBottom: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
+          <div style={{ width: '360px', height: '500px', marginBottom: '16px', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRadius: '20px', border: '1px solid rgba(124,58,237,0.3)', background: 'rgba(8,12,20,0.97)', backdropFilter: 'blur(24px)', boxShadow: '0 25px 60px rgba(0,0,0,0.6)', animation: 'fadeIn 0.3s ease-out' }}>
+            <div style={{ padding: '16px 20px', background: 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(79,70,229,0.2))', borderBottom: '1px solid rgba(255,255,255,0.07)', flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', flexShrink: 0 }}>🤖</div>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>🤖</div>
                   <div>
-                    <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'white' }}>RentBot AI</div>
-                    <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
-                      Trực tuyến • Tư vấn thuê phòng
+                    <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'white' }}>RentBot AI</div>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+                      Trực tuyến · Tư vấn thuê phòng
                     </div>
                   </div>
                 </div>
-                <button onClick={() => setIsChatOpen(false)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '1.1rem', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                <button onClick={() => setIsChatOpen(false)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', width: '26px', height: '26px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>×</button>
               </div>
             </div>
 
-            {/* Messages */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {chatMessages.map((msg, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', gap: '8px', alignItems: 'flex-end' }}>
-                  {msg.role === 'ai' && (
-                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', flexShrink: 0 }}>🤖</div>
-                  )}
-                  <div style={{
-                    maxWidth: '78%',
-                    padding: '10px 14px',
-                    borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '4px 16px 16px 16px',
-                    background: msg.role === 'user' ? 'linear-gradient(135deg, #a855f7, #3b82f6)' : 'rgba(255,255,255,0.07)',
-                    fontSize: '0.82rem',
-                    lineHeight: '1.6',
-                    color: 'white',
-                    border: msg.role === 'ai' ? '1px solid rgba(255,255,255,0.08)' : 'none',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word',
-                  }}>
+                  {msg.role === 'ai' && <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', flexShrink: 0 }}>🤖</div>}
+                  <div style={{ maxWidth: '78%', padding: '10px 13px', borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '4px 16px 16px 16px', background: msg.role === 'user' ? 'linear-gradient(135deg, #7c3aed, #4f46e5)' : 'rgba(255,255,255,0.06)', fontSize: '0.82rem', lineHeight: '1.6', color: 'white', border: msg.role === 'ai' ? '1px solid rgba(255,255,255,0.07)' : 'none', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                     {msg.text.replace(/\*\*(.*?)\*\*/g, '$1')}
                   </div>
                 </div>
               ))}
               {isChatLoading && (
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>🤖</div>
-                  <div style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.07)', borderRadius: '4px 16px 16px 16px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>🤖</div>
+                  <div style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px 16px 16px 16px', border: '1px solid rgba(255,255,255,0.07)' }}>
                     <div style={{ display: 'flex', gap: '4px' }}>
-                      {[0,1,2].map(i => <span key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#a855f7', display: 'inline-block', animation: `bounce 1.2s ${i*0.2}s infinite` }} />)}
+                      {[0, 1, 2].map(i => <span key={i} style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#7c3aed', display: 'inline-block', animation: `bounce 1.2s ${i * 0.2}s infinite` }} />)}
                     </div>
+                    <style>{`@keyframes bounce { 0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)} }`}</style>
                   </div>
                 </div>
               )}
               <div ref={chatEndRef} />
             </div>
 
-            {/* Quick Questions - chỉ hiện lúc đầu */}
             {chatMessages.length <= 1 && (
-              <div style={{ padding: '8px 16px', display: 'flex', flexWrap: 'wrap', gap: '6px', borderTop: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
+              <div style={{ padding: '8px 14px', display: 'flex', flexWrap: 'wrap', gap: '5px', borderTop: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
                 {QUICK_QUESTIONS.map(q => (
-                  <button
-                    key={q}
-                    onClick={() => handleSendChat(q)}
-                    style={{ padding: '5px 11px', borderRadius: '999px', fontSize: '0.72rem', cursor: 'pointer', background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.3)', color: '#c084fc', transition: 'all 0.2s', whiteSpace: 'nowrap' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.25)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.12)'; }}
-                  >
-                    {q}
-                  </button>
+                  <button key={q} onClick={() => handleSendChat(q)} style={{ padding: '4px 10px', borderRadius: '999px', fontSize: '0.7rem', cursor: 'pointer', background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.25)', color: '#c084fc', transition: 'all 0.2s', whiteSpace: 'nowrap', fontFamily: 'inherit' }}>{q}</button>
                 ))}
               </div>
             )}
 
-            {/* Input */}
-            <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: '8px', flexShrink: 0 }}>
-              <input
-                value={chatInput}
-                onChange={e => setChatInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendChat(); } }}
-                placeholder="Hỏi tôi bất kỳ điều gì..."
-                disabled={isChatLoading}
-                style={{ flex: 1, padding: '10px 14px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', color: 'white', fontSize: '0.82rem', outline: 'none' }}
-              />
-              <button
-                onClick={() => handleSendChat()}
-                disabled={isChatLoading || !chatInput.trim()}
-                style={{ padding: '10px 14px', background: 'linear-gradient(135deg, #a855f7, #3b82f6)', border: 'none', borderRadius: '10px', color: 'white', cursor: 'pointer', fontSize: '1rem', opacity: (!chatInput.trim() || isChatLoading) ? 0.4 : 1, transition: 'opacity 0.2s' }}
-              >
-                ➤
-              </button>
+            <div style={{ padding: '10px 14px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', gap: '8px', flexShrink: 0 }}>
+              <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendChat(); } }} placeholder="Hỏi tôi bất kỳ điều gì..." disabled={isChatLoading} style={{ flex: 1, padding: '9px 13px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white', fontSize: '0.82rem', outline: 'none', fontFamily: 'inherit' }} />
+              <button onClick={() => handleSendChat()} disabled={isChatLoading || !chatInput.trim()} style={{ padding: '9px 13px', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', border: 'none', borderRadius: '10px', color: 'white', cursor: 'pointer', fontSize: '0.9rem', opacity: (!chatInput.trim() || isChatLoading) ? 0.4 : 1, transition: 'opacity 0.2s' }}>➤</button>
             </div>
           </div>
         )}
 
-        {/* Toggle Button */}
-        <button
-          onClick={() => setIsChatOpen(prev => !prev)}
-          style={{
-            width: '58px', height: '58px', borderRadius: '50%', border: 'none', cursor: 'pointer',
-            background: 'linear-gradient(135deg, #a855f7, #3b82f6)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: isChatOpen ? '1.5rem' : '1.75rem',
-            boxShadow: '0 8px 30px rgba(168,85,247,0.5)',
-            transition: 'all 0.3s ease',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.12)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(168,85,247,0.7)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(168,85,247,0.5)'; }}
-          title={isChatOpen ? 'Đóng chat' : 'Chat với RentBot AI'}
+        <button onClick={() => setIsChatOpen(prev => !prev)} style={{ width: '56px', height: '56px', borderRadius: '50%', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isChatOpen ? '1.4rem' : '1.6rem', boxShadow: '0 8px 28px rgba(124,58,237,0.5)', transition: 'all 0.3s ease' }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 10px 36px rgba(124,58,237,0.7)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(124,58,237,0.5)'; }}
         >
           {isChatOpen ? '✕' : '🤖'}
         </button>
