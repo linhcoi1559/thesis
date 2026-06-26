@@ -173,7 +173,7 @@ export default function TenantDashboard() {
           .neo-header > div { padding: 0 16px !important; }
           main { padding: 20px 16px 80px !important; }
           .payment-modal { padding: 24px !important; }
-          .payment-qr { width: 150px !important; height: 150px !important; }
+          .payment-qr { width: 100% !important; max-width: 250px !important; height: auto !important; }
           .welcome-header { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
           .welcome-header button { width: 100% !important; justify-content: center !important; }
         }
@@ -512,7 +512,7 @@ export default function TenantDashboard() {
                 src="/qr-thanh-toan.jpg"
                 alt="QR Code Thanh Toán"
                 className="payment-qr"
-                style={{ width: 180, height: 180, borderRadius: 12, border: '2px solid var(--border-light)', padding: 6, background: 'white', objectFit: 'contain' }}
+                style={{ width: '100%', maxWidth: 280, height: 'auto', borderRadius: 12, border: '2px solid var(--border-light)', padding: 6, background: 'white', display: 'inline-block' }}
               />
               <p style={{ fontSize: '0.8rem', color: 'var(--text-light-muted)', marginTop: 8 }}>Quét mã QR để thanh toán nhanh</p>
             </div>
