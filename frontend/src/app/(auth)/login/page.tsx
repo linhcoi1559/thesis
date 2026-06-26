@@ -52,9 +52,29 @@ export default function LoginPage() {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', fontFamily: "'Plus Jakarta Sans', 'Outfit', sans-serif" }}>
+    <div className="login-container">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        
+        .login-container {
+          min-height: 100vh;
+          display: grid;
+          grid-template-columns: 1.1fr 0.9fr;
+          font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+        }
+
+        @media (max-width: 850px) {
+          .login-container {
+            grid-template-columns: 1fr;
+          }
+          .left-panel {
+            display: none !important;
+          }
+          .right-panel {
+            padding: 40px 24px !important;
+          }
+        }
+
         
         .login-input {
           width: 100%;
