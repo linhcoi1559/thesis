@@ -180,7 +180,6 @@ export default function InvoicesPage() {
         {[
           { label: 'Đã thu', value: formatCurrency(stats.totalRevenue), subtext: `${stats.paid} hóa đơn`, color: 'green', icon: '✅' },
           { label: 'Chờ thanh toán', value: formatCurrency(stats.pendingAmount), subtext: `${stats.unpaid} hóa đơn`, color: 'yellow', icon: '⏳' },
-          { label: 'Quá hạn', value: String(stats.overdue), subtext: 'hóa đơn cần xử lý', color: 'red', icon: '🚨' },
           { label: 'Tổng hóa đơn', value: String(stats.total), subtext: 'tất cả trạng thái', color: 'indigo', icon: '📋' },
         ].map((card, i) => (
           <div key={i} className={`stat-card ${card.color} animate-fade-in`} style={{ animationDelay: `${i * 0.07}s` }}>

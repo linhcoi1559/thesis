@@ -163,6 +163,7 @@ export default function TenantDashboard() {
   const formatCurrency = (n: number) => Number(n).toLocaleString('vi-VN') + ' đ';
   const getDaysLeft = (endDate: string) => Math.ceil((new Date(endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   const getDaysUntilDue = (dueDate: string) => Math.ceil((new Date(dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  const removeAccents = (str: string) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
 
   return (
     <div className="tenant-layout" style={{ minHeight: '100vh', fontFamily: 'Outfit, sans-serif', color: 'var(--text-light-main)', background: 'var(--bg-light-base)' }}>
@@ -509,7 +510,7 @@ export default function TenantDashboard() {
             </div>
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
               <img
-                src={`https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-qr_only.png?amount=${payingInvoice.amount}&addInfo=${(user as any)?.phone}%20${payingInvoice.invoiceNumber}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`}
+                src={`https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-qr_only.png?amount=${payingInvoice.amount}&addInfo=${encodeURIComponent(`${removeAccents((user as any)?.name || 'Khach')} chuyen tien tro thang ${new Date(payingInvoice.dueDate).getMonth() + 1}`)}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`}
                 alt="QR Code"
                 className="payment-qr"
                 style={{ width: 180, height: 180, borderRadius: 12, border: '2px solid var(--border-light)', padding: 6, background: 'white' }}
