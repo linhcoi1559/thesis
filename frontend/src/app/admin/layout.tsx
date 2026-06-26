@@ -155,7 +155,51 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-light-base)', color: 'var(--text-light-main)', fontFamily: 'Outfit, sans-serif' }}>
+    <div className="admin-layout" style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-light-base)', color: 'var(--text-light-main)', fontFamily: 'Outfit, sans-serif' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .admin-layout { flex-direction: column !important; }
+          .neo-sidebar { 
+            position: fixed !important; 
+            bottom: 0 !important; 
+            top: auto !important;
+            width: 100% !important; 
+            height: 65px !important; 
+            flex-direction: row !important;
+            border-top: 1px solid var(--border-light);
+            border-right: none !important;
+            z-index: 50 !important;
+            background: var(--bg-light-base) !important;
+            padding: 0 !important;
+          }
+          .neo-sidebar > div:first-child, .neo-sidebar > div:last-child { display: none !important; }
+          .neo-sidebar nav { 
+            flex-direction: row !important; 
+            justify-content: space-around !important; 
+            padding: 0 !important; 
+            overflow: visible !important;
+          }
+          .sidebar-nav-item { 
+            flex-direction: column !important; 
+            justify-content: center !important;
+            align-items: center !important;
+            font-size: 0.65rem !important; 
+            padding: 8px 4px !important; 
+            gap: 4px !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            margin: 0 !important;
+          }
+          .sidebar-nav-item:hover { background: transparent !important; }
+          .sidebar-nav-item .nav-icon { margin-right: 0 !important; }
+          .sidebar-nav-item span:last-child:not(.nav-icon) { display: none !important; }
+          .neo-sidebar nav > div:first-child { display: none !important; }
+          
+          .admin-layout > div { margin-bottom: 65px !important; }
+          .neo-header { padding: 0 16px !important; }
+          main { padding: 16px 16px 40px !important; }
+        }
+      `}</style>
       {/* ====== SIDEBAR ====== */}
       <aside
         className="neo-sidebar"

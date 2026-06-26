@@ -165,7 +165,19 @@ export default function TenantDashboard() {
   const getDaysUntilDue = (dueDate: string) => Math.ceil((new Date(dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 
   return (
-    <div style={{ minHeight: '100vh', fontFamily: 'Outfit, sans-serif', color: 'var(--text-light-main)', background: 'var(--bg-light-base)' }}>
+    <div className="tenant-layout" style={{ minHeight: '100vh', fontFamily: 'Outfit, sans-serif', color: 'var(--text-light-main)', background: 'var(--bg-light-base)' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .tenant-hero-grid { grid-template-columns: 1fr !important; }
+          .tenant-stats-grid { grid-template-columns: 1fr !important; }
+          .neo-header > div { padding: 0 16px !important; }
+          main { padding: 20px 16px 80px !important; }
+          .payment-modal { padding: 24px !important; }
+          .payment-qr { width: 150px !important; height: 150px !important; }
+          .welcome-header { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+          .welcome-header button { width: 100% !important; justify-content: center !important; }
+        }
+      `}</style>
       {/* Navbar */}
       <header className="neo-header" style={{ position: 'sticky', top: 0, zIndex: 20 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -204,7 +216,7 @@ export default function TenantDashboard() {
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 24px 80px', display: 'flex', flexDirection: 'column', gap: 28 }}>
 
         {/* Welcome */}
-        <div className="animate-fade-in" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+        <div className="welcome-header animate-fade-in" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
           <div>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, letterSpacing: '-0.02em' }}>
               Xin chào, <span className="text-gradient">{user?.name?.split(' ').pop()}</span>! 👋
@@ -224,7 +236,7 @@ export default function TenantDashboard() {
         </div>
 
         {currentContract ? (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div className="tenant-hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
 
             {/* Left: Contract Hero Card */}
             <div style={{ gridColumn: '1 / 2' }}>
@@ -314,7 +326,7 @@ export default function TenantDashboard() {
               )}
 
               {/* Quick Stats */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="tenant-stats-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 {[
                   { label: 'Tổng hóa đơn', value: invoices.length, color: '#818cf8', icon: '📋' },
                   { label: 'Đã thanh toán', value: paidInvoices.length, color: '#4ade80', icon: '✅' },
@@ -475,7 +487,7 @@ export default function TenantDashboard() {
       {/* Payment Modal */}
       {payingInvoice && (
         <div className="modal-overlay" style={{ background: 'rgba(0,0,0,0.4)' }}>
-          <div className="neo-card animate-fade-in" style={{ maxWidth: 440, width: '100%', padding: 32, position: 'relative' }}>
+          <div className="neo-card animate-fade-in payment-modal" style={{ maxWidth: 440, width: '100%', padding: 32, position: 'relative' }}>
             <button onClick={() => setPayingInvoice(null)} style={{ position: 'absolute', top: 14, right: 14, width: 30, height: 30, borderRadius: '50%', background: 'var(--border-light)', border: 'none', color: 'var(--text-light-muted)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
             <h2 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: 20, textAlign: 'center' }}>💳 Thanh toán hóa đơn</h2>
             <div style={{ background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', borderRadius: 14, padding: 20, textAlign: 'center', marginBottom: 20 }}>
@@ -499,6 +511,7 @@ export default function TenantDashboard() {
               <img
                 src={`https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-qr_only.png?amount=${payingInvoice.amount}&addInfo=${(user as any)?.phone}%20${payingInvoice.invoiceNumber}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`}
                 alt="QR Code"
+                className="payment-qr"
                 style={{ width: 180, height: 180, borderRadius: 12, border: '2px solid var(--border-light)', padding: 6, background: 'white' }}
               />
               <p style={{ fontSize: '0.8rem', color: 'var(--text-light-muted)', marginTop: 8 }}>Quét mã QR để thanh toán nhanh</p>

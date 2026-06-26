@@ -247,6 +247,33 @@ export default function LandingPage() {
           color: var(--text-light-muted); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
           margin-bottom: 16px;
         }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+          .hero-grid { grid-template-columns: 1fr !important; gap: 40px !important; text-align: center; }
+          .hero-grid > div:first-child { display: flex; flex-direction: column; align-items: center; }
+          .hero-grid .hero-sub { margin-left: auto; margin-right: auto; }
+          .hero-grid .hero-btns { justify-content: center; }
+          .hero-grid .hero-stats { justify-content: center; }
+          .features-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .testimonials-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .footer-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+
+        @media (max-width: 768px) {
+          .features-grid { grid-template-columns: 1fr !important; }
+          .rooms-grid { grid-template-columns: 1fr !important; }
+          .testimonials-grid { grid-template-columns: 1fr !important; }
+          .footer-grid { grid-template-columns: 1fr !important; }
+          .lp-nav-links { display: none !important; }
+          .lp-nav-cta { gap: 6px !important; }
+          .lp-nav-cta a, .lp-nav-cta button { padding: 8px 12px !important; font-size: 0.8rem !important; }
+          .hero-title { font-size: 2.5rem !important; }
+          .contact-grid { grid-template-columns: 1fr !important; }
+          section { padding: 60px 24px !important; }
+          .hero-grid { padding: 100px 24px 40px !important; }
+          .lp-nav-container { padding: 14px 20px !important; }
+        }
       `}</style>
 
       {/* ── Navbar ──────────────────────────────────────────────────── */}
@@ -254,7 +281,7 @@ export default function LandingPage() {
         className={`lp-nav ${scrolled ? 'scrolled' : ''}`}
         style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', flexDirection: 'column' }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 48px', width: '100%' }}>
+        <div className="lp-nav-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 48px', width: '100%' }}>
         {/* Logo */}
         <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(124,58,237,0.5)' }}>
@@ -268,7 +295,7 @@ export default function LandingPage() {
         </a>
 
         {/* Nav Links */}
-        <nav style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+        <nav className="lp-nav-links" style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           {[
             { label: 'Tính năng', href: '#features' },
             { label: 'Phòng trống', href: '#rooms' },
@@ -282,7 +309,7 @@ export default function LandingPage() {
         </nav>
 
         {/* CTA */}
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div className="lp-nav-cta" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           {user ? (
             <>
               <span style={{ color: 'var(--text-light-muted)', fontSize: '0.88rem' }}>Hi, <strong style={{ color: 'var(--text-light-main)' }}>{user.name}</strong></span>
@@ -312,7 +339,7 @@ export default function LandingPage() {
         
         <div className="grid-pattern" />
 
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '100px 48px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', position: 'relative', zIndex: 1, width: '100%' }}>
+        <div className="hero-grid" style={{ maxWidth: 1280, margin: '0 auto', padding: '100px 48px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', position: 'relative', zIndex: 1, width: '100%' }}>
           {/* Left: Text */}
           <div>
             <div className="hero-badge tag-badge" style={{ marginBottom: 24 }}>
@@ -407,7 +434,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
+          <div className="features-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
             {features.map((feat, i) => (
               <div key={i} className="feat-card" style={{ padding: '32px 28px', borderRadius: 20, background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', cursor: 'default', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${feat.glow}, transparent)` }} />
@@ -440,7 +467,7 @@ export default function LandingPage() {
           ) : rooms.length === 0 ? (
             <div style={{ textAlign: 'center', color: 'var(--text-light-muted)', padding: 60, fontSize: '0.95rem' }}>Hiện tại không có phòng nào trong hệ thống.</div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 28 }}>
+            <div className="rooms-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 28 }}>
               {rooms.map((room) => (
                 <div key={room.id} className="room-card" style={{ borderRadius: 20, background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                   {/* Image */}
@@ -507,7 +534,7 @@ export default function LandingPage() {
             <h2 style={{ fontSize: '2.8rem', fontWeight: 800, color: 'var(--text-light-main)', letterSpacing: '-0.03em', marginBottom: 16 }}>Được tin dùng bởi<br /><span style={{ background: 'linear-gradient(135deg,#a78bfa,#60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>hàng trăm cư dân</span></h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+          <div className="testimonials-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
             {testimonials.map((t, i) => (
               <div key={i} className="testimonial-card" style={{ padding: '30px', borderRadius: 20, background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${t.color}60, transparent)` }} />
@@ -574,7 +601,7 @@ export default function LandingPage() {
             )}
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div className="contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-light-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Họ và tên *</label>
                   <input required name="name" type="text" value={formData.name} onChange={handleFormChange} className="lp-input" placeholder="Nguyễn Văn A" />
@@ -614,7 +641,7 @@ export default function LandingPage() {
 
       {/* ── Footer ───────────────────────────────────────────────────── */}
       <footer style={{ background: 'var(--bg-light-surface)', borderTop: '1px solid var(--border-light)', padding: '60px 48px 40px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
+        <div className="footer-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
           {/* Brand */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
