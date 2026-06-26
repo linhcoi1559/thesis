@@ -167,7 +167,7 @@ export default function LandingPage() {
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         
         .lp-nav { transition: all 0.4s ease; }
-        .lp-nav.scrolled { background: rgba(8,12,20,0.9) !important; backdrop-filter: blur(24px) !important; box-shadow: 0 1px 0 rgba(255,255,255,0.06) !important; }
+        .lp-nav.scrolled { background: rgba(255,255,255,0.95) !important; backdrop-filter: blur(24px) !important; box-shadow: 0 1px 0 rgba(255,255,255,0.06) !important; }
         
         .hero-badge { animation: fadeSlideUp 0.7s ease both; }
         .hero-title { animation: fadeSlideUp 0.7s 0.1s ease both; }
@@ -201,11 +201,11 @@ export default function LandingPage() {
           display: inline-flex; align-items: center; gap: 8px;
           padding: 16px 36px; border-radius: 14px; cursor: pointer;
           font-family: inherit; font-weight: 600; font-size: 1rem;
-          background: rgba(255,255,255,0.05); color: white;
-          border: 1px solid rgba(255,255,255,0.12);
+          background: var(--bg-light-surface-alt); color: var(--text-light-main);
+          border: 1px solid var(--border-light);
           transition: all 0.25s ease; text-decoration: none;
         }
-        .btn-lp-ghost:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .btn-lp-ghost:hover { background: var(--bg-light-surface); border-color: #cbd5e1; transform: translateY(-2px); box-shadow: var(--neo-shadow); }
         
         .mesh-gradient {
           position: absolute; inset: 0; z-index: 0;
@@ -227,24 +227,24 @@ export default function LandingPage() {
         
         .lp-input {
           width: 100%; padding: 14px 18px; border-radius: 12px; font-size: 0.95rem; font-family: inherit;
-          background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
-          color: white; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+          background: var(--bg-light-surface); border: 1px solid var(--border-light);
+          color: var(--text-light-main); outline: none; transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .lp-input::placeholder { color: rgba(255,255,255,0.3); }
+        .lp-input::placeholder { color: var(--text-light-muted); }
         .lp-input:focus { border-color: rgba(124,58,237,0.6); box-shadow: 0 0 0 3px rgba(124,58,237,0.15); }
         
         .tag-badge {
           display: inline-flex; align-items: center; gap: 6px;
           padding: 6px 16px; border-radius: 999px;
           background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.3);
-          color: #c4b5fd; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.02em;
+          color: #6d28d9; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.02em;
         }
         
         .section-label {
           display: inline-flex; align-items: center; gap: 8px;
           padding: 6px 14px; border-radius: 999px;
-          background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-          color: rgba(255,255,255,0.5); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+          background: var(--bg-light-surface-alt); border: 1px solid var(--border-light);
+          color: var(--text-light-muted); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
           margin-bottom: 16px;
         }
       `}</style>
@@ -252,8 +252,9 @@ export default function LandingPage() {
       {/* ── Navbar ──────────────────────────────────────────────────── */}
       <header
         className={`lp-nav ${scrolled ? 'scrolled' : ''}`}
-        style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 48px' }}
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', flexDirection: 'column' }}
       >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 48px', width: '100%' }}>
         {/* Logo */}
         <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(124,58,237,0.5)' }}>
@@ -261,7 +262,7 @@ export default function LandingPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
             </svg>
           </div>
-          <span style={{ fontWeight: 800, fontSize: '1.25rem', color: 'white', letterSpacing: '-0.03em' }}>
+          <span style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-light-main)', letterSpacing: '-0.03em' }}>
             SaaS<span style={{ color: '#a78bfa' }}> Rent</span>
           </span>
         </a>
@@ -273,9 +274,9 @@ export default function LandingPage() {
             { label: 'Phòng trống', href: '#rooms' },
             { label: 'Liên hệ', href: '#contact' },
           ].map(item => (
-            <a key={item.label} href={item.href} style={{ padding: '8px 14px', color: 'rgba(255,255,255,0.65)', fontSize: '0.9rem', fontWeight: 500, borderRadius: 8, textDecoration: 'none', transition: 'color 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.color = 'white'}
-              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.65)'}
+            <a key={item.label} href={item.href} style={{ padding: '8px 14px', color: 'var(--text-light-muted)', fontSize: '0.9rem', fontWeight: 600, borderRadius: 8, textDecoration: 'none', transition: 'color 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--text-light-main)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'var(--text-light-muted)'}
             >{item.label}</a>
           ))}
         </nav>
@@ -284,15 +285,14 @@ export default function LandingPage() {
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           {user ? (
             <>
-              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.88rem' }}>Hi, <strong style={{ color: 'white' }}>{user.name}</strong></span>
+              <span style={{ color: 'var(--text-light-muted)', fontSize: '0.88rem' }}>Hi, <strong style={{ color: 'var(--text-light-main)' }}>{user.name}</strong></span>
               {(user.role === 'ADMIN' || user.role === 'LANDLORD') && <Link href="/admin" className="btn-lp-primary" style={{ padding: '9px 18px', fontSize: '0.88rem' }}>Dashboard</Link>}
               {user.role === 'TENANT' && <Link href="/tenant" className="btn-lp-primary" style={{ padding: '9px 18px', fontSize: '0.88rem' }}>Phòng Của Tôi</Link>}
               <button onClick={logout} style={{ padding: '9px 16px', background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, cursor: 'pointer', fontSize: '0.88rem', fontFamily: 'inherit', fontWeight: 600, transition: 'all 0.2s' }}>Đăng Xuất</button>
             </>
           ) : (
             <>
-              <Link href="/login" style={{ padding: '9px 18px', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none', borderRadius: 10, transition: 'color 0.2s' }}
-                onMouseEnter={e => (e.currentTarget as any).style.color = 'white'}
+              <Link href="/login" style={{ padding: '9px 18px', color: 'var(--text-light-muted)', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none', borderRadius: 10, transition: 'color 0.2s' }}
                 onMouseLeave={e => (e.currentTarget as any).style.color = 'rgba(255,255,255,0.7)'}
               >Đăng Nhập</Link>
               <button onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} className="btn-lp-primary" style={{ padding: '9px 20px', fontSize: '0.9rem' }}>
@@ -301,11 +301,15 @@ export default function LandingPage() {
             </>
           )}
         </div>
+        </div>
+
+        {/* Bottom Decorative Line */}
+        <div style={{ width: '100%', height: 1, background: 'linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.8) 20%, rgba(79,70,229,0.8) 50%, rgba(6,182,212,0.8) 80%, transparent 100%)', boxShadow: '0 1px 12px rgba(124,58,237,0.5)' }} />
       </header>
 
       {/* ── Hero Section ─────────────────────────────────────────────── */}
-      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: '#080C14' }}>
-        <div className="mesh-gradient" />
+      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: 'var(--bg-light-base)' }}>
+        
         <div className="grid-pattern" />
 
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '100px 48px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', position: 'relative', zIndex: 1, width: '100%' }}>
@@ -316,14 +320,14 @@ export default function LandingPage() {
               Hệ thống quản lý nhà trọ thông minh #1
             </div>
 
-            <h1 className="hero-title" style={{ fontSize: '3.8rem', fontWeight: 900, lineHeight: 1.08, letterSpacing: '-0.04em', color: 'white', marginBottom: 24 }}>
+            <h1 className="hero-title" style={{ fontSize: '3.8rem', fontWeight: 900, lineHeight: 1.08, letterSpacing: '-0.04em', color: 'var(--text-light-main)', marginBottom: 24 }}>
               Sống đẳng cấp,<br />
-              <span style={{ background: 'linear-gradient(135deg, #a78bfa, #60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              <span style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                 quản lý thông minh
               </span>
             </h1>
 
-            <p className="hero-sub" style={{ fontSize: '1.15rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.75, marginBottom: 40, maxWidth: 480 }}>
+            <p className="hero-sub" style={{ fontSize: '1.15rem', color: '#475569', fontWeight: 500, lineHeight: 1.75, marginBottom: 40, maxWidth: 480 }}>
               Nền tảng thuê & quản lý phòng trọ tự động hóa 100%. Thanh toán online, báo cáo sự cố, theo dõi hợp đồng — tất cả trong một app.
             </p>
 
@@ -338,15 +342,15 @@ export default function LandingPage() {
             </div>
 
             {/* Stats */}
-            <div className="hero-stats" style={{ display: 'flex', gap: 32, padding: '20px 0', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="hero-stats" style={{ display: 'flex', gap: 32, padding: '20px 0', borderTop: '1px solid var(--border-light)' }}>
               {[
                 { value: '500+', label: 'Khách hài lòng' },
                 { value: '50+', label: 'Phòng quản lý' },
                 { value: '99.9%', label: 'Uptime hệ thống' },
               ].map((s, i) => (
                 <div key={i}>
-                  <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{s.value}</div>
-                  <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', marginTop: 3, fontWeight: 500 }}>{s.label}</div>
+                  <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-light-main)', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{s.value}</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-light-muted)', marginTop: 3, fontWeight: 500 }}>{s.label}</div>
                 </div>
               ))}
             </div>
@@ -364,24 +368,24 @@ export default function LandingPage() {
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%)', pointerEvents: 'none' }} />
             </div>
             {/* Floating badge */}
-            <div style={{ position: 'absolute', bottom: -20, left: -24, background: 'rgba(8,12,20,0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 10, zIndex: 2, boxShadow: '0 10px 30px rgba(0,0,0,0.4)' }}>
+            <div style={{ position: 'absolute', bottom: -20, left: -24, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(20px)', border: '1px solid var(--border-light)', borderRadius: 16, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 10, zIndex: 2, boxShadow: '0 10px 30px rgba(0,0,0,0.4)' }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#22c55e,#16a34a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>✅</div>
               <div>
-                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'white' }}>Hóa đơn đã thu</div>
-                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>Vừa xong · tháng 6/2026</div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-light-main)' }}>Hóa đơn đã thu</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-light-muted)' }}>Vừa xong · tháng 6/2026</div>
               </div>
             </div>
-            <div style={{ position: 'absolute', top: -16, right: -20, background: 'rgba(8,12,20,0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8, zIndex: 2, boxShadow: '0 10px 30px rgba(0,0,0,0.4)' }}>
+            <div style={{ position: 'absolute', top: -16, right: -20, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(20px)', border: '1px solid var(--border-light)', borderRadius: 16, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8, zIndex: 2, boxShadow: '0 10px 30px rgba(0,0,0,0.4)' }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
-              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'white' }}>98% Tỉ lệ thanh toán đúng hạn</div>
+              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-light-main)' }}>98% Tỉ lệ thanh toán đúng hạn</div>
             </div>
           </div>
         </div>
 
         {/* Scroll indicator */}
-        <div style={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.25)', fontSize: '0.72rem', fontWeight: 500 }}>
+        <div style={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: 'var(--text-light-muted)', fontSize: '0.72rem', fontWeight: 500 }}>
           <div style={{ width: 24, height: 40, border: '1.5px solid rgba(255,255,255,0.15)', borderRadius: 12, display: 'flex', justifyContent: 'center', padding: '6px 0' }}>
-            <div style={{ width: 3, height: 8, background: 'rgba(255,255,255,0.3)', borderRadius: 999, animation: 'scrollDot 2s ease infinite' }} />
+            <div style={{ width: 3, height: 8, background: 'var(--bg-light-surface-alt)', borderRadius: 999, animation: 'scrollDot 2s ease infinite' }} />
           </div>
           Cuộn xuống
           <style>{`@keyframes scrollDot { 0%,100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(6px); opacity: 0.3; } }`}</style>
@@ -389,29 +393,29 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features Section ─────────────────────────────────────────── */}
-      <section id="features" style={{ padding: '120px 48px', background: '#080C14', position: 'relative', overflow: 'hidden' }}>
+      <section id="features" style={{ padding: '120px 48px', background: 'var(--bg-light-base)', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 800, height: 600, background: 'radial-gradient(ellipse at center, rgba(124,58,237,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <div style={{ textAlign: 'center', marginBottom: 72 }}>
             <div className="section-label" style={{ display: 'inline-flex', marginBottom: 16 }}>✦ Tính năng</div>
-            <h2 style={{ fontSize: '2.8rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', marginBottom: 16 }}>
+            <h2 style={{ fontSize: '2.8rem', fontWeight: 800, color: 'var(--text-light-main)', letterSpacing: '-0.03em', marginBottom: 16 }}>
               Mọi thứ bạn cần<br />
               <span style={{ background: 'linear-gradient(135deg,#a78bfa,#60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>trong một nền tảng</span>
             </h2>
-            <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '1.05rem', maxWidth: 500, margin: '0 auto' }}>
+            <p style={{ color: 'var(--text-light-muted)', fontSize: '1.05rem', maxWidth: 500, margin: '0 auto' }}>
               Được thiết kế để tối ưu trải nghiệm cho cả chủ nhà lẫn người thuê
             </p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
             {features.map((feat, i) => (
-              <div key={i} className="feat-card" style={{ padding: '32px 28px', borderRadius: 20, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', cursor: 'default', position: 'relative', overflow: 'hidden' }}>
+              <div key={i} className="feat-card" style={{ padding: '32px 28px', borderRadius: 20, background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', cursor: 'default', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${feat.glow}, transparent)` }} />
-                <div style={{ width: 54, height: 54, borderRadius: 14, background: `${feat.glow.replace('0.3', '0.15')}`, border: `1px solid ${feat.glow}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', marginBottom: 20 }}>
+                <div style={{ width: 54, height: 54, borderRadius: 14, background: `${feat.glow.replace('0.3', '0.15')}`, border: `1px solid ${feat.glow}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light-main)', marginBottom: 20 }}>
                   {feat.icon}
                 </div>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'white', marginBottom: 10 }}>{feat.title}</h3>
-                <p style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.7 }}>{feat.desc}</p>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-light-main)', marginBottom: 10 }}>{feat.title}</h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-light-muted)', lineHeight: 1.7 }}>{feat.desc}</p>
               </div>
             ))}
           </div>
@@ -419,35 +423,35 @@ export default function LandingPage() {
       </section>
 
       {/* ── Rooms Section ────────────────────────────────────────────── */}
-      <section id="rooms" ref={roomsRef} style={{ padding: '120px 48px', background: '#0A0F1E' }}>
+      <section id="rooms" ref={roomsRef} style={{ padding: '120px 48px', background: 'var(--bg-light-surface)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 72 }}>
             <div className="section-label" style={{ display: 'inline-flex', marginBottom: 16 }}>🏠 Phòng cho thuê</div>
-            <h2 style={{ fontSize: '2.8rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', marginBottom: 16 }}>Phòng đang có sẵn</h2>
-            <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '1.05rem' }}>Tham quan các lựa chọn phù hợp nhất với nhu cầu của bạn</p>
+            <h2 style={{ fontSize: '2.8rem', fontWeight: 800, color: 'var(--text-light-main)', letterSpacing: '-0.03em', marginBottom: 16 }}>Phòng đang có sẵn</h2>
+            <p style={{ color: 'var(--text-light-muted)', fontSize: '1.05rem' }}>Tham quan các lựa chọn phù hợp nhất với nhu cầu của bạn</p>
           </div>
 
           {loadingRooms ? (
             <div style={{ textAlign: 'center', padding: 60 }}>
               <div style={{ width: 40, height: 40, border: '3px solid rgba(124,58,237,0.2)', borderTopColor: '#7c3aed', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
               <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
-              <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.9rem' }}>Đang tải...</div>
+              <div style={{ color: 'var(--text-light-muted)', fontSize: '0.9rem' }}>Đang tải...</div>
             </div>
           ) : rooms.length === 0 ? (
-            <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.3)', padding: 60, fontSize: '0.95rem' }}>Hiện tại không có phòng nào trong hệ thống.</div>
+            <div style={{ textAlign: 'center', color: 'var(--text-light-muted)', padding: 60, fontSize: '0.95rem' }}>Hiện tại không có phòng nào trong hệ thống.</div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 28 }}>
               {rooms.map((room) => (
-                <div key={room.id} className="room-card" style={{ borderRadius: 20, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <div key={room.id} className="room-card" style={{ borderRadius: 20, background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                   {/* Image */}
-                  <div style={{ height: 220, position: 'relative', overflow: 'hidden', background: '#0f1629' }}>
+                  <div style={{ height: 220, position: 'relative', overflow: 'hidden', background: 'var(--bg-light-surface-alt)' }}>
                     {room.imageUrls && room.imageUrls.length > 0 ? (
                       <img className="room-img" src={room.imageUrls[0]} alt={`Phòng ${room.roomNumber}`} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: room.status === 'VACANT' ? 1 : 0.5 }} />
                     ) : (
-                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.2)', fontSize: '2.5rem' }}>🏠</div>
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light-muted)', fontSize: '2.5rem' }}>🏠</div>
                     )}
                     {/* Gradient overlay */}
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', background: 'linear-gradient(transparent, rgba(8,12,20,0.95))' }} />
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', background: 'linear-gradient(transparent, rgba(255,255,255,0.95))' }} />
                     {/* Status badge */}
                     <div style={{ position: 'absolute', top: 14, right: 14, padding: '5px 12px', borderRadius: 999, fontSize: '0.75rem', fontWeight: 700, backdropFilter: 'blur(12px)',
                       background: room.status === 'VACANT' ? 'rgba(34,197,94,0.2)' : room.status === 'OCCUPIED' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)',
@@ -458,7 +462,7 @@ export default function LandingPage() {
                     </div>
                     {/* Room number overlay */}
                     <div style={{ position: 'absolute', bottom: 14, left: 18 }}>
-                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white' }}>Phòng {room.roomNumber}</div>
+                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-light-main)' }}>Phòng {room.roomNumber}</div>
                     </div>
                   </div>
 
@@ -467,18 +471,18 @@ export default function LandingPage() {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div>
                         <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#a78bfa', letterSpacing: '-0.02em' }}>{formatCurrency(room.price)}</div>
-                        <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>mỗi tháng</div>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-light-muted)', marginTop: 2 }}>mỗi tháng</div>
                       </div>
                     </div>
-                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.88rem', lineHeight: 1.65, flexGrow: 1 }}>
+                    <p style={{ color: 'var(--text-light-muted)', fontSize: '0.88rem', lineHeight: 1.65, flexGrow: 1 }}>
                       {room.description || 'Phòng hiện đại, tiện nghi đầy đủ. Môi trường sống thoải mái và an toàn.'}
                     </p>
                     <button
                       onClick={() => handleSelectRoom(room.id)}
                       disabled={room.status !== 'VACANT'}
                       style={{ width: '100%', padding: '13px', borderRadius: 12, border: 'none', cursor: room.status === 'VACANT' ? 'pointer' : 'not-allowed', fontFamily: 'inherit', fontWeight: 700, fontSize: '0.92rem', transition: 'all 0.25s',
-                        background: room.status === 'VACANT' ? 'linear-gradient(135deg,#7c3aed,#4f46e5)' : 'rgba(255,255,255,0.06)',
-                        color: room.status === 'VACANT' ? 'white' : 'rgba(255,255,255,0.3)',
+                        background: room.status === 'VACANT' ? 'linear-gradient(135deg,#7c3aed,#4f46e5)' : 'var(--bg-light-surface-alt)',
+                        color: room.status === 'VACANT' ? 'white' : 'var(--text-light-muted)',
                         boxShadow: room.status === 'VACANT' ? '0 4px 20px rgba(124,58,237,0.35)' : 'none',
                       }}
                       onMouseEnter={e => { if (room.status === 'VACANT') e.currentTarget.style.boxShadow = '0 6px 28px rgba(124,58,237,0.55)'; }}
@@ -495,28 +499,28 @@ export default function LandingPage() {
       </section>
 
       {/* ── Testimonials ─────────────────────────────────────────────── */}
-      <section style={{ padding: '120px 48px', background: '#080C14', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ padding: '120px 48px', background: 'var(--bg-light-base)', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '50%', right: -200, transform: 'translateY(-50%)', width: 600, height: 600, background: 'radial-gradient(ellipse at center, rgba(6,182,212,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <div style={{ textAlign: 'center', marginBottom: 72 }}>
             <div className="section-label" style={{ display: 'inline-flex', marginBottom: 16 }}>💬 Khách hàng nói gì</div>
-            <h2 style={{ fontSize: '2.8rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', marginBottom: 16 }}>Được tin dùng bởi<br /><span style={{ background: 'linear-gradient(135deg,#a78bfa,#60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>hàng trăm cư dân</span></h2>
+            <h2 style={{ fontSize: '2.8rem', fontWeight: 800, color: 'var(--text-light-main)', letterSpacing: '-0.03em', marginBottom: 16 }}>Được tin dùng bởi<br /><span style={{ background: 'linear-gradient(135deg,#a78bfa,#60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>hàng trăm cư dân</span></h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
             {testimonials.map((t, i) => (
-              <div key={i} className="testimonial-card" style={{ padding: '30px', borderRadius: 20, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', position: 'relative', overflow: 'hidden' }}>
+              <div key={i} className="testimonial-card" style={{ padding: '30px', borderRadius: 20, background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${t.color}60, transparent)` }} />
                 {/* Stars */}
                 <div style={{ display: 'flex', gap: 3, marginBottom: 16 }}>
                   {[...Array(5)].map((_, si) => <span key={si} style={{ color: '#fbbf24', fontSize: '0.95rem' }}>★</span>)}
                 </div>
-                <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.92rem', lineHeight: 1.75, marginBottom: 24, fontStyle: 'italic' }}>"{t.text}"</p>
+                <p style={{ color: 'var(--text-light-muted)', fontSize: '0.92rem', lineHeight: 1.75, marginBottom: 24, fontStyle: 'italic' }}>"{t.text}"</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: `${t.color}30`, border: `2px solid ${t.color}60`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.75rem', flexShrink: 0 }}>{t.avatar}</div>
+                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: `${t.color}30`, border: `2px solid ${t.color}60`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light-main)', fontWeight: 800, fontSize: '0.75rem', flexShrink: 0 }}>{t.avatar}</div>
                   <div>
-                    <div style={{ fontWeight: 700, color: 'white', fontSize: '0.88rem' }}>{t.name}</div>
-                    <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.75rem' }}>{t.role}</div>
+                    <div style={{ fontWeight: 700, color: 'var(--text-light-main)', fontSize: '0.88rem' }}>{t.name}</div>
+                    <div style={{ color: 'var(--text-light-muted)', fontSize: '0.75rem' }}>{t.role}</div>
                   </div>
                 </div>
               </div>
@@ -526,15 +530,15 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA Banner ──────────────────────────────────────────────── */}
-      <section style={{ padding: '100px 48px', background: '#0A0F1E', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ padding: '100px 48px', background: 'var(--bg-light-surface)', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(6,182,212,0.08) 100%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '80%', height: 300, background: 'radial-gradient(ellipse at center, rgba(124,58,237,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <h2 style={{ fontSize: '3rem', fontWeight: 900, color: 'white', letterSpacing: '-0.04em', marginBottom: 20, lineHeight: 1.1 }}>
+          <h2 style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-light-main)', letterSpacing: '-0.04em', marginBottom: 20, lineHeight: 1.1 }}>
             Sẵn sàng tìm<br />
             <span style={{ background: 'linear-gradient(135deg,#a78bfa,#60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>ngôi nhà mới?</span>
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '1.1rem', lineHeight: 1.7, marginBottom: 40 }}>
+          <p style={{ color: 'var(--text-light-muted)', fontSize: '1.1rem', lineHeight: 1.7, marginBottom: 40 }}>
             Đăng ký ngay hôm nay và chuyển vào phòng trong vòng 48 giờ. Quy trình nhanh gọn, minh bạch.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
@@ -549,43 +553,43 @@ export default function LandingPage() {
       </section>
 
       {/* ── Form Section ────────────────────────────────────────────── */}
-      <section id="contact" ref={formRef} style={{ padding: '120px 48px', background: '#080C14', position: 'relative', overflow: 'hidden' }}>
+      <section id="contact" ref={formRef} style={{ padding: '120px 48px', background: 'var(--bg-light-base)', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '30%', left: -100, width: 500, height: 500, background: 'radial-gradient(ellipse at center, rgba(124,58,237,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: 600, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <div className="section-label" style={{ display: 'inline-flex', marginBottom: 16 }}>📋 Liên hệ</div>
-            <h2 style={{ fontSize: '2.4rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', marginBottom: 12 }}>Đăng ký tư vấn</h2>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem' }}>Để lại thông tin, chúng tôi sẽ liên hệ trong vòng 15 phút</p>
+            <h2 style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--text-light-main)', letterSpacing: '-0.03em', marginBottom: 12 }}>Đăng ký tư vấn</h2>
+            <p style={{ color: 'var(--text-light-muted)', fontSize: '1rem' }}>Để lại thông tin, chúng tôi sẽ liên hệ trong vòng 15 phút</p>
           </div>
 
-          <div style={{ padding: '48px', borderRadius: 24, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(20px)' }}>
+          <div style={{ padding: '48px', borderRadius: 24, background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', backdropFilter: 'blur(20px)' }}>
             {selectedRoomDetails && (
               <div style={{ marginBottom: 24, padding: '14px 18px', background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Đang quan tâm:</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-light-muted)', marginBottom: 2 }}>Đang quan tâm:</div>
                   <div style={{ color: '#a78bfa', fontWeight: 700 }}>Phòng {selectedRoomDetails.roomNumber} — {formatCurrency(selectedRoomDetails.price)}/tháng</div>
                 </div>
-                <button onClick={() => setFormData(prev => ({ ...prev, roomId: '' }))} style={{ color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', textDecoration: 'underline', fontFamily: 'inherit' }}>Hủy chọn</button>
+                <button onClick={() => setFormData(prev => ({ ...prev, roomId: '' }))} style={{ color: 'var(--text-light-muted)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', textDecoration: 'underline', fontFamily: 'inherit' }}>Hủy chọn</button>
               </div>
             )}
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Họ và tên *</label>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-light-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Họ và tên *</label>
                   <input required name="name" type="text" value={formData.name} onChange={handleFormChange} className="lp-input" placeholder="Nguyễn Văn A" />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Số điện thoại *</label>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-light-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Số điện thoại *</label>
                   <input required name="phone" type="tel" value={formData.phone} onChange={handleFormChange} className="lp-input" placeholder="0901 234 567" />
                 </div>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Email *</label>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-light-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Email *</label>
                 <input required name="email" type="email" value={formData.email} onChange={handleFormChange} className="lp-input" placeholder="email@example.com" />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Ghi chú (tùy chọn)</label>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-light-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Ghi chú (tùy chọn)</label>
                 <textarea name="message" rows={3} value={formData.message} onChange={handleFormChange} className="lp-input" placeholder="Thời gian bạn có thể xem phòng, yêu cầu đặc biệt..." style={{ resize: 'vertical' }} />
               </div>
 
@@ -609,7 +613,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Footer ───────────────────────────────────────────────────── */}
-      <footer style={{ background: '#060910', borderTop: '1px solid rgba(255,255,255,0.05)', padding: '60px 48px 40px' }}>
+      <footer style={{ background: 'var(--bg-light-surface)', borderTop: '1px solid var(--border-light)', padding: '60px 48px 40px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
           {/* Brand */}
           <div>
@@ -619,9 +623,9 @@ export default function LandingPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
                 </svg>
               </div>
-              <span style={{ fontWeight: 800, color: 'white', fontSize: '1.1rem' }}>SaaS<span style={{ color: '#a78bfa' }}> Rent</span></span>
+              <span style={{ fontWeight: 800, color: 'var(--text-light-main)', fontSize: '1.1rem' }}>SaaS<span style={{ color: '#a78bfa' }}> Rent</span></span>
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.88rem', lineHeight: 1.7, maxWidth: 280 }}>
+            <p style={{ color: 'var(--text-light-muted)', fontSize: '0.88rem', lineHeight: 1.7, maxWidth: 280 }}>
               Nền tảng quản lý nhà trọ thông minh, giúp chủ nhà và người thuê kết nối hiệu quả.
             </p>
           </div>
@@ -648,10 +652,10 @@ export default function LandingPage() {
             ]},
           ].map((col, i) => (
             <div key={i}>
-              <div style={{ fontWeight: 700, color: 'white', fontSize: '0.88rem', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{col.title}</div>
+              <div style={{ fontWeight: 700, color: 'var(--text-light-main)', fontSize: '0.88rem', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{col.title}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {col.links.map(link => (
-                  <Link key={link.label} href={link.href} style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.88rem', textDecoration: 'none', transition: 'color 0.2s' }}
+                  <Link key={link.label} href={link.href} style={{ color: 'var(--text-light-muted)', fontSize: '0.88rem', textDecoration: 'none', transition: 'color 0.2s' }}
                     onMouseEnter={e => (e.currentTarget as any).style.color = 'rgba(255,255,255,0.7)'}
                     onMouseLeave={e => (e.currentTarget as any).style.color = 'rgba(255,255,255,0.35)'}
                   >{link.label}</Link>
@@ -661,12 +665,12 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'rgba(255,255,255,0.25)', fontSize: '0.82rem' }}>
+        <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'var(--text-light-muted)', fontSize: '0.82rem' }}>
           <span>© 2026 NestPro. All rights reserved.</span>
           <div style={{ display: 'flex', gap: 24 }}>
             <span>Chính sách bảo mật</span>
             <span>Điều khoản sử dụng</span>
-            <span style={{ color: 'rgba(255,255,255,0.15)' }}>Made with ♥ in Vietnam</span>
+            <span style={{ color: 'var(--text-light-muted)' }}>Made with ♥ in Vietnam</span>
           </div>
         </div>
       </footer>
@@ -674,20 +678,20 @@ export default function LandingPage() {
       {/* ── AI Chat Widget ────────────────────────────────────────────── */}
       <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
         {isChatOpen && (
-          <div style={{ width: '360px', height: '500px', marginBottom: '16px', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRadius: '20px', border: '1px solid rgba(124,58,237,0.3)', background: 'rgba(8,12,20,0.97)', backdropFilter: 'blur(24px)', boxShadow: '0 25px 60px rgba(0,0,0,0.6)', animation: 'fadeIn 0.3s ease-out' }}>
-            <div style={{ padding: '16px 20px', background: 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(79,70,229,0.2))', borderBottom: '1px solid rgba(255,255,255,0.07)', flexShrink: 0 }}>
+          <div style={{ width: '360px', height: '500px', marginBottom: '16px', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRadius: '20px', border: '1px solid rgba(124,58,237,0.3)', background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(24px)', boxShadow: '0 25px 60px rgba(0,0,0,0.6)', animation: 'fadeIn 0.3s ease-out' }}>
+            <div style={{ padding: '16px 20px', background: 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(79,70,229,0.2))', borderBottom: '1px solid var(--border-light)', flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>🤖</div>
                   <div>
-                    <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'white' }}>RentBot AI</div>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-light-main)' }}>RentBot AI</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-light-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
                       Trực tuyến · Tư vấn thuê phòng
                     </div>
                   </div>
                 </div>
-                <button onClick={() => setIsChatOpen(false)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', width: '26px', height: '26px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>×</button>
+                <button onClick={() => setIsChatOpen(false)} style={{ background: 'var(--bg-light-surface-alt)', border: 'none', color: 'var(--text-light-muted)', cursor: 'pointer', width: '26px', height: '26px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>×</button>
               </div>
             </div>
 
@@ -695,7 +699,7 @@ export default function LandingPage() {
               {chatMessages.map((msg, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', gap: '8px', alignItems: 'flex-end' }}>
                   {msg.role === 'ai' && <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', flexShrink: 0 }}>🤖</div>}
-                  <div style={{ maxWidth: '78%', padding: '10px 13px', borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '4px 16px 16px 16px', background: msg.role === 'user' ? 'linear-gradient(135deg, #7c3aed, #4f46e5)' : 'rgba(255,255,255,0.06)', fontSize: '0.82rem', lineHeight: '1.6', color: 'white', border: msg.role === 'ai' ? '1px solid rgba(255,255,255,0.07)' : 'none', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  <div style={{ maxWidth: '78%', padding: '10px 13px', borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '4px 16px 16px 16px', background: msg.role === 'user' ? 'linear-gradient(135deg, #7c3aed, #4f46e5)' : 'rgba(255,255,255,0.06)', fontSize: '0.82rem', lineHeight: '1.6', color: 'var(--text-light-main)', border: msg.role === 'ai' ? '1px solid rgba(255,255,255,0.07)' : 'none', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                     {msg.text.replace(/\*\*(.*?)\*\*/g, '$1')}
                   </div>
                 </div>
@@ -703,7 +707,7 @@ export default function LandingPage() {
               {isChatLoading && (
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
                   <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>🤖</div>
-                  <div style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px 16px 16px 16px', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <div style={{ padding: '10px 14px', background: 'var(--bg-light-surface-alt)', borderRadius: '4px 16px 16px 16px', border: '1px solid var(--border-light)' }}>
                     <div style={{ display: 'flex', gap: '4px' }}>
                       {[0, 1, 2].map(i => <span key={i} style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#7c3aed', display: 'inline-block', animation: `bounce 1.2s ${i * 0.2}s infinite` }} />)}
                     </div>
@@ -715,16 +719,16 @@ export default function LandingPage() {
             </div>
 
             {chatMessages.length <= 1 && (
-              <div style={{ padding: '8px 14px', display: 'flex', flexWrap: 'wrap', gap: '5px', borderTop: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
+              <div style={{ padding: '8px 14px', display: 'flex', flexWrap: 'wrap', gap: '5px', borderTop: '1px solid var(--border-light)', flexShrink: 0 }}>
                 {QUICK_QUESTIONS.map(q => (
                   <button key={q} onClick={() => handleSendChat(q)} style={{ padding: '4px 10px', borderRadius: '999px', fontSize: '0.7rem', cursor: 'pointer', background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.25)', color: '#c084fc', transition: 'all 0.2s', whiteSpace: 'nowrap', fontFamily: 'inherit' }}>{q}</button>
                 ))}
               </div>
             )}
 
-            <div style={{ padding: '10px 14px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', gap: '8px', flexShrink: 0 }}>
-              <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendChat(); } }} placeholder="Hỏi tôi bất kỳ điều gì..." disabled={isChatLoading} style={{ flex: 1, padding: '9px 13px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white', fontSize: '0.82rem', outline: 'none', fontFamily: 'inherit' }} />
-              <button onClick={() => handleSendChat()} disabled={isChatLoading || !chatInput.trim()} style={{ padding: '9px 13px', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', border: 'none', borderRadius: '10px', color: 'white', cursor: 'pointer', fontSize: '0.9rem', opacity: (!chatInput.trim() || isChatLoading) ? 0.4 : 1, transition: 'opacity 0.2s' }}>➤</button>
+            <div style={{ padding: '10px 14px', borderTop: '1px solid var(--border-light)', display: 'flex', gap: '8px', flexShrink: 0 }}>
+              <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendChat(); } }} placeholder="Hỏi tôi bất kỳ điều gì..." disabled={isChatLoading} style={{ flex: 1, padding: '9px 13px', background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'var(--text-light-main)', fontSize: '0.82rem', outline: 'none', fontFamily: 'inherit' }} />
+              <button onClick={() => handleSendChat()} disabled={isChatLoading || !chatInput.trim()} style={{ padding: '9px 13px', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', border: 'none', borderRadius: '10px', color: 'var(--text-light-main)', cursor: 'pointer', fontSize: '0.9rem', opacity: (!chatInput.trim() || isChatLoading) ? 0.4 : 1, transition: 'opacity 0.2s' }}>➤</button>
             </div>
           </div>
         )}

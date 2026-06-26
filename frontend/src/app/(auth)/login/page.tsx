@@ -108,7 +108,7 @@ export default function LoginPage() {
         
         .left-panel {
           position: relative;
-          background: #080C14;
+          background: var(--bg-light-base);
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -173,18 +173,18 @@ export default function LoginPage() {
         <div className="floating-card" style={{ top: 100, right: 40 }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>📈</div>
           <div>
-            <div style={{ fontWeight: 800, color: 'white', fontSize: '0.88rem' }}>+142 khách</div>
-            <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.7rem' }}>tháng này</div>
+            <div style={{ fontWeight: 800, color: 'var(--text-light-main)', fontSize: '0.88rem' }}>+142 khách</div>
+            <div style={{ color: 'var(--text-light-muted)', fontSize: '0.7rem' }}>tháng này</div>
           </div>
         </div>
         <div className="floating-card" style={{ bottom: 120, right: 32 }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
-          <div style={{ fontWeight: 600, color: 'rgba(255,255,255,0.6)', fontSize: '0.78rem' }}>99.9% uptime</div>
+          <div style={{ fontWeight: 600, color: 'var(--text-light-muted)', fontSize: '0.78rem' }}>99.9% uptime</div>
         </div>
         <div className="floating-card" style={{ bottom: 220, left: 40, flexDirection: 'column', alignItems: 'flex-start', gap: 8 }}>
-          <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Doanh thu tháng 6</div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-light-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Doanh thu tháng 6</div>
           <div style={{ fontWeight: 900, color: '#a78bfa', fontSize: '1.1rem' }}>142.500.000 đ</div>
-          <div style={{ width: '100%', height: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 999 }}>
+          <div style={{ width: '100%', height: 4, background: 'var(--bg-light-surface-alt)', borderRadius: 999 }}>
             <div style={{ width: '78%', height: '100%', background: 'linear-gradient(90deg,#7c3aed,#a78bfa)', borderRadius: 999 }} />
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function LoginPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
               </svg>
             </div>
-            <span style={{ fontWeight: 800, fontSize: '1.3rem', color: 'white', letterSpacing: '-0.03em' }}>
+            <span style={{ fontWeight: 800, fontSize: '1.3rem', color: 'var(--text-light-main)', letterSpacing: '-0.03em' }}>
               SaaS<span style={{ color: '#a78bfa' }}> Rent</span>
             </span>
           </a>
@@ -207,12 +207,12 @@ export default function LoginPage() {
             🏆 Nền tảng số 1 cho chủ nhà trọ Việt Nam
           </div>
 
-          <h1 style={{ fontSize: '2.8rem', fontWeight: 900, color: 'white', lineHeight: 1.1, letterSpacing: '-0.04em', marginBottom: 20 }}>
+          <h1 style={{ fontSize: '2.8rem', fontWeight: 900, color: 'var(--text-light-main)', lineHeight: 1.1, letterSpacing: '-0.04em', marginBottom: 20 }}>
             Quản lý nhà trọ<br />
-            <span style={{ background: 'linear-gradient(135deg, #a78bfa, #60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>thông minh hơn</span>
+            <span style={{ background: 'linear-gradient(135deg, #4f46e5, #06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>thông minh hơn</span>
           </h1>
 
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '1.05rem', lineHeight: 1.7, marginBottom: 40 }}>
+          <p style={{ color: 'var(--text-light-muted)', fontSize: '1.05rem', lineHeight: 1.7, marginBottom: 40 }}>
             Tự động hóa toàn bộ quy trình từ ký hợp đồng, thu tiền thuê đến xử lý sự cố. Tiết kiệm 10 giờ mỗi tuần.
           </p>
 
@@ -220,24 +220,24 @@ export default function LoginPage() {
             {features.map((f, i) => (
               <div key={i} className="feature-item">
                 <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{f.icon}</span>
-                <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', fontWeight: 500 }}>{f.text}</span>
+                <span style={{ color: 'var(--text-light-muted)', fontSize: '0.9rem', fontWeight: 500 }}>{f.text}</span>
               </div>
             ))}
           </div>
 
           {/* Testimonial */}
-          <div style={{ marginTop: 40, padding: '20px 22px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16 }}>
+          <div style={{ marginTop: 40, padding: '20px 22px', background: 'var(--bg-light-surface)', border: '1px solid var(--border-light)', borderRadius: 16 }}>
             <div style={{ display: 'flex', gap: 2, marginBottom: 10 }}>
               {[...Array(5)].map((_, i) => <span key={i} style={{ color: '#fbbf24', fontSize: '0.9rem' }}>★</span>)}
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.88rem', lineHeight: 1.7, marginBottom: 14, fontStyle: 'italic' }}>
+            <p style={{ color: 'var(--text-light-muted)', fontSize: '0.88rem', lineHeight: 1.7, marginBottom: 14, fontStyle: 'italic' }}>
               "NestPro đã giúp tôi tự động hóa việc quản lý 30 phòng trọ. Giờ tôi chỉ cần 30 phút mỗi tuần cho công việc hành chính."
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.72rem' }}>NVA</div>
+              <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light-main)', fontWeight: 800, fontSize: '0.72rem' }}>NVA</div>
               <div>
-                <div style={{ fontWeight: 700, color: 'white', fontSize: '0.84rem' }}>Nguyễn Văn An</div>
-                <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.74rem' }}>Chủ nhà trọ · Hà Nội</div>
+                <div style={{ fontWeight: 700, color: 'var(--text-light-main)', fontSize: '0.84rem' }}>Nguyễn Văn An</div>
+                <div style={{ color: 'var(--text-light-muted)', fontSize: '0.74rem' }}>Chủ nhà trọ · Hà Nội</div>
               </div>
             </div>
           </div>
@@ -249,10 +249,10 @@ export default function LoginPage() {
         <div style={{ width: '100%', maxWidth: 380 }}>
           {/* Header */}
           <div className="anim-1" style={{ marginBottom: 36 }}>
-            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', marginBottom: 8 }}>
+            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-light-main)', letterSpacing: '-0.03em', marginBottom: 8 }}>
               Chào mừng trở lại
             </h2>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.95rem' }}>
+            <p style={{ color: 'var(--text-light-muted)', fontSize: '0.95rem' }}>
               Đăng nhập để tiếp tục quản lý hệ thống
             </p>
           </div>
@@ -261,11 +261,11 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="anim-2" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {/* Email */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-light-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 Email / Tài khoản
               </label>
               <div style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', left: 15, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.25)', pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', left: 15, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light-muted)', pointerEvents: 'none' }}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 18, height: 18 }}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                   </svg>
@@ -285,12 +285,12 @@ export default function LoginPage() {
             {/* Password */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-light-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Mật khẩu
                 </label>
               </div>
               <div style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', left: 15, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.25)', pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', left: 15, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light-muted)', pointerEvents: 'none' }}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 18, height: 18 }}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                   </svg>
@@ -308,7 +308,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', padding: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s' }}
+                  style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-light-muted)', padding: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s' }}
                   onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}
                   onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.3)'}
                 >
@@ -334,7 +334,7 @@ export default function LoginPage() {
               >
                 {rememberMe && <svg viewBox="0 0 12 10" fill="none" style={{ width: 10 }}><path d="M1 5l3 3.5L11 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
               </div>
-              <label onClick={() => setRememberMe(!rememberMe)} style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.45)', cursor: 'pointer', userSelect: 'none' }}>
+              <label onClick={() => setRememberMe(!rememberMe)} style={{ fontSize: '0.88rem', color: 'var(--text-light-muted)', cursor: 'pointer', userSelect: 'none' }}>
                 Ghi nhớ đăng nhập trong 30 ngày
               </label>
             </div>
@@ -353,14 +353,14 @@ export default function LoginPage() {
 
           {/* Divider */}
           <div className="anim-5" style={{ display: 'flex', alignItems: 'center', gap: 14, margin: '28px 0' }}>
-            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.07)' }} />
-            <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.78rem', fontWeight: 500 }}>hoặc</span>
-            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.07)' }} />
+            <div style={{ flex: 1, height: 1, background: 'var(--bg-light-surface-alt)' }} />
+            <span style={{ color: 'var(--text-light-muted)', fontSize: '0.78rem', fontWeight: 500 }}>hoặc</span>
+            <div style={{ flex: 1, height: 1, background: 'var(--bg-light-surface-alt)' }} />
           </div>
 
           {/* Back to home */}
           <div className="anim-5" style={{ textAlign: 'center' }}>
-            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.35)', textDecoration: 'none', fontSize: '0.88rem', fontWeight: 500, transition: 'color 0.2s', borderRadius: 8, padding: '8px 14px', border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}
+            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--text-light-muted)', textDecoration: 'none', fontSize: '0.88rem', fontWeight: 500, transition: 'color 0.2s', borderRadius: 8, padding: '8px 14px', border: '1px solid var(--border-light)', background: 'var(--bg-light-surface-alt)' }}
               onMouseEnter={e => (e.currentTarget as any).style.color = 'rgba(255,255,255,0.7)'}
               onMouseLeave={e => (e.currentTarget as any).style.color = 'rgba(255,255,255,0.35)'}
             >
@@ -372,8 +372,8 @@ export default function LoginPage() {
           </div>
 
           {/* Footer note */}
-          <div style={{ marginTop: 40, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
-            <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.75rem', lineHeight: 1.6 }}>
+          <div style={{ marginTop: 40, paddingTop: 24, borderTop: '1px solid var(--border-light)', textAlign: 'center' }}>
+            <p style={{ color: 'var(--text-light-muted)', fontSize: '0.75rem', lineHeight: 1.6 }}>
               Bằng việc đăng nhập, bạn đồng ý với{' '}
               <Link href="#" style={{ color: 'rgba(124,58,237,0.6)', textDecoration: 'underline', cursor: 'pointer' }}>Điều khoản dịch vụ</Link>
               {' '}và{' '}

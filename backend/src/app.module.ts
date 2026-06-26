@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './core/use-cases/auth/auth.module';
 import { RentRequestModule } from './core/use-cases/rent-request/rent-request.module';
@@ -19,6 +21,10 @@ import { ViolationModule } from './core/use-cases/violation/violation.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100,
+    }]),
     AuthModule,
     RentRequestModule,
     RoomModule,
@@ -34,6 +40,12 @@ import { ViolationModule } from './core/use-cases/violation/violation.module';
     AiModule,
     ViolationModule,
   ],
-  providers: [NotificationGateway],
+  providers: [
+    NotificationGateway,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

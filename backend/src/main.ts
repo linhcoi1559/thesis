@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
@@ -53,11 +54,15 @@ async function seedDemoData() {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS so the Next.js client can connect
-  app.enableCors();
+  // Restrict CORS to the frontend domain to prevent unauthorized API requests
+  app.enableCors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
-  // Enable global DTO validation
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  // Enable global DTO validation with strict whitelisting to prevent Mass Assignment
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }));
 
   // Seed demo landlord data before listening
   await seedDemoData();

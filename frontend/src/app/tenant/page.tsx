@@ -126,11 +126,11 @@ export default function TenantDashboard() {
 
   if (loading || authLoading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-light-base)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
           <div style={{ width: 40, height: 40, border: '3px solid rgba(79,70,229,0.3)', borderTopColor: '#818cf8', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Đang tải...</span>
+          <span style={{ color: 'var(--text-light-muted)', fontSize: '0.9rem' }}>Đang tải...</span>
         </div>
       </div>
     );
@@ -139,10 +139,10 @@ export default function TenantDashboard() {
   if (user?.status === 'PENDING') {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-        <div className="glass-panel animate-fade-in" style={{ maxWidth: 440, width: '100%', padding: 40, textAlign: 'center', borderTop: '4px solid #f59e0b' }}>
+        <div className="neo-card animate-fade-in" style={{ maxWidth: 440, width: '100%', padding: 40, textAlign: 'center', borderTop: '4px solid #f59e0b' }}>
           <div style={{ fontSize: '3.5rem', marginBottom: 16 }}>⏳</div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: 12, color: 'var(--text-main)' }}>Đang chờ phê duyệt</h2>
-          <p style={{ color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 28 }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: 12, color: 'var(--text-light-main)' }}>Đang chờ phê duyệt</h2>
+          <p style={{ color: 'var(--text-light-muted)', lineHeight: 1.7, marginBottom: 28 }}>
             Tài khoản của bạn đã được đăng ký thành công. Hệ thống đang chờ chủ trọ xác nhận hợp đồng. Vui lòng quay lại sau.
           </p>
           <button onClick={logout} className="btn-primary" style={{ width: '100%', padding: 14, borderRadius: 12, fontSize: '1rem' }}>Đăng xuất</button>
@@ -165,12 +165,12 @@ export default function TenantDashboard() {
   const getDaysUntilDue = (dueDate: string) => Math.ceil((new Date(dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 
   return (
-    <div style={{ minHeight: '100vh', fontFamily: 'Outfit, sans-serif', color: 'var(--text-main)' }}>
+    <div style={{ minHeight: '100vh', fontFamily: 'Outfit, sans-serif', color: 'var(--text-light-main)', background: 'var(--bg-light-base)' }}>
       {/* Navbar */}
-      <header className="glass-header" style={{ position: 'sticky', top: 0, zIndex: 20 }}>
+      <header className="neo-header" style={{ position: 'sticky', top: 0, zIndex: 20 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 800, fontSize: '1.2rem', color: 'white' }}>
-            <div style={{ width: 34, height: 34, background: 'linear-gradient(135deg,var(--primary),var(--accent))', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.95rem', boxShadow: '0 4px 12px rgba(79,70,229,0.4)' }}>S</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 800, fontSize: '1.2rem', color: 'var(--text-light-main)' }}>
+            <div style={{ width: 34, height: 34, background: 'linear-gradient(135deg,var(--primary),var(--accent))', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light-main)', fontWeight: 800, fontSize: '0.95rem', boxShadow: '0 4px 12px rgba(79,70,229,0.4)' }}>S</div>
             SaaS Rent
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -179,11 +179,11 @@ export default function TenantDashboard() {
                 ⚠️ {activeIncidents.length} sự cố
               </div>
             )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 14px 6px 6px', background: 'rgba(255,255,255,0.08)', borderRadius: 999, border: '1px solid rgba(255,255,255,0.1)' }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.8rem', boxShadow: '0 2px 8px rgba(99,102,241,0.4)' }}>{initials}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 14px 6px 6px', background: 'var(--bg-light-surface-alt)', borderRadius: 999, border: '1px solid var(--border-light)' }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light-main)', fontWeight: 800, fontSize: '0.8rem', boxShadow: '0 2px 8px rgba(99,102,241,0.4)' }}>{initials}</div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{user?.name}</div>
-                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Khách thuê</div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-light-muted)' }}>Khách thuê</div>
               </div>
             </div>
             <button
@@ -209,7 +209,7 @@ export default function TenantDashboard() {
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, letterSpacing: '-0.02em' }}>
               Xin chào, <span className="text-gradient">{user?.name?.split(' ').pop()}</span>! 👋
             </h1>
-            <p style={{ color: 'var(--text-muted)', marginTop: 4 }}>
+            <p style={{ color: 'var(--text-light-muted)', marginTop: 4 }}>
               {new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
@@ -228,16 +228,16 @@ export default function TenantDashboard() {
 
             {/* Left: Contract Hero Card */}
             <div style={{ gridColumn: '1 / 2' }}>
-              <div className="glass-panel animate-fade-in" style={{ padding: 28, height: '100%' }}>
+              <div className="neo-card animate-fade-in" style={{ padding: 28, height: '100%' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
                   <div>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Hợp đồng hiện tại</div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-light-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Hợp đồng hiện tại</div>
                     <span style={{ padding: '4px 12px', background: 'rgba(34,197,94,0.15)', color: '#4ade80', borderRadius: 999, fontSize: '0.78rem', fontWeight: 700, border: '1px solid rgba(34,197,94,0.3)', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                       <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px #22c55e' }} />
                       Đang có hiệu lực
                     </span>
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-light-muted)', textAlign: 'right' }}>
                     Mã HĐ: <span style={{ fontWeight: 700, color: '#818cf8' }}>{currentContract.contractNumber}</span>
                   </div>
                 </div>
@@ -245,24 +245,24 @@ export default function TenantDashboard() {
                 {/* Room Number Big Display */}
                 <div style={{ display: 'flex', gap: 14, marginBottom: 20 }}>
                   <div style={{ flex: 1, background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 16, padding: '20px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 4 }}>Số phòng</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-light-muted)', marginBottom: 4 }}>Số phòng</div>
                     <div style={{ fontSize: '2.8rem', fontWeight: 900, color: '#818cf8', lineHeight: 1 }}>{currentContract.room?.roomNumber || 'N/A'}</div>
                   </div>
                   <div style={{ flex: 1, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)', borderRadius: 16, padding: '20px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 4 }}>Tiền thuê/tháng</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-light-muted)', marginBottom: 4 }}>Tiền thuê/tháng</div>
                     <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#c084fc' }}>{formatCurrency(currentContract.rentalPrice)}</div>
                   </div>
                 </div>
 
                 {/* Contract info rows */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '16px', background: 'rgba(255,255,255,0.04)', borderRadius: 14, border: '1px solid var(--border-color)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '16px', background: 'var(--bg-light-surface-alt)', borderRadius: 14, border: '1px solid var(--border-light)' }}>
                   {[
                     { icon: '📅', label: 'Thời gian thuê', value: `${formatDate(currentContract.startDate)} → ${formatDate(currentContract.endDate)}` },
                     { icon: '💰', label: 'Tiền cọc', value: formatCurrency(currentContract.deposit || 0) },
                     { icon: '⏰', label: 'Còn lại', value: `${getDaysLeft(currentContract.endDate)} ngày` },
                   ].map(row => (
                     <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>{row.icon} {row.label}</span>
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-light-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>{row.icon} {row.label}</span>
                       <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{row.value}</span>
                     </div>
                   ))}
@@ -274,10 +274,10 @@ export default function TenantDashboard() {
                     return (
                       <div style={{ paddingTop: 4 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Tiến độ hợp đồng</span>
+                          <span style={{ fontSize: '0.72rem', color: 'var(--text-light-muted)' }}>Tiến độ hợp đồng</span>
                           <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#818cf8' }}>{pct}%</span>
                         </div>
-                        <div style={{ height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 999, overflow: 'hidden' }}>
+                        <div style={{ height: 6, background: 'var(--border-light)', borderRadius: 999, overflow: 'hidden' }}>
                           <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg,#6366f1,#a855f7)', borderRadius: 999, transition: 'width 0.5s ease' }} />
                         </div>
                       </div>
@@ -291,12 +291,12 @@ export default function TenantDashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {/* Debt summary */}
               {totalDebt > 0 ? (
-                <div className="glass-panel animate-fade-in" style={{ animationDelay: '0.1s', padding: 24, borderTop: '3px solid #ef4444', flex: 'none' }}>
+                <div className="neo-card animate-fade-in" style={{ animationDelay: '0.1s', padding: 24, borderTop: '3px solid #ef4444', flex: 'none' }}>
                   <div style={{ fontSize: '0.75rem', color: '#f87171', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>🚨 Số dư cần thanh toán</div>
                   <div style={{ fontSize: '2.2rem', fontWeight: 900, color: '#f87171', letterSpacing: '-0.03em', marginBottom: 12 }}>{formatCurrency(totalDebt)}</div>
                   <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      <span style={{ fontWeight: 700, color: 'white' }}>{unpaidInvoices.length}</span> hóa đơn chưa đóng
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-light-muted)' }}>
+                      <span style={{ fontWeight: 700, color: 'var(--text-light-main)' }}>{unpaidInvoices.length}</span> hóa đơn chưa đóng
                     </div>
                     {unpaidInvoices.some(i => i.status === 'OVERDUE') && (
                       <div style={{ fontSize: '0.8rem', color: '#f87171', fontWeight: 700 }}>
@@ -306,10 +306,10 @@ export default function TenantDashboard() {
                   </div>
                 </div>
               ) : (
-                <div className="glass-panel animate-fade-in" style={{ animationDelay: '0.1s', padding: 24, borderTop: '3px solid #22c55e', flex: 'none', textAlign: 'center' }}>
+                <div className="neo-card animate-fade-in" style={{ animationDelay: '0.1s', padding: 24, borderTop: '3px solid #22c55e', flex: 'none', textAlign: 'center' }}>
                   <div style={{ fontSize: '2rem', marginBottom: 8 }}>✅</div>
                   <div style={{ fontWeight: 800, fontSize: '1rem', color: '#4ade80' }}>Không có dư nợ!</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>Bạn đã thanh toán đầy đủ</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-light-muted)', marginTop: 4 }}>Bạn đã thanh toán đầy đủ</div>
                 </div>
               )}
 
@@ -321,11 +321,11 @@ export default function TenantDashboard() {
                   { label: 'Sự cố đang mở', value: activeIncidents.length, color: '#f87171', icon: '⚠️' },
                   { label: 'Đã giải quyết', value: incidents.filter(i => i.status === 'RESOLVED').length, color: '#60a5fa', icon: '🔧' },
                 ].map((s, i) => (
-                  <div key={i} className="glass-panel animate-fade-in" style={{ animationDelay: `${0.15 + i * 0.05}s`, padding: '16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div key={i} className="neo-card animate-fade-in" style={{ animationDelay: `${0.15 + i * 0.05}s`, padding: '16px', display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ fontSize: '1.3rem' }}>{s.icon}</div>
                     <div>
                       <div style={{ fontSize: '1.4rem', fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</div>
-                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 2 }}>{s.label}</div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-light-muted)', marginTop: 2 }}>{s.label}</div>
                     </div>
                   </div>
                 ))}
@@ -334,9 +334,9 @@ export default function TenantDashboard() {
 
             {/* Tabs: Invoices & Incidents */}
             <div style={{ gridColumn: '1 / -1' }}>
-              <div className="glass-panel animate-fade-in" style={{ animationDelay: '0.25s', overflow: 'hidden' }}>
+              <div className="neo-card animate-fade-in" style={{ animationDelay: '0.25s', overflow: 'hidden' }}>
                 {/* Tab Header */}
-                <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', padding: '0 8px' }}>
+                <div style={{ display: 'flex', borderBottom: '1px solid var(--border-light)', padding: '0 8px' }}>
                   {[
                     { key: 'invoices', label: '💰 Hóa đơn', badge: unpaidInvoices.length },
                     { key: 'incidents', label: '⚠️ Sự cố', badge: activeIncidents.length },
@@ -347,14 +347,14 @@ export default function TenantDashboard() {
                       style={{
                         padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
                         fontSize: '0.9rem', fontWeight: activeTab === tab.key ? 700 : 500,
-                        color: activeTab === tab.key ? 'white' : 'var(--text-muted)',
+                        color: activeTab === tab.key ? 'var(--primary)' : 'var(--text-light-muted)',
                         borderBottom: `2px solid ${activeTab === tab.key ? '#818cf8' : 'transparent'}`,
                         transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 8,
                       }}
                     >
                       {tab.label}
                       {tab.badge > 0 && (
-                        <span style={{ background: '#ef4444', color: 'white', borderRadius: 999, width: 18, height: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 800 }}>{tab.badge}</span>
+                        <span style={{ background: '#ef4444', color: 'var(--text-light-main)', borderRadius: 999, width: 18, height: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 800 }}>{tab.badge}</span>
                       )}
                     </button>
                   ))}
@@ -365,7 +365,7 @@ export default function TenantDashboard() {
                   {activeTab === 'invoices' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                       {invoices.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+                        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-light-muted)' }}>
                           <div style={{ fontSize: '2.5rem', marginBottom: 12, opacity: 0.5 }}>💰</div>
                           <div style={{ fontWeight: 600 }}>Chưa có hóa đơn nào</div>
                         </div>
@@ -373,7 +373,7 @@ export default function TenantDashboard() {
                         const daysUntil = getDaysUntilDue(inv.dueDate);
                         const isOverdue = inv.status === 'OVERDUE';
                         return (
-                          <div key={inv.id} className="animate-slide-in" style={{ animationDelay: `${idx * 0.04}s`, padding: '18px 20px', background: 'rgba(255,255,255,0.04)', borderRadius: 14, border: `1px solid ${isOverdue ? 'rgba(239,68,68,0.3)' : 'var(--border-color)'}`, borderLeft: `4px solid ${inv.status === 'PAID' ? '#22c55e' : isOverdue ? '#ef4444' : '#f59e0b'}`, display: 'flex', alignItems: 'center', gap: 16 }}>
+                          <div key={inv.id} className="animate-slide-in" style={{ animationDelay: `${idx * 0.04}s`, padding: '18px 20px', background: 'var(--bg-light-surface-alt)', borderRadius: 14, border: `1px solid ${isOverdue ? 'rgba(239,68,68,0.3)' : 'var(--border-light)'}`, borderLeft: `4px solid ${inv.status === 'PAID' ? '#22c55e' : isOverdue ? '#ef4444' : '#f59e0b'}`, display: 'flex', alignItems: 'center', gap: 16 }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                                 <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{inv.invoiceNumber}</span>
@@ -381,17 +381,17 @@ export default function TenantDashboard() {
                                   : isOverdue ? <span style={{ fontSize: '0.7rem', padding: '2px 8px', background: 'rgba(239,68,68,0.15)', color: '#f87171', borderRadius: 999, fontWeight: 700 }}>🚨 Quá hạn</span>
                                   : <span style={{ fontSize: '0.7rem', padding: '2px 8px', background: 'rgba(245,158,11,0.15)', color: '#fbbf24', borderRadius: 999, fontWeight: 700 }}>⏳ Chờ thanh toán</span>}
                               </div>
-                              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', gap: 12 }}>
+                              <div style={{ fontSize: '0.78rem', color: 'var(--text-light-muted)', display: 'flex', gap: 12 }}>
                                 <span>Hạn: {formatDate(inv.dueDate)}</span>
                                 {inv.status !== 'PAID' && (
-                                  <span style={{ fontWeight: 700, color: daysUntil < 0 ? '#f87171' : daysUntil <= 3 ? '#fbbf24' : 'var(--text-muted)' }}>
+                                  <span style={{ fontWeight: 700, color: daysUntil < 0 ? '#f87171' : daysUntil <= 3 ? '#fbbf24' : 'var(--text-light-muted)' }}>
                                     {daysUntil < 0 ? `Trễ ${Math.abs(daysUntil)} ngày` : daysUntil === 0 ? 'Hết hạn hôm nay!' : `Còn ${daysUntil} ngày`}
                                   </span>
                                 )}
                               </div>
                             </div>
                             <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                              <div style={{ fontWeight: 900, fontSize: '1.1rem', color: inv.status === 'PAID' ? 'var(--text-main)' : '#f87171', marginBottom: 6 }}>
+                              <div style={{ fontWeight: 900, fontSize: '1.1rem', color: inv.status === 'PAID' ? 'var(--text-light-main)' : '#f87171', marginBottom: 6 }}>
                                 {formatCurrency(inv.amount)}
                               </div>
                               {inv.status !== 'PAID' && (
@@ -420,24 +420,24 @@ export default function TenantDashboard() {
                         >+ Tạo báo cáo mới</button>
                       </div>
                       {incidents.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+                        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-light-muted)' }}>
                           <div style={{ fontSize: '2.5rem', marginBottom: 12, opacity: 0.5 }}>✅</div>
                           <div style={{ fontWeight: 600 }}>Không có sự cố nào</div>
                           <div style={{ fontSize: '0.85rem', marginTop: 4 }}>Mọi thứ đang hoạt động tốt!</div>
                         </div>
                       ) : incidents.map((inc, idx) => (
-                        <div key={inc.id} className="animate-slide-in" style={{ animationDelay: `${idx * 0.04}s`, padding: '16px 18px', background: 'rgba(255,255,255,0.04)', borderRadius: 14, border: `1px solid ${inc.status === 'RESOLVED' ? 'rgba(34,197,94,0.2)' : 'rgba(245,158,11,0.25)'}`, borderLeft: `4px solid ${inc.status === 'RESOLVED' ? '#22c55e' : '#f59e0b'}` }}>
+                        <div key={inc.id} className="animate-slide-in" style={{ animationDelay: `${idx * 0.04}s`, padding: '16px 18px', background: 'var(--bg-light-surface-alt)', borderRadius: 14, border: `1px solid ${inc.status === 'RESOLVED' ? 'rgba(34,197,94,0.2)' : 'rgba(245,158,11,0.25)'}`, borderLeft: `4px solid ${inc.status === 'RESOLVED' ? '#22c55e' : '#f59e0b'}` }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                             <div>
                               <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{inc.title}</div>
-                              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>{formatDate(inc.createdAt)}</div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-light-muted)', marginTop: 2 }}>{formatDate(inc.createdAt)}</div>
                             </div>
                             {inc.status === 'RESOLVED'
                               ? <span style={{ fontSize: '0.72rem', padding: '3px 10px', background: 'rgba(34,197,94,0.15)', color: '#4ade80', borderRadius: 999, fontWeight: 700, border: '1px solid rgba(34,197,94,0.25)' }}>✓ Đã xử lý</span>
                               : <span style={{ fontSize: '0.72rem', padding: '3px 10px', background: 'rgba(245,158,11,0.15)', color: '#fbbf24', borderRadius: 999, fontWeight: 700, border: '1px solid rgba(245,158,11,0.25)' }}>⏳ Đang xử lý</span>
                             }
                           </div>
-                          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{inc.description}</div>
+                          <div style={{ fontSize: '0.85rem', color: 'var(--text-light-muted)', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{inc.description}</div>
                         </div>
                       ))}
                     </div>
@@ -447,10 +447,10 @@ export default function TenantDashboard() {
             </div>
           </div>
         ) : (
-          <div className="glass-panel animate-fade-in" style={{ padding: 48, textAlign: 'center' }}>
+          <div className="neo-card animate-fade-in" style={{ padding: 48, textAlign: 'center' }}>
             <div style={{ fontSize: '3.5rem', marginBottom: 16, opacity: 0.6 }}>🏠</div>
             <h2 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: 10 }}>Chưa có hợp đồng</h2>
-            <p style={{ color: 'var(--text-muted)', lineHeight: 1.7 }}>
+            <p style={{ color: 'var(--text-light-muted)', lineHeight: 1.7 }}>
               Bạn chưa có hợp đồng phòng nào đang hoạt động.<br />Vui lòng liên hệ chủ trọ để được cấp hợp đồng.
             </p>
           </div>
@@ -474,12 +474,12 @@ export default function TenantDashboard() {
 
       {/* Payment Modal */}
       {payingInvoice && (
-        <div className="modal-overlay" style={{ background: 'rgba(0,0,0,0.7)' }}>
-          <div className="glass-panel animate-fade-in" style={{ maxWidth: 440, width: '100%', padding: 32, position: 'relative' }}>
-            <button onClick={() => setPayingInvoice(null)} style={{ position: 'absolute', top: 14, right: 14, width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+        <div className="modal-overlay" style={{ background: 'rgba(0,0,0,0.4)' }}>
+          <div className="neo-card animate-fade-in" style={{ maxWidth: 440, width: '100%', padding: 32, position: 'relative' }}>
+            <button onClick={() => setPayingInvoice(null)} style={{ position: 'absolute', top: 14, right: 14, width: 30, height: 30, borderRadius: '50%', background: 'var(--border-light)', border: 'none', color: 'var(--text-light-muted)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
             <h2 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: 20, textAlign: 'center' }}>💳 Thanh toán hóa đơn</h2>
-            <div style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: 14, padding: 20, textAlign: 'center', marginBottom: 20 }}>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 6 }}>Số tiền cần thanh toán</div>
+            <div style={{ background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', borderRadius: 14, padding: 20, textAlign: 'center', marginBottom: 20 }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-light-muted)', marginBottom: 6 }}>Số tiền cần thanh toán</div>
               <div style={{ fontSize: '2.2rem', fontWeight: 900, color: '#f87171', letterSpacing: '-0.03em' }}>{formatCurrency(payingInvoice.amount)}</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
@@ -489,9 +489,9 @@ export default function TenantDashboard() {
                 { label: 'Chủ tài khoản', value: ACCOUNT_NAME },
                 { label: 'Nội dung CK', value: `${(user as any)?.phone} ${payingInvoice.invoiceNumber}` },
               ].map(row => (
-                <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border-color)' }}>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{row.label}</span>
-                  <span style={{ fontWeight: 700, fontSize: '0.9rem', color: row.label === 'Nội dung CK' ? '#f87171' : 'white' }}>{row.value}</span>
+                <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border-light)' }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-light-muted)' }}>{row.label}</span>
+                  <span style={{ fontWeight: 700, fontSize: '0.9rem', color: row.label === 'Nội dung CK' ? '#ef4444' : 'var(--text-light-main)' }}>{row.value}</span>
                 </div>
               ))}
             </div>
@@ -499,12 +499,12 @@ export default function TenantDashboard() {
               <img
                 src={`https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-qr_only.png?amount=${payingInvoice.amount}&addInfo=${(user as any)?.phone}%20${payingInvoice.invoiceNumber}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`}
                 alt="QR Code"
-                style={{ width: 180, height: 180, borderRadius: 12, border: '2px solid var(--border-color)', padding: 6, background: 'white' }}
+                style={{ width: 180, height: 180, borderRadius: 12, border: '2px solid var(--border-light)', padding: 6, background: 'white' }}
               />
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 8 }}>Quét mã QR để thanh toán nhanh</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-light-muted)', marginTop: 8 }}>Quét mã QR để thanh toán nhanh</p>
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setPayingInvoice(null)} style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'rgba(255,255,255,0.08)', border: '1px solid var(--border-color)', color: 'var(--text-muted)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Đóng</button>
+              <button onClick={() => setPayingInvoice(null)} style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', color: 'var(--text-light-muted)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Đóng</button>
               <button onClick={() => handlePayInvoice(payingInvoice.id)} className="btn-primary" style={{ flex: 1, padding: '11px', borderRadius: 12 }}>✅ Đã chuyển khoản</button>
             </div>
           </div>
@@ -513,15 +513,15 @@ export default function TenantDashboard() {
 
       {/* Incident Modal */}
       {showIncidentModal && (
-        <div className="modal-overlay" style={{ background: 'rgba(0,0,0,0.7)' }}>
-          <div className="glass-panel animate-fade-in" style={{ maxWidth: 460, width: '100%', padding: 32, position: 'relative' }}>
-            <button onClick={() => setShowIncidentModal(false)} style={{ position: 'absolute', top: 14, right: 14, width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+        <div className="modal-overlay" style={{ background: 'rgba(0,0,0,0.4)' }}>
+          <div className="neo-card animate-fade-in" style={{ maxWidth: 460, width: '100%', padding: 32, position: 'relative' }}>
+            <button onClick={() => setShowIncidentModal(false)} style={{ position: 'absolute', top: 14, right: 14, width: 30, height: 30, borderRadius: '50%', background: 'var(--border-light)', border: 'none', color: 'var(--text-light-muted)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
             <h2 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>⚠️ Báo cáo sự cố</h2>
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 24 }}>Mô tả sự cố để chủ trọ hỗ trợ xử lý sớm nhất</p>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-light-muted)', marginBottom: 24 }}>Mô tả sự cố để chủ trọ hỗ trợ xử lý sớm nhất</p>
             <form onSubmit={handleReportIncident} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
                 <label className="form-label">Loại sự cố</label>
-                <select className="form-input" value={incidentType} onChange={e => setIncidentType(e.target.value)}>
+                <select className="form-input" style={{ background: "var(--bg-light-surface)", borderColor: "var(--border-light)", color: "var(--text-light-main)" }} value={incidentType} onChange={e => setIncidentType(e.target.value)}>
                   <option value="ELECTRICITY">⚡ Điện (Mất điện, chập cháy...)</option>
                   <option value="WATER">💧 Nước (Mất nước, rò rỉ...)</option>
                   <option value="FURNITURE">🪑 Nội thất (Hỏng giường, tủ...)</option>
@@ -530,23 +530,23 @@ export default function TenantDashboard() {
               </div>
               <div>
                 <label className="form-label">Tiêu đề sự cố</label>
-                <input className="form-input" placeholder="VD: Mất nước tầng 2..." value={incidentTitle} onChange={e => setIncidentTitle(e.target.value)} />
+                <input className="form-input" style={{ background: "var(--bg-light-surface)", borderColor: "var(--border-light)", color: "var(--text-light-main)" }} placeholder="VD: Mất nước tầng 2..." value={incidentTitle} onChange={e => setIncidentTitle(e.target.value)} />
               </div>
               <div>
                 <label className="form-label">Mô tả chi tiết <span style={{ color: '#ef4444' }}>*</span></label>
                 <textarea
-                  className="form-input"
+                  className="form-input" 
                   placeholder="Mô tả chi tiết sự cố bạn đang gặp phải..."
                   required
                   value={incidentDescription}
                   onChange={e => setIncidentDescription(e.target.value)}
-                  style={{ minHeight: 100, resize: 'vertical' }}
+                  style={{ background: "var(--bg-light-surface)", borderColor: "var(--border-light)", color: "var(--text-light-main)", minHeight: 100, resize: 'vertical' }}
                 />
               </div>
               {incidentError && <div style={{ color: '#f87171', fontSize: '0.85rem', fontWeight: 500 }}>⚠️ {incidentError}</div>}
               <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-                <button type="button" onClick={() => setShowIncidentModal(false)} style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'rgba(255,255,255,0.08)', border: '1px solid var(--border-color)', color: 'var(--text-muted)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Hủy</button>
-                <button type="submit" style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'linear-gradient(135deg,#f59e0b,#ef4444)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.9rem' }}>
+                <button type="button" onClick={() => setShowIncidentModal(false)} style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'var(--bg-light-surface-alt)', border: '1px solid var(--border-light)', color: 'var(--text-light-muted)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Hủy</button>
+                <button type="submit" style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'linear-gradient(135deg,#f59e0b,#ef4444)', color: 'var(--text-light-main)', fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.9rem' }}>
                   📤 Gửi báo cáo
                 </button>
               </div>
