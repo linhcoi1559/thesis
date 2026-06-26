@@ -21,7 +21,7 @@ export default function TenantDashboard() {
 
   const BANK_ID = process.env.NEXT_PUBLIC_BANK_ID || 'TCB';
   const ACCOUNT_NO = process.env.NEXT_PUBLIC_BANK_ACCOUNT || '8888885580';
-  const ACCOUNT_NAME = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME || 'NGUYEN VAN A';
+  const ACCOUNT_NAME = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME || 'NGUYEN VAN LINH';
 
   const [showIncidentModal, setShowIncidentModal] = useState(false);
   const [incidentType, setIncidentType] = useState('ELECTRICITY');
@@ -500,7 +500,7 @@ export default function TenantDashboard() {
                 { label: 'Ngân hàng', value: BANK_ID },
                 { label: 'Số tài khoản', value: ACCOUNT_NO },
                 { label: 'Chủ tài khoản', value: ACCOUNT_NAME },
-                { label: 'Nội dung CK', value: `${(user as any)?.phone} ${payingInvoice.invoiceNumber}` },
+                { label: 'Nội dung CK', value: `${removeAccents((user as any)?.name || 'Khach')} chuyen tien tro thang ${new Date(payingInvoice.dueDate).getMonth() + 1}` },
               ].map(row => (
                 <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border-light)' }}>
                   <span style={{ fontSize: '0.85rem', color: 'var(--text-light-muted)' }}>{row.label}</span>
