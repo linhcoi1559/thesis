@@ -87,8 +87,8 @@ export default function InvoicesPage() {
     const paid = invoices.filter(i => i.status === 'PAID');
     const unpaid = invoices.filter(i => i.status === 'UNPAID');
     const overdue = invoices.filter(i => i.status === 'OVERDUE');
-    const totalRevenue = paid.reduce((sum, i) => sum + i.amount, 0);
-    const pendingAmount = unpaid.concat(overdue).reduce((sum, i) => sum + i.amount, 0);
+    const totalRevenue = paid.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+    const pendingAmount = unpaid.concat(overdue).reduce((sum, i) => sum + Number(i.amount || 0), 0);
     return { total: invoices.length, paid: paid.length, unpaid: unpaid.length, overdue: overdue.length, totalRevenue, pendingAmount };
   }, [invoices]);
 
