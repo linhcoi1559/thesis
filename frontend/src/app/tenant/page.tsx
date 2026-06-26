@@ -504,7 +504,7 @@ export default function TenantDashboard() {
               ].map(row => (
                 <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border-light)' }}>
                   <span style={{ fontSize: '0.85rem', color: 'var(--text-light-muted)' }}>{row.label}</span>
-                  <span style={{ fontWeight: 700, fontSize: '0.9rem', color: row.label === 'Nội dung CK' ? '#ef4444' : 'var(--text-light-main)' }}>{row.value}</span>
+                  <span style={{ fontWeight: 700, fontSize: '0.9rem', color: row.label === 'Nội dung CK' ? 'var(--primary)' : 'var(--text-light-main)' }}>{row.value}</span>
                 </div>
               ))}
             </div>
