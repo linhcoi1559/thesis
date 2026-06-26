@@ -64,7 +64,7 @@ Tôi có thể giúp bạn tìm phòng phù hợp, tư vấn giá cả và thờ
     setIsLoading(true);
 
     try {
-      const endpoint = tenantContext ? 'http://localhost:3000/ai/tenant-chat' : 'http://localhost:3000/ai/chat';
+      const endpoint = tenantContext ? 'https://thesis-2rkn.onrender.com/ai/tenant-chat' : 'https://thesis-2rkn.onrender.com/ai/chat';
       const body = tenantContext
         ? { message: userMsg, tenantContext }
         : { message: userMsg };

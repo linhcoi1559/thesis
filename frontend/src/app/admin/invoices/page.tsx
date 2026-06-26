@@ -59,7 +59,7 @@ export default function InvoicesPage() {
 
   const fetchInvoices = async () => {
     try {
-      const res = await fetch('http://localhost:3000/invoices', { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch('https://thesis-2rkn.onrender.com/invoices', { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } });
       if (res.ok) {
         const data = await res.json();
         setInvoices(Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : []);
@@ -69,7 +69,7 @@ export default function InvoicesPage() {
 
   const fetchContracts = async () => {
     try {
-      const res = await fetch('http://localhost:3000/contracts', { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch('https://thesis-2rkn.onrender.com/contracts', { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } });
       if (res.ok) {
         const data = await res.json();
         const list = Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : [];
@@ -116,7 +116,7 @@ export default function InvoicesPage() {
       const wCost = Number(waterCost || 0);
       const oCost = Number(otherCost || 0);
       const totalAmount = baseAmount + eCost + wCost + oCost;
-      const res = await fetch('http://localhost:3000/invoices', {
+      const res = await fetch('https://thesis-2rkn.onrender.com/invoices', {
         method: 'POST', cache: 'no-store',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ contractId: selectedContractId, amount: totalAmount, dueDate: new Date(dueDate).toISOString(), electricityCost: eCost, waterCost: wCost, otherCost: oCost })
@@ -136,7 +136,7 @@ export default function InvoicesPage() {
 
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/invoices/${id}/status`, {
+      const res = await fetch(`https://thesis-2rkn.onrender.com/invoices/${id}/status`, {
         method: 'PATCH', cache: 'no-store',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status })

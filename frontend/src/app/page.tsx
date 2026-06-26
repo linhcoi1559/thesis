@@ -51,7 +51,7 @@ export default function LandingPage() {
     setChatInput('');
     setIsChatLoading(true);
     try {
-      const res = await fetch('http://localhost:3000/ai/public-chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message }) });
+      const res = await fetch('https://thesis-2rkn.onrender.com/ai/public-chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message }) });
       const data = await res.json();
       setChatMessages(prev => [...prev, { role: 'ai', text: data.text || 'Xin lỗi, tôi không thể trả lời lúc này.' }]);
     } catch {
@@ -64,7 +64,7 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await fetch('http://localhost:3000/rooms/public');
+        const response = await fetch('https://thesis-2rkn.onrender.com/rooms/public');
         if (response.ok) { const data = await response.json(); setRooms(data); }
       } catch (error) { console.error('Failed to fetch rooms:', error); }
       finally { setLoadingRooms(false); }
@@ -88,7 +88,7 @@ export default function LandingPage() {
     setStatus('loading');
     setErrorMessage('');
     try {
-      const response = await fetch('http://localhost:3000/rent-requests', {
+      const response = await fetch('https://thesis-2rkn.onrender.com/rent-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: formData.name, email: formData.email, phone: formData.phone, message: formData.message || undefined, landlordId, roomId: formData.roomId || undefined }),
