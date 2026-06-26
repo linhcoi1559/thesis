@@ -19,8 +19,8 @@ export default function TenantDashboard() {
   const [payingInvoice, setPayingInvoice] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'invoices' | 'incidents'>('invoices');
 
-  const BANK_ID = process.env.NEXT_PUBLIC_BANK_ID || 'MB';
-  const ACCOUNT_NO = process.env.NEXT_PUBLIC_BANK_ACCOUNT || '0901234567';
+  const BANK_ID = process.env.NEXT_PUBLIC_BANK_ID || 'TCB';
+  const ACCOUNT_NO = process.env.NEXT_PUBLIC_BANK_ACCOUNT || '8888885580';
   const ACCOUNT_NAME = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME || 'NGUYEN VAN A';
 
   const [showIncidentModal, setShowIncidentModal] = useState(false);
@@ -156,7 +156,7 @@ export default function TenantDashboard() {
   const unpaidInvoices = invoices.filter(i => i.status !== 'PAID');
   const paidInvoices = invoices.filter(i => i.status === 'PAID');
   const totalDebt = unpaidInvoices.reduce((sum, i) => sum + i.amount, 0);
-  
+
   const initials = user?.name ? user.name.split(' ').map((w: string) => w[0]).slice(-2).join('').toUpperCase() : 'KT';
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('vi-VN');
@@ -173,7 +173,7 @@ export default function TenantDashboard() {
           .neo-header > div { padding: 0 16px !important; }
           main { padding: 20px 16px 80px !important; }
           .payment-modal { padding: 24px !important; }
-          .payment-qr { width: 100% !important; max-width: 250px !important; height: auto !important; }
+          .payment-qr { width: 150px !important; height: 150px !important; }
           .welcome-header { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
           .welcome-header button { width: 100% !important; justify-content: center !important; }
         }
@@ -205,7 +205,7 @@ export default function TenantDashboard() {
               onMouseLeave={e => e.currentTarget.style.background = 'rgba(239,68,68,0.15)'}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 15, height: 15 }}>
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
               </svg>
               Đăng xuất
             </button>
@@ -391,7 +391,7 @@ export default function TenantDashboard() {
                                 <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{inv.invoiceNumber}</span>
                                 {inv.status === 'PAID' ? <span style={{ fontSize: '0.7rem', padding: '2px 8px', background: 'rgba(34,197,94,0.15)', color: '#4ade80', borderRadius: 999, fontWeight: 700 }}>✓ Đã thanh toán</span>
                                   : isOverdue ? <span style={{ fontSize: '0.7rem', padding: '2px 8px', background: 'rgba(239,68,68,0.15)', color: '#f87171', borderRadius: 999, fontWeight: 700 }}>🚨 Quá hạn</span>
-                                  : <span style={{ fontSize: '0.7rem', padding: '2px 8px', background: 'rgba(245,158,11,0.15)', color: '#fbbf24', borderRadius: 999, fontWeight: 700 }}>⏳ Chờ thanh toán</span>}
+                                    : <span style={{ fontSize: '0.7rem', padding: '2px 8px', background: 'rgba(245,158,11,0.15)', color: '#fbbf24', borderRadius: 999, fontWeight: 700 }}>⏳ Chờ thanh toán</span>}
                               </div>
                               <div style={{ fontSize: '0.78rem', color: 'var(--text-light-muted)', display: 'flex', gap: 12 }}>
                                 <span>Hạn: {formatDate(inv.dueDate)}</span>
@@ -509,10 +509,10 @@ export default function TenantDashboard() {
             </div>
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
               <img
-                src="/qr-thanh-toan.jpg"
-                alt="QR Code Thanh Toán"
+                src={`https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-qr_only.png?amount=${payingInvoice.amount}&addInfo=${(user as any)?.phone}%20${payingInvoice.invoiceNumber}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`}
+                alt="QR Code"
                 className="payment-qr"
-                style={{ width: '100%', maxWidth: 280, height: 'auto', borderRadius: 12, border: '2px solid var(--border-light)', padding: 6, background: 'white', display: 'inline-block' }}
+                style={{ width: 180, height: 180, borderRadius: 12, border: '2px solid var(--border-light)', padding: 6, background: 'white' }}
               />
               <p style={{ fontSize: '0.8rem', color: 'var(--text-light-muted)', marginTop: 8 }}>Quét mã QR để thanh toán nhanh</p>
             </div>
@@ -548,7 +548,7 @@ export default function TenantDashboard() {
               <div>
                 <label className="form-label">Mô tả chi tiết <span style={{ color: '#ef4444' }}>*</span></label>
                 <textarea
-                  className="form-input" 
+                  className="form-input"
                   placeholder="Mô tả chi tiết sự cố bạn đang gặp phải..."
                   required
                   value={incidentDescription}
