@@ -54,8 +54,8 @@ export default function AdminRoomsPage() {
     setLoading(true);
     try {
       const [roomsRes, contractsRes] = await Promise.all([
-        fetch(`https://thesis-2rkn.onrender.com/rooms?landlordId=${landlordId}`, { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('https://thesis-2rkn.onrender.com/contracts', { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rooms?landlordId=${landlordId}`, { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/contracts`, { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       if (roomsRes.ok) {
         const roomsData = await roomsRes.json();
@@ -109,7 +109,7 @@ export default function AdminRoomsPage() {
   const handleSaveRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const url = editingRoom ? `https://thesis-2rkn.onrender.com/rooms/${editingRoom.id}` : `https://thesis-2rkn.onrender.com/rooms`;
+      const url = editingRoom ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rooms/${editingRoom.id}` : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rooms`;
       const response = await fetch(url, {
         method: editingRoom ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -126,7 +126,7 @@ export default function AdminRoomsPage() {
   const handleDeleteRoom = async (id: string) => {
     if (!confirm('Bạn có chắc chắn muốn xóa phòng này?')) return;
     try {
-      const response = await fetch(`https://thesis-2rkn.onrender.com/rooms/${id}?landlordId=${landlordId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rooms/${id}?landlordId=${landlordId}`, {
         method: 'DELETE', cache: 'no-store',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ landlordId }),
@@ -143,7 +143,7 @@ export default function AdminRoomsPage() {
     fd.append('landlordId', landlordId);
     setUploadingImage(true);
     try {
-      const response = await fetch(`https://thesis-2rkn.onrender.com/rooms/${selectedRoom.id}/images`, { method: 'POST', cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rooms/${selectedRoom.id}/images`, { method: 'POST', cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
       if (response.ok) {
         const updatedRoom = await response.json();
         setSelectedRoom(updatedRoom);
@@ -157,7 +157,7 @@ export default function AdminRoomsPage() {
   const handleDeleteImage = async (imageUrl: string) => {
     if (!selectedRoom || !confirm('Xóa ảnh này?')) return;
     try {
-      const response = await fetch(`https://thesis-2rkn.onrender.com/rooms/${selectedRoom.id}/images`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rooms/${selectedRoom.id}/images`, {
         method: 'DELETE', cache: 'no-store',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ landlordId, imageUrl }),

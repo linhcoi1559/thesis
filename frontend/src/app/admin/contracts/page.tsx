@@ -88,8 +88,8 @@ export default function ContractsPage() {
   const fetchContracts = async () => {
     try {
       const [res, incRes] = await Promise.all([
-        fetch('https://thesis-2rkn.onrender.com/contracts', { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('https://thesis-2rkn.onrender.com/incidents', { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/contracts`, { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/incidents`, { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       if (res.ok) {
         const data = await res.json();
@@ -111,8 +111,8 @@ export default function ContractsPage() {
       const userStr = typeof window !== 'undefined' ? sessionStorage.getItem('user') : null;
       const landlordId = userStr ? (JSON.parse(userStr).landlordId || JSON.parse(userStr).id) : '';
       const [roomsRes, tenantsRes] = await Promise.all([
-        fetch(`https://thesis-2rkn.onrender.com/rooms?landlordId=${landlordId}`, { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('https://thesis-2rkn.onrender.com/tenants', { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rooms?landlordId=${landlordId}`, { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/tenants`, { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       if (roomsRes.ok) {
         const rd = await roomsRes.json();
@@ -167,8 +167,8 @@ export default function ContractsPage() {
   const loadTenantData = async (contract: Contract) => {
     try {
       const [invRes, incRes] = await Promise.all([
-        fetch('https://thesis-2rkn.onrender.com/invoices', { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('https://thesis-2rkn.onrender.com/incidents', { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/invoices`, { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/incidents`, { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       if (invRes.ok) {
         const invData = await invRes.json();
@@ -192,7 +192,7 @@ export default function ContractsPage() {
 
   const handleResolveIncident = async (incidentId: string) => {
     try {
-      const res = await fetch(`https://thesis-2rkn.onrender.com/incidents/${incidentId}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/incidents/${incidentId}/status`, {
         method: 'PATCH', cache: 'no-store',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status: 'RESOLVED' })
@@ -210,7 +210,7 @@ export default function ContractsPage() {
     e.preventDefault();
     setIsAdding(true);
     try {
-      const res = await fetch('https://thesis-2rkn.onrender.com/contracts', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/contracts`, {
         method: 'POST', cache: 'no-store',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ ...addFormData, deposit: Number(addFormData.deposit), rentalPrice: Number(addFormData.rentalPrice) })
@@ -379,7 +379,7 @@ export default function ContractsPage() {
                             onClick={async () => {
                               if (window.confirm('Xóa hợp đồng này? Thao tác không thể hoàn tác.')) {
                                 try {
-                                  const res = await fetch(`https://thesis-2rkn.onrender.com/contracts/${c.id}`, { method: 'DELETE', cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } });
+                                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/contracts/${c.id}`, { method: 'DELETE', cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } });
                                   if (res.ok) { toast({ title: 'Thành công', description: 'Đã xóa hợp đồng' }); setContracts(prev => prev.filter((con: any) => con.id !== c.id)); }
                                   else toast({ title: 'Lỗi', description: 'Không thể xóa hợp đồng' });
                                 } catch { toast({ title: 'Lỗi', description: 'Không thể kết nối' }); }

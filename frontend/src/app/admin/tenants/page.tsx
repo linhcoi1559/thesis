@@ -52,7 +52,7 @@ export default function TenantsPage() {
   const fetchTenants = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('https://thesis-2rkn.onrender.com/tenants', { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/tenants`, { cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } });
       if (res.ok) {
         const data = await res.json();
         setTenants(data || []);
@@ -85,7 +85,7 @@ export default function TenantsPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch('https://thesis-2rkn.onrender.com/tenants', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/tenants`, {
         method: 'POST', cache: 'no-store',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(formData)
@@ -109,7 +109,7 @@ export default function TenantsPage() {
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`Bạn có chắc muốn xóa khách thuê ${name} không?`)) return;
     try {
-      const res = await fetch(`https://thesis-2rkn.onrender.com/tenants/${id}`, { method: 'DELETE', cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/tenants/${id}`, { method: 'DELETE', cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` } });
       if (res.ok) {
         toast({ title: 'Thành công', description: 'Đã xóa khách thuê', duration: 3000 });
         setTenants(tenants.filter(t => t.id !== id));
@@ -122,7 +122,7 @@ export default function TenantsPage() {
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch(`https://thesis-2rkn.onrender.com/tenants/${id}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/tenants/${id}/status`, {
         method: 'PATCH', cache: 'no-store',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status: newStatus })

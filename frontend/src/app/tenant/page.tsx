@@ -36,7 +36,7 @@ export default function TenantDashboard() {
     const unsubscribe = on(`notification-${user.id}`, (notification: any) => {
       if (notification.title === 'Cập nhật sự cố') {
         const fetchIncidentsOnly = async () => {
-          const res = await fetch('https://thesis-2rkn.onrender.com/incidents', { cache: 'no-store', headers: { Authorization: `Bearer ${token}` } });
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/incidents`, { cache: 'no-store', headers: { Authorization: `Bearer ${token}` } });
           if (res.ok) {
             const data = await res.json();
             setIncidents(Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : []);
@@ -57,9 +57,9 @@ export default function TenantDashboard() {
       if (!token) return;
       try {
         const [invRes, conRes, incRes] = await Promise.all([
-          fetch('https://thesis-2rkn.onrender.com/invoices', { cache: 'no-store', headers: { Authorization: `Bearer ${token}` } }),
-          fetch('https://thesis-2rkn.onrender.com/contracts', { cache: 'no-store', headers: { Authorization: `Bearer ${token}` } }),
-          fetch('https://thesis-2rkn.onrender.com/incidents', { cache: 'no-store', headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/invoices`, { cache: 'no-store', headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/contracts`, { cache: 'no-store', headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/incidents`, { cache: 'no-store', headers: { Authorization: `Bearer ${token}` } }),
         ]);
         if (invRes.ok) { const data = await invRes.json(); setInvoices(Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : []); }
         if (conRes.ok) { const data = await conRes.json(); setContracts(Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : []); }
@@ -89,7 +89,7 @@ export default function TenantDashboard() {
 
   const handlePayInvoice = async (invoiceId: string) => {
     try {
-      const res = await fetch(`https://thesis-2rkn.onrender.com/invoices/${invoiceId}/pay`, { method: 'POST', cache: 'no-store', headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/invoices/${invoiceId}/pay`, { method: 'POST', cache: 'no-store', headers: { Authorization: `Bearer ${token}` } });
       if (res.ok) {
         toast({ title: 'Thành công', description: 'Đã gửi thông báo thanh toán cho chủ trọ.' });
         setInvoices(invoices.map(i => i.id === invoiceId ? { ...i, status: 'PAID' } : i));
@@ -105,7 +105,7 @@ export default function TenantDashboard() {
     if (!roomId) { setIncidentError('Không tìm thấy thông tin phòng để báo cáo.'); return; }
     const title = incidentTitle || incidentType;
     try {
-      const res = await fetch('https://thesis-2rkn.onrender.com/incidents', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/incidents`, {
         method: 'POST', cache: 'no-store',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title, description: incidentDescription, roomId })
@@ -114,7 +114,7 @@ export default function TenantDashboard() {
         toast({ title: 'Thành công', description: 'Đã gửi báo cáo sự cố cho chủ trọ.' });
         setShowIncidentModal(false);
         setIncidentDescription(''); setIncidentTitle('');
-        const incRes = await fetch('https://thesis-2rkn.onrender.com/incidents', { cache: 'no-store', headers: { Authorization: `Bearer ${token}` } });
+        const incRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/incidents`, { cache: 'no-store', headers: { Authorization: `Bearer ${token}` } });
         if (incRes.ok) { const data = await incRes.json(); setIncidents(Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : []); }
         setActiveTab('incidents');
       } else {

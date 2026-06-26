@@ -64,7 +64,7 @@ export default function AdminDashboardPage() {
     const fetchRequests = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('https://thesis-2rkn.onrender.com/rent-requests', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rent-requests`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         const result = await response.json();
@@ -111,7 +111,7 @@ export default function AdminDashboardPage() {
 
   const handleUpdateStatus = async (id: string, status: 'PENDING' | 'CONTACTED' | 'CANCELLED') => {
     try {
-      const res = await fetch(`https://thesis-2rkn.onrender.com/rent-requests/${id}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rent-requests/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status })
@@ -123,7 +123,7 @@ export default function AdminDashboardPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Bạn có chắc muốn xóa đăng ký này?')) return;
     try {
-      const res = await fetch(`https://thesis-2rkn.onrender.com/rent-requests/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rent-requests/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -141,7 +141,7 @@ export default function AdminDashboardPage() {
     e.preventDefault();
     if (!selectedReq) return;
     try {
-      const res = await fetch(`https://thesis-2rkn.onrender.com/rent-requests/${selectedReq.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rent-requests/${selectedReq.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(formData)
@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
     e.preventDefault();
     setCreatingTenant(true);
     try {
-      const res = await fetch('https://thesis-2rkn.onrender.com/tenants', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/tenants`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(createTenantData)

@@ -9,7 +9,7 @@ interface UseSocketOptions {
 
 export const useSocket = (options: UseSocketOptions = {}) => {
   const {
-    url = process.env.NEXT_PUBLIC_WS_URL || 'https://thesis-2rkn.onrender.com',
+    url = process.env.NEXT_PUBLIC_WS_URL || `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}`,
     token,
     autoConnect = true,
   } = options;
