@@ -509,10 +509,10 @@ export default function TenantDashboard() {
             </div>
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
               <img
-                src={`https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-qr_only.png?amount=${payingInvoice.amount}&addInfo=${(user as any)?.phone}%20${payingInvoice.invoiceNumber}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`}
-                alt="QR Code"
+                src="/qr-thanh-toan.jpg"
+                alt="QR Code Thanh Toán"
                 className="payment-qr"
-                style={{ width: 180, height: 180, borderRadius: 12, border: '2px solid var(--border-light)', padding: 6, background: 'white' }}
+                style={{ width: 180, height: 180, borderRadius: 12, border: '2px solid var(--border-light)', padding: 6, background: 'white', objectFit: 'contain' }}
               />
               <p style={{ fontSize: '0.8rem', color: 'var(--text-light-muted)', marginTop: 8 }}>Quét mã QR để thanh toán nhanh</p>
             </div>
