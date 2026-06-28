@@ -63,7 +63,7 @@ export class RoomController {
   async uploadImage(
     @Param('id') id: string,
     @Body('landlordId') landlordId: string,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file: any
   ) {
     if (!file) throw new BadRequestException('File is required');
     if (!landlordId) throw new BadRequestException('landlordId is required');

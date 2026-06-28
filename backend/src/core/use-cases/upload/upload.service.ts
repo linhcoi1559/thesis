@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class UploadService {
-  async uploadImage(file: Express.Multer.File): Promise<any> {
+  async uploadImage(file: any): Promise<any> {
     try {
       const base64Image = file.buffer.toString('base64');
       

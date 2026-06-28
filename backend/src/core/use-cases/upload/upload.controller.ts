@@ -8,7 +8,7 @@ export class UploadController {
 
   @Post('image')
   @UseInterceptors(FileInterceptor('image'))
-  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+  async uploadImage(@UploadedFile() file: any) {
     if (!file) throw new BadRequestException('Vui lòng chọn ảnh để upload');
 
     const result = await this.uploadService.uploadImage(file);
