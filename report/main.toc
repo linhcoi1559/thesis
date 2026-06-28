@@ -44,39 +44,40 @@
 \contentsline {chapter}{\numberline {4}METHODOLOGY}{24}{chapter.4}%
 \contentsline {section}{\numberline {4.1}Tools and Techniques}{24}{section.4.1}%
 \contentsline {subsection}{\numberline {4.1.1}Backend Services}{24}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Frontend Portal}{24}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.2}Frontend Portal}{25}{subsection.4.1.2}%
 \contentsline {subsection}{\numberline {4.1.3}Supporting Services and Integrations}{25}{subsection.4.1.3}%
-\contentsline {subsection}{\numberline {4.1.4}Infrastructure and Deployment}{25}{subsection.4.1.4}%
-\contentsline {section}{\numberline {4.2}System Architecture}{25}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Overall System Structure}{25}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Layered Design}{26}{subsection.4.2.2}%
-\contentsline {section}{\numberline {4.3}Database Design}{27}{section.4.3}%
-\contentsline {subsection}{\numberline {4.3.1}Entity-Relationship Diagram}{27}{subsection.4.3.1}%
-\contentsline {subsection}{\numberline {4.3.2}Core Database Tables}{28}{subsection.4.3.2}%
-\contentsline {subsection}{\numberline {4.3.3}Multi-Tenant Data Privacy}{29}{subsection.4.3.3}%
-\contentsline {section}{\numberline {4.4}Authentication and Authorization}{29}{section.4.4}%
-\contentsline {subsection}{\numberline {4.4.1}User Authentication with JWT}{29}{subsection.4.4.1}%
-\contentsline {subsection}{\numberline {4.4.2}API Protection with Auth Guards}{30}{subsection.4.4.2}%
-\contentsline {subsection}{\numberline {4.4.3}Multi-Tenant Authorization Filter}{30}{subsection.4.4.3}%
-\contentsline {section}{\numberline {4.5}Automation and Business Logic}{31}{section.4.5}%
-\contentsline {subsection}{\numberline {4.5.1}Rental Contract Creation}{31}{subsection.4.5.1}%
-\contentsline {subsection}{\numberline {4.5.2}Invoice Payment and Verification}{33}{subsection.4.5.2}%
-\contentsline {subsection}{\numberline {4.5.3}Tenant Incident Handling}{35}{subsection.4.5.3}%
-\contentsline {section}{\numberline {4.6}AI Integration}{37}{section.4.6}%
-\contentsline {subsection}{\numberline {4.6.1}AI Assistant with Google Gemini}{37}{subsection.4.6.1}%
-\contentsline {chapter}{\numberline {5}RESULTS AND DISCUSSION}{39}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Landlord Administration Dashboard and Room Management}{39}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Public Room Listing and RentBot AI Chatbot}{40}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Tenant Portal and Personal AI Assistant}{41}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Invoice Payment with VietQR Integration}{43}{section.5.4}%
-\contentsline {section}{\numberline {5.5}Difficulties and Limitations}{44}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Discussion}{45}{section.5.6}%
-\contentsline {chapter}{\numberline {6}CONCLUSION AND FUTURE WORK}{47}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Conclusion}{47}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Future Work}{47}{section.6.2}%
-\contentsline {subsection}{\numberline {6.2.1}Production Payment Integration}{47}{subsection.6.2.1}%
-\contentsline {subsection}{\numberline {6.2.2}Advanced Utility Billing}{48}{subsection.6.2.2}%
-\contentsline {subsection}{\numberline {6.2.3}Stronger Multi-Tenant Security}{48}{subsection.6.2.3}%
-\contentsline {subsection}{\numberline {6.2.4}Mobile Tenant Experience}{48}{subsection.6.2.4}%
-\contentsline {subsection}{\numberline {6.2.5}Analytics and Forecasting}{48}{subsection.6.2.5}%
-\contentsline {subsection}{\numberline {6.2.6}Document and Contract Management}{48}{subsection.6.2.6}%
+\contentsline {subsection}{\numberline {4.1.4}Infrastructure and Deployment}{26}{subsection.4.1.4}%
+\contentsline {section}{\numberline {4.2}System Architecture}{26}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Overall System Structure}{26}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Layered Design}{27}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Database Design}{28}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Entity-Relationship Diagram}{28}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Core Database Tables}{29}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Multi-Tenant Data Privacy}{30}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}Authentication and Authorization}{30}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}User Authentication with JWT}{30}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}API Protection with Auth Guards}{32}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Multi-Tenant Authorization Filter}{32}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}Room and Tenant Management}{33}{subsection.4.4.4}%
+\contentsline {section}{\numberline {4.5}Automation and Business Logic}{35}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Rental Contract Creation}{35}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Invoice Payment and Verification}{37}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Tenant Incident Handling}{40}{subsection.4.5.3}%
+\contentsline {section}{\numberline {4.6}AI Integration}{44}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}AI Assistant with Google Gemini}{44}{subsection.4.6.1}%
+\contentsline {chapter}{\numberline {5}RESULTS AND DISCUSSION}{47}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Landlord Administration Dashboard and Room Management}{47}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Public Room Listing and RentBot AI Chatbot}{48}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Tenant Portal and Personal AI Assistant}{49}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Invoice Payment with VietQR Integration}{51}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Difficulties and Limitations}{52}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Discussion}{53}{section.5.6}%
+\contentsline {chapter}{\numberline {6}CONCLUSION AND FUTURE WORK}{55}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Conclusion}{55}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Future Work}{55}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Production Payment Integration}{55}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}Advanced Utility Billing}{56}{subsection.6.2.2}%
+\contentsline {subsection}{\numberline {6.2.3}Stronger Multi-Tenant Security}{56}{subsection.6.2.3}%
+\contentsline {subsection}{\numberline {6.2.4}Mobile Tenant Experience}{56}{subsection.6.2.4}%
+\contentsline {subsection}{\numberline {6.2.5}Analytics and Forecasting}{56}{subsection.6.2.5}%
+\contentsline {subsection}{\numberline {6.2.6}Document and Contract Management}{56}{subsection.6.2.6}%

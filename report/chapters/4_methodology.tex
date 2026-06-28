@@ -1,29 +1,54 @@
 \chapter{METHODOLOGY}
 
-This chapter presents the architecture and implementation methods used to build the \textit{\textbf{Smart Boarding House Management System}}.
+This chapter presents the architecture and implementation methods used to build the \textit{\textbf{Smart Boarding House Management System}}. It explains the technology choices, system design, database structure, security mechanisms, business logic automation, and AI integration in detail.
 
 \section{Tools and Techniques}
-Choosing the right tools is very important to build a reliable rental management platform. This section explains the technologies selected for the backend, frontend, supporting services, and system deployment, and the reasons for choosing them instead of other options.
+
+Choosing the right tools is very important to build a reliable rental management platform. The selection of the technology stack was driven not only by functional requirements but also by specific engineering goals: ensuring data consistency, enabling real-time communication, and supporting rapid development across a modular codebase. This section explains the technologies selected and the reasons for choosing them over common alternatives.
 
 \subsection{Backend Services}
-For the backend, \textbf{NestJS} is chosen instead of simple frameworks like \textbf{Express}. \textbf{NestJS} provides a modular structure, dependency injection, and decorators, which makes it easy to organize the codebase. This organization is very helpful for implementing \textbf{Clean Architecture} and keeping the code neat as the system grows. \textbf{PostgreSQL} is used as the primary database because rental data like contracts and invoices must be secure and consistent. To connect the backend with \textbf{PostgreSQL}, \textbf{Prisma ORM} is used because it offers type-safe queries and makes database migrations easy. While \textbf{MongoDB} schemas are present in the codebase for potential logging development, the current active implementation relies entirely on \textbf{PostgreSQL} for data consistency.
+\begin{itemize}
+    \item \textbf{NestJS (vs. Express):} While Express is a popular minimalist framework, \textbf{NestJS} is chosen because it provides a structured, modular architecture built on top of Express with built-in support for dependency injection, decorators, and guards. This structure is essential for organizing a large codebase into independent domain modules such as authentication, rooms, contracts, invoices, and AI. Without this structure, a plain Express application would quickly become difficult to maintain as the number of features grows.
+
+    \item \textbf{PostgreSQL with Prisma ORM (vs. MongoDB):} \textbf{PostgreSQL} is chosen as the primary database because rental management data, particularly contracts and invoices, requires strict relational integrity and ACID-compliant transactions. For example, when a contract is created, the room status must be updated atomically in the same operation. A document database like \textbf{MongoDB} cannot enforce foreign key relationships or multi-table transactions as reliably. \textbf{Prisma ORM} is used on top of \textbf{PostgreSQL} because it provides type-safe query builders and auto-generated TypeScript types from the schema, which prevents type mismatch bugs at compile time and makes database migrations traceable.
+
+    \item \textbf{Socket.IO (vs. HTTP Polling):} Instead of having the frontend repeatedly send HTTP requests to check for new notifications, \textbf{Socket.IO} is used to maintain a persistent WebSocket connection between the server and each logged-in client. This allows the backend to push events such as invoice payment confirmations and new incident reports to the landlord's browser instantly, without any delay or wasted network traffic from polling.
+\end{itemize}
 
 \subsection{Frontend Portal}
-For the frontend, \textbf{Next.js 14 App Router} is used instead of a standard \textbf{React} single-page application. \textbf{Next.js} offers server-side rendering, which is useful for the public landing page to load faster and have better search engine optimization. It also has a clean routing system that helps separate public pages, landlord admin pages, and the tenant portal. To manage the global application state, \textbf{Zustand} is chosen instead of \textbf{Redux}. \textbf{Zustand} is much lighter, has less boilerplate code, and is easier to learn, while still providing great performance for storing user sessions and UI states. For API requests, \textbf{Axios} is used with custom interceptors to automatically attach landlord identification headers and authorization tokens to every request.
+\begin{itemize}
+    \item \textbf{Next.js 14 App Router (vs. React SPA):} \textbf{Next.js} is chosen instead of a standard single-page application because it supports server-side rendering. This is important for the public landing page, where room listings must be visible to search engines to attract potential tenants. The App Router also provides a clean file-based routing system that naturally separates the three access contexts: public pages, the landlord administration dashboard, and the tenant portal.
+
+    \item \textbf{Zustand (vs. Redux):} For global state management, \textbf{Zustand} is chosen over \textbf{Redux} because it requires significantly less boilerplate code. Redux requires defining actions, reducers, and selectors separately, which adds unnecessary complexity for managing simple states such as the logged-in user session and UI preferences. Zustand achieves the same result with a simple hook-based store, making the codebase easier to read and maintain.
+
+    \item \textbf{Axios with Interceptors:} For API requests, \textbf{Axios} is used with custom request interceptors. These interceptors automatically attach the \textbf{JWT} Bearer token and the landlord identification header to every outgoing request, so individual components do not need to manage authentication headers manually. A response interceptor also handles token expiry errors globally.
+\end{itemize}
 
 \subsection{Supporting Services and Integrations}
-To add special features to the platform, several supporting libraries and services are integrated. \textbf{Socket.IO} is used instead of constant HTTP polling to send notifications. This allows landlords to receive instant alerts when a tenant reports an incident or sends a room request. To store room images, \textbf{Cloudinary} is chosen instead of saving files locally on the server, which helps save disk space and automatically optimizes images for faster loading. For \textbf{AI} features, the \textbf{Google Generative AI} library with the \textbf{Gemini} model is used because it is very fast, accurate, and cost-effective for generating landlord notices and chatting with tenants. Finally, the \textbf{VietQR} image API is used to generate payment QR codes and insert them into invoice \textbf{PDF} files, allowing tenants to pay easily using their banking apps.
+\begin{itemize}
+    \item \textbf{Cloudinary (vs. Local File Storage):} Room images are stored on \textbf{Cloudinary} instead of on the local server disk. This avoids filling up the server's disk space and allows \textbf{Cloudinary} to automatically optimize and resize images for faster loading on public devices. The backend stores only the secure image URL in \textbf{PostgreSQL}, keeping the database lightweight.
+
+    \item \textbf{Google Gemini (vs. OpenAI GPT):} The \textbf{Gemini 2.0 Flash Lite} model is chosen for the AI assistant features because it offers a very fast response time and a generous free-usage tier, which keeps operational costs low for a student project. It is accurate enough for the three required tasks: generating formal Vietnamese announcements, answering room availability questions, and answering tenant billing questions from structured database context.
+
+    \item \textbf{VietQR API:} The \textbf{VietQR} image API is called dynamically when an invoice PDF is generated. It produces a QR code image pre-filled with the landlord's bank account number and the exact invoice amount. Tenants can scan this code with any Vietnamese banking application to complete the transfer instantly, without needing to type account numbers manually.
+\end{itemize}
 
 \subsection{Infrastructure and Deployment}
-For deployment and production hosting, the system uses a serverless cloud infrastructure. The database is hosted on \textbf{Neon}, which provides a serverless \textbf{PostgreSQL} database. This allows the system to store rental data securely with high availability. The \textbf{NestJS} backend is deployed as a Web Service on \textbf{Render}. \textbf{Render} automatically builds the \textbf{NestJS} application from the backend directory and connects it to the \textbf{Neon} database. The \textbf{Next.js} frontend is deployed on \textbf{Vercel} because \textbf{Vercel} is optimized for \textbf{Next.js} applications, offering fast loading speeds. The frontend communicates with the backend on \textbf{Render} using environment variables. Both \textbf{Render} and \textbf{Vercel} are connected to the \textbf{GitHub} repository. This setup enables automatic \textbf{CI/CD} deployment, meaning any new code changes pushed to the repository are automatically built and deployed to the production environment.
+\begin{itemize}
+    \item \textbf{Neon (Serverless PostgreSQL):} The \textbf{PostgreSQL} database is hosted on \textbf{Neon}, a serverless cloud database provider. Neon automatically scales compute resources based on demand and provides connection pooling, which is important because serverless backends on \textbf{Render} can spin up many instances simultaneously.
 
+    \item \textbf{Render (Backend Hosting):} The \textbf{NestJS} backend is deployed as a Web Service on \textbf{Render}. \textbf{Render} detects the backend directory from the \textbf{GitHub} repository, runs the build command automatically, and connects to the \textbf{Neon} database through environment variables.
+
+    \item \textbf{Vercel (Frontend Hosting):} The \textbf{Next.js} frontend is deployed on \textbf{Vercel} because \textbf{Vercel} is built and optimized specifically for \textbf{Next.js} applications. It handles server-side rendering infrastructure automatically and provides a global CDN for fast page loads. Both \textbf{Render} and \textbf{Vercel} are connected to the \textbf{GitHub} repository, enabling automatic \textbf{CI/CD}: any code pushed to the main branch is built and deployed to production without manual intervention.
+\end{itemize}
 
 
 \section{System Architecture}
-This section describes how the different parts of the Smart Boarding House Management System are organized and connect with each other. The system is designed using a clean, layered structure to separate the user interface, business logic, and database operations.
+
+This section describes how the different parts of the Smart Boarding House Management System are organized and how they connect with each other. The system is designed using a clean, layered structure to separate the user interface, business logic, and data persistence concerns.
 
 \subsection{Overall System Structure}
-The system follows a \textbf{client-server} architecture. The frontend is built with \textbf{Next.js} and acts as the client side. The backend is built with \textbf{NestJS} and acts as the server side. As shown in Figure \ref{fig:system_architecture}, the client and the server communicate using HTTP \textbf{REST APIs} for standard data requests and \textbf{Socket.IO} for real-time notifications. The backend server connects directly to the \textbf{PostgreSQL} database to read and store information. It also communicates with external services like \textbf{Cloudinary} to upload images, \textbf{Google Gemini} to run \textbf{AI} features, and the \textbf{VietQR API} to get payment codes.
+The system follows a \textbf{client-server} architecture. The frontend built with \textbf{Next.js} acts as the client, and the backend built with \textbf{NestJS} acts as the server. As shown in Figure \ref{fig:system_architecture}, the client and server communicate using HTTP \textbf{REST APIs} for standard data requests and \textbf{Socket.IO} WebSockets for real-time event notifications. The backend server connects directly to the \textbf{PostgreSQL} database on \textbf{Neon} to read and store all rental information. It also communicates with three external services: \textbf{Cloudinary} for image storage, \textbf{Google Gemini} for AI features, and the \textbf{VietQR API} for payment QR code generation.
 
 \begin{figure}[H]
     \centering
@@ -32,21 +57,24 @@ The system follows a \textbf{client-server} architecture. The frontend is built 
     \label{fig:system_architecture}
 \end{figure}
 
+\textbf{Design Rationale:} A single backend service rather than a microservices architecture is chosen deliberately. Because the project is built and maintained by a single developer within a limited timeframe, a monolithic \textbf{NestJS} application organized into domain modules provides the right balance between structure and simplicity. Each domain module (rooms, contracts, invoices, AI, etc.) is self-contained and could be extracted into a separate service in a future version without significant refactoring.
+
 \subsection{Layered Design}
-To make the codebase easy to maintain, the \textbf{backend} and \textbf{frontend} are organized into three distinct layers: the \textbf{presentation layer}, the \textbf{application layer}, and the \textbf{infrastructure layer}.
+To make the codebase easy to maintain and extend, both the \textbf{backend} and \textbf{frontend} are organized into three distinct layers: the \textbf{presentation layer}, the \textbf{application layer}, and the \textbf{infrastructure layer}. This separation ensures that changes in one layer do not directly affect the others.
 
-The \textbf{presentation layer} is the top layer. In the \textbf{backend}, it contains HTTP controllers and data transfer objects to receive requests and send responses. In the \textbf{frontend}, it contains the visual pages and interactive components. The \textbf{presentation layer} does not process business rules; it only passes data to the next layer.
+The \textbf{presentation layer} is the top layer. In the \textbf{backend}, it contains \textbf{NestJS} HTTP controllers and Data Transfer Objects (DTOs) that receive incoming requests, validate their shape, and send formatted responses. In the \textbf{frontend}, it contains the \textbf{Next.js} pages and \textbf{React} components that render the UI. This layer does not contain any business rules; its sole responsibility is to pass validated data to the next layer.
 
-The \textbf{application layer} contains the core business logic of the system. For example, when a landlord creates a contract, the \textbf{application layer} checks if the room is vacant and updates the room status. It contains modules for authentication, room management, contract lifecycles, and invoice creation. This layer is completely independent of the database details or framework configurations.
+The \textbf{application layer} contains the core business logic. For example, when a landlord creates a contract, it is this layer that checks whether the selected room is vacant, executes the database transaction, and updates the room status. It contains service classes for authentication, room management, contract lifecycles, invoice creation, and notification dispatch. This layer is completely independent of the specific database library or HTTP framework being used.
 
-The \textbf{infrastructure layer} is the bottom layer. It handles communication with external systems. In the \textbf{backend}, it includes database services to execute \textbf{PostgreSQL} queries using \textbf{Prisma}, and call external APIs like \textbf{Cloudinary} and \textbf{Google Generative AI}. This layered design ensures that changes in one part of the system, like upgrading the database, do not affect the rest of the application.
+The \textbf{infrastructure layer} is the bottom layer. It handles all communication with external systems. In the \textbf{backend}, this includes \textbf{Prisma} repository classes for executing \textbf{PostgreSQL} queries, a \textbf{Cloudinary} upload service, and the \textbf{Google Generative AI} client. This layered design ensures that, for example, switching from \textbf{Prisma} to another ORM would only require changes in the infrastructure layer without touching the business logic above it.
 
 
 \section{Database Design}
-The database is a very important part of the platform because it stores all information about rooms, tenants, contracts, and invoices. \textbf{PostgreSQL} is used as the database and \textbf{Prisma ORM} connects the backend server to it. This section explains the database structure, the relationships between different tables, and how the data is organized.
+
+The database is the foundation of the platform, storing all rental information in a structured and consistent way. \textbf{PostgreSQL} is used as the database and \textbf{Prisma ORM} manages the connection and schema. This section explains the entity relationships, the purpose of each table, and how the schema enforces multi-tenant data privacy.
 
 \subsection{Entity-Relationship Diagram}
-To understand how the data is structured, an \textbf{Entity-Relationship Diagram (ERD)} is created. As shown in Figure \ref{fig:erd_diagram}, the database has eight main tables that represent the core parts of the boarding house system. These tables are \textbf{User}, \textbf{Landlord}, \textbf{Room}, \textbf{Contract}, \textbf{Invoice}, \textbf{RentRequest}, \textbf{Incident}, and \textbf{Violation}.
+To understand how the data is structured, an \textbf{Entity-Relationship Diagram (ERD)} is created. As shown in Figure \ref{fig:erd_diagram}, the database contains eight main tables that represent the core domain objects of the boarding house system: \textbf{User}, \textbf{Landlord}, \textbf{Room}, \textbf{Contract}, \textbf{Invoice}, \textbf{RentRequest}, \textbf{Incident}, and \textbf{Violation}.
 
 \begin{figure}[H]
     \centering
@@ -56,27 +84,37 @@ To understand how the data is structured, an \textbf{Entity-Relationship Diagram
 \end{figure}
 
 \subsection{Core Database Tables}
-The \textbf{User} table stores information about all accounts in the system. Each user has an email, password, name, phone, status, and role (which can be \textbf{Admin}, \textbf{Landlord}, or \textbf{Tenant}). If the user is a tenant, they can also have a \textbf{landlordId} to connect them to a specific landlord.
+The \textbf{User} table is the central identity record for all accounts in the system. Each user record stores an email, a bcrypt-hashed password, a display name, a phone number, an account status (\textbf{PENDING}, \textbf{APPROVED}, \textbf{REJECTED}, or \textbf{BANNED}), and a role (\textbf{ADMIN}, \textbf{LANDLORD}, or \textbf{TENANT}). If the account belongs to a tenant, the record also stores a \texttt{landlordId} foreign key that connects the tenant to their specific property owner. New user registrations are saved with \textbf{PENDING} status by default, so landlords must explicitly approve tenants before they can log in.
 
-The \textbf{Landlord} table stores the business profile of property owners. It contains details like the landlord's name, phone, address, and bank account information (bank name, account name, and account number). This bank information is used to generate \textbf{VietQR} codes on invoice \textbf{PDF}s automatically.
+The \textbf{Landlord} table stores the business profile of each property owner. It records the landlord's name, phone, address, and bank account details (bank name, account holder name, and account number). These bank details are critical because they are fetched automatically every time an invoice PDF is generated to produce the \textbf{VietQR} payment code.
 
-The \textbf{Room} table contains information about the rental rooms. Each room has a room number, floor, description, rental price, status (which can be \textbf{Vacant}, \textbf{Occupied}, or \textbf{Maintenance}), and a list of image URLs hosted on \textbf{Cloudinary}. Every room is connected to a specific landlord.
+The \textbf{Room} table represents a rentable unit. Each room record stores a room number, floor, description, a decimal rental price, a status field (\textbf{VACANT}, \textbf{OCCUPIED}, or \textbf{MAINTENANCE}), and an array of Cloudinary image URLs. Every room is associated with a landlord through a \texttt{landlordId} foreign key with cascade deletion, meaning all room records are automatically removed if the landlord account is deleted.
 
-The \textbf{Contract} table represents the lease agreement. It connects a tenant user and a room together. It stores the start date, end date, deposit amount, monthly rental price, electricity price, water price, and status (which can be \textbf{Pending}, \textbf{Active}, \textbf{Expired}, or \textbf{Terminated}).
+The \textbf{Contract} table represents the formal lease agreement between a landlord, a tenant, and a room. It stores the contract number, start date, end date, deposit amount, monthly rental price, electricity unit price, water unit price, member count, and a status field (\textbf{PENDING}, \textbf{ACTIVE}, \textbf{EXPIRED}, or \textbf{TERMINATED}). The contract also stores a boolean \texttt{autoPayEnabled} flag that controls whether the monthly cron job should automatically generate an invoice for this contract.
 
-The \textbf{Invoice} table stores monthly billing records. It links to a specific contract and stores the total amount, electric cost, water cost, other costs, due date, payment date, and status (which can be \textbf{Unpaid}, \textbf{Paid}, \textbf{Overdue}, or \textbf{Cancelled}).
+The \textbf{Invoice} table stores individual monthly billing records. Each invoice is linked to a contract and records the total amount due, the breakdown of electricity cost, water cost, other costs, the due date, the actual payment date, and a status (\textbf{UNPAID}, \textbf{PAID}, \textbf{OVERDUE}, or \textbf{CANCELLED}). A unique invoice number is generated for each record to allow tenants and landlords to identify payments easily.
 
-The \textbf{RentRequest} table stores requests from public visitors who want to ask about rooms. The \textbf{Incident} table stores repair and maintenance requests submitted by tenants. The \textbf{Violation} table stores rules violations recorded by landlords.
+The \textbf{RentRequest}, \textbf{Incident}, and \textbf{Violation} tables support the operational side of the platform. \textbf{RentRequest} stores inquiries from public visitors who are interested in a room. \textbf{Incident} stores maintenance or repair requests submitted by tenants, each with a priority level (\textbf{LOW}, \textbf{MEDIUM}, or \textbf{HIGH}) and a resolution status. \textbf{Violation} stores rule infractions recorded by the landlord against specific tenants.
 
 \subsection{Multi-Tenant Data Privacy}
-To keep the data of each landlord private, the system uses a multi-tenant design. Most tables in the database, including \textbf{Room}, \textbf{Contract}, \textbf{Invoice}, \textbf{RentRequest}, \textbf{Incident}, and \textbf{Violation}, contain a \textbf{landlordId} field. When a landlord logs in, the \textbf{backend} server automatically filters all queries using their \textbf{landlordId}. This ensures that a landlord can only see their own rooms, contracts, and invoices, and cannot access data belonging to other landlords.
+Because multiple landlords share the same \textbf{PostgreSQL} database instance, preventing cross-tenant data leakage is a critical design concern. To solve this, every business table — \textbf{Room}, \textbf{Contract}, \textbf{Invoice}, \textbf{RentRequest}, \textbf{Incident}, and \textbf{Violation} — includes a \texttt{landlordId} column with a database-level index. When a landlord logs in, their \texttt{landlordId} is embedded in the \textbf{JWT} token. Every service method that queries these tables automatically appends a \texttt{WHERE landlordId = ?} filter using the value extracted from the authenticated request object. This means that even if a landlord attempts to request another landlord's invoice by guessing its UUID, the query returns no results because the \texttt{landlordId} filter does not match.
 
 
 \section{Authentication and Authorization}
-Security is a critical part of the Smart Boarding House Management System. The platform must ensure that only registered users can access private pages, and that landlords can only see their own rental data. To implement this, the backend uses token-based authentication and role-based access control.
+
+Security is a critical part of the platform. The system must ensure that only registered and approved users can access private pages, and that landlords can only access their own rental data. To achieve this, the backend implements token-based authentication and a layered role and ownership authorization system.
 
 \subsection{User Authentication with JWT}
-The system uses JSON Web Tokens (JWT) to authenticate users. When a user logs in by entering their email and password, the authentication service validates their credentials. If the information is correct, the server generates a signed JWT token and returns it to the client. This token contains a payload with the user's identification code, email address, role, and landlord identification code. For every subsequent request, the client must send this token in the HTTP Authorization header as a Bearer token. To validate these tokens, the backend uses a NestJS Passport strategy. This strategy extracts the token, verifies its signature using a secret key, and automatically attaches the decoded user data to the request object as the authenticated user. The structure of this JWT token payload is described in Table \ref{tab:jwt_payload}.
+
+The authentication workflow uses \textbf{JSON Web Tokens (JWT)} to issue and verify user identities. The detailed execution steps are as follows:
+
+\begin{enumerate}
+    \item The user submits their email and password to the \texttt{POST /auth/login} endpoint.
+    \item The \textbf{AuthService} queries the \textbf{User} table for a record with the matching email. If no record is found, an unauthorized exception is thrown immediately.
+    \item The service calls \textbf{bcrypt.compare} to verify the submitted password against the stored hash. If the comparison fails, an unauthorized exception is thrown.
+    \item If the credentials are valid, the service calls \textbf{JwtService.sign} to generate a signed \textbf{JWT} token. The token payload includes the user's UUID (\texttt{sub}), email, role, and \texttt{landlordId}, as described in Table~\ref{tab:jwt_payload}.
+    \item The signed token is returned to the client. The frontend stores it in memory and attaches it as a \texttt{Bearer} token to the \texttt{Authorization} header of every subsequent API request using an \textbf{Axios} interceptor.
+\end{enumerate}
 
 \begin{table}[H]
     \centering
@@ -89,17 +127,25 @@ The system uses JSON Web Tokens (JWT) to authenticate users. When a user logs in
         \hline
         email & String & The email address used to identify the user account. \\
         \hline
-        role & Enum & The system role of the user (e.g., ADMIN, LANDLORD, or TENANT). \\
+        role & Enum & The system role of the user (ADMIN, LANDLORD, or TENANT). \\
         \hline
-        landlordId & String (UUID) & The landlord identifier used to filter data access for multi-tenancy. \\
+        landlordId & String (UUID) & The landlord identifier used to scope all database queries for multi-tenancy. \\
         \hline
     \end{tabular}
     \caption{Structure of the JSON Web Token (JWT) Payload}
     \label{tab:jwt_payload}
 \end{table}
 
+\textbf{Implementation Highlights:}
+\begin{itemize}
+    \item \textbf{Passport JWT Strategy:} Token validation is implemented as a \textbf{NestJS Passport} strategy. When a protected request arrives, the strategy extracts the token from the \texttt{Authorization} header, verifies its cryptographic signature using the server's secret key, and attaches the decoded payload to the request object as \texttt{req.user}. This decoded object is then available to all downstream guards and service methods without any additional database queries.
+    \item \textbf{Password Hashing:} All passwords are hashed with \textbf{bcrypt} using a salt round of 10 before being saved to the database. Plain-text passwords are never stored or logged at any point.
+    \item \textbf{Axios Interceptors on the Frontend:} The \textbf{Next.js} frontend uses a custom \textbf{Axios} instance with a request interceptor that reads the \textbf{JWT} token from the \textbf{Zustand} auth store and attaches it to every outgoing request automatically. This ensures that individual components never need to manage authentication headers directly.
+\end{itemize}
+
 \subsection{API Protection with Auth Guards}
-To protect individual API endpoints, the backend implements custom NestJS guards. The primary guard is the JWT Auth Guard, which intercepts incoming requests to protected routes. If the request does not contain a valid token, the guard blocks the request and throws an unauthorized exception. For routes that require specific roles, the system combines the JWT Auth Guard with a Roles Guard. The Roles Guard uses a custom Roles decorator and the NestJS Reflector to read the roles allowed for a route. It checks the role of the logged-in user inside the request object and compares it with the required roles. For example, if a route is decorated for landlords only, a tenant attempting to access it will be blocked and receive a forbidden exception. The flowchart in Figure \ref{fig:auth_guard_flowchart} shows how requests are processed through these guards.
+
+To protect individual API endpoints, the backend implements two custom \textbf{NestJS} guards that are applied to controllers using decorators. As shown in Figure \ref{fig:auth_guard_flowchart}, every protected request passes through both guards before reaching the route handler.
 
 \begin{figure}[H]
     \centering
@@ -111,10 +157,10 @@ To protect individual API endpoints, the backend implements custom NestJS guards
         \draw[fill=blue!10, draw=blue!50, rounded corners] (7.4,0) rectangle (10.4,1.2) node[pos=.5, align=center] {Roles Guard \\ (Role Checking)};
         \draw[->, thick] (10.4,0.6) -- (11.2,0.6);
         \draw[fill=green!10, draw=green!50, rounded corners] (11.2,0) rectangle (14.2,1.2) node[pos=.5, align=center] {Route Controller \\ (Resource Access)};
-        
+
         \draw[->, thick] (5.1,0) -- (5.1,-1);
         \draw[fill=red!10, draw=red!50, rounded corners] (3.6,-2.2) rectangle (6.6,-1) node[pos=.5, align=center] {Unauthorized \\ (API Blocked)};
-        
+
         \draw[->, thick] (8.9,0) -- (8.9,-1);
         \draw[fill=red!10, draw=red!50, rounded corners] (7.4,-2.2) rectangle (10.4,-1) node[pos=.5, align=center] {Forbidden \\ (Access Blocked)};
     \end{tikzpicture}
@@ -122,16 +168,117 @@ To protect individual API endpoints, the backend implements custom NestJS guards
     \label{fig:auth_guard_flowchart}
 \end{figure}
 
-\subsection{Multi-Tenant Authorization Filter}
-Apart from roles, the system enforces multi-tenant authorization using the landlord identification code. Because multiple landlords share the same database, the \textbf{backend} must prevent cross-tenant access. During authentication, the landlord's unique identification code is stored inside the \textbf{JWT} token. When a landlord requests room listings, contracts, or invoice records, the corresponding backend service reads this \textbf{landlordId} code directly from the request user object. The database query then filters the results based on this code. This technique guarantees that landlords can never view or modify the records of other property owners, even if they try to bypass the frontend interface.
+\textbf{Implementation Highlights:}
+\begin{itemize}
+    \item \textbf{JwtAuthGuard:} This guard is the first checkpoint. It calls the \textbf{Passport JWT Strategy} to extract and verify the token. If the token is missing, malformed, or expired, the guard immediately throws an \texttt{UnauthorizedException} and the request never reaches the controller. On success, it attaches the decoded user payload to the request object.
+    \item \textbf{RolesGuard:} This guard is applied after \textbf{JwtAuthGuard} on routes that require a specific role. It uses the \textbf{NestJS Reflector} to read the \texttt{@Roles()} decorator metadata on the current route handler. It then compares the \texttt{role} field from the decoded \textbf{JWT} payload against the required roles. If the user's role does not match (for example, a tenant trying to access a landlord-only route), the guard throws a \texttt{ForbiddenException}.
+    \item \textbf{Public Route Bypass:} Routes that must be accessible without authentication (such as \texttt{GET /rooms/public}, \texttt{POST /auth/login}, and \texttt{POST /ai/public-chat}) are decorated with a custom \texttt{@Public()} metadata marker. The \textbf{JwtAuthGuard} checks for this marker using the \textbf{Reflector} and skips token validation for those routes entirely.
+\end{itemize}
 
+\subsection{Multi-Tenant Authorization Filter}
+
+Apart from roles, the system enforces data ownership using the \texttt{landlordId} embedded in the \textbf{JWT} token. Because multiple landlords share the same database, the backend must prevent one landlord from reading or modifying another landlord's records.
+
+\textbf{Execution Flow:}
+\begin{enumerate}
+    \item When a landlord logs in, the \textbf{AuthService} fetches the landlord's \texttt{landlordId} from the \textbf{Landlord} table and embeds it in the \textbf{JWT} payload.
+    \item On every subsequent protected request, the \textbf{JwtAuthGuard} decodes the token and attaches the full payload — including \texttt{landlordId} — to \texttt{req.user}.
+    \item The service method receives the \texttt{landlordId} from \texttt{req.user} and passes it as a mandatory filter in every \textbf{Prisma} query: \texttt{where: \{ landlordId: req.user.landlordId \}}.
+    \item The database returns only records that belong to that specific landlord, making it structurally impossible for one landlord to access another's data through the API.
+\end{enumerate}
+
+\textbf{Implementation Highlights:}
+\begin{itemize}
+    \item \textbf{No Separate Middleware:} The multi-tenant filter is not implemented as a separate middleware layer. Instead, the \texttt{landlordId} is injected directly into each service method call. This keeps the authorization logic co-located with the business logic and avoids any risk of the filter being accidentally bypassed by a new route.
+    \item \textbf{Database Indexes:} All business tables have a database index on the \texttt{landlordId} column, defined in the \textbf{Prisma} schema using \texttt{@@index([landlordId])}. This ensures that the landlord-scoped filter queries remain fast even as the number of records grows.
+\end{itemize}
+
+To provide a clear interface for client applications, the Authentication Service exposes the following endpoints:
+
+\begin{table}[H]
+    \centering
+    \caption{Authentication Service API Specification}
+    \label{tab:auth_api}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|l|c|l|l|l|}
+        \hline
+        \textbf{Endpoint} & \textbf{Method} & \textbf{Request Body} & \textbf{Role Required} & \textbf{Description} \\ \hline
+        \texttt{/auth/register} & POST & \parbox[t]{3.5cm}{\texttt{email, password,}\\\texttt{name, phone, role}} & Public & \parbox[t]{4.5cm}{Creates a new user account with PENDING status.} \\ \hline
+        \texttt{/auth/login} & POST & \texttt{email, password} & Public & \parbox[t]{4.5cm}{Validates credentials and returns a signed JWT token.} \\ \hline
+        \texttt{/auth/profile} & GET & None & Authenticated & \parbox[t]{4.5cm}{Returns the profile of the currently authenticated user.} \\ \hline
+    \end{tabular}}
+\end{table}
+
+\subsection{Room and Tenant Management}
+
+Room management is the foundation of the platform. Before contracts or invoices can be created, the landlord must register rooms and approve tenant accounts. The room creation workflow validates all required fields on the backend using \textbf{NestJS} class-validator DTOs before saving to the database.
+
+\textbf{Execution Workflow — Room Image Upload:}
+\begin{enumerate}
+    \item The landlord selects an image file in the dashboard and submits it to \texttt{POST /rooms/:id/images}.
+    \item The \textbf{NestJS} controller receives the file via \textbf{Multer} middleware.
+    \item The \textbf{RoomService} calls the \textbf{CloudinaryService}, which uploads the binary file to the \textbf{Cloudinary} cloud using the official SDK.
+    \item \textbf{Cloudinary} returns a secure HTTPS URL for the uploaded image.
+    \item The service appends this URL to the room's \texttt{imageUrls} array in \textbf{PostgreSQL} using a \textbf{Prisma} update.
+    \item The updated room record is returned to the frontend, which immediately reflects the new image in the room card.
+\end{enumerate}
+
+\textbf{Implementation Highlights:}
+\begin{itemize}
+    \item \textbf{Public Room Listing:} The \texttt{GET /rooms/public} endpoint is decorated with \texttt{@Public()} and requires no authentication. It queries only rooms with \texttt{status: VACANT} across all landlords to populate the public landing page. This is the only cross-tenant query in the system and is intentionally scoped to vacant rooms only to prevent privacy leakage.
+    \item \textbf{Tenant Account Status:} New users who register with the \textbf{TENANT} role receive \texttt{PENDING} status. The landlord must explicitly call \texttt{PATCH /tenants/:id/status} to set the status to \textbf{APPROVED} before the tenant can log in and access the portal. This prevents unauthorized users from accessing private rental data.
+\end{itemize}
+
+\begin{table}[H]
+    \centering
+    \caption{Room Service API Specification}
+    \label{tab:room_api}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|l|c|l|l|l|}
+        \hline
+        \textbf{Endpoint} & \textbf{Method} & \textbf{Request Body / Params} & \textbf{Role Required} & \textbf{Description} \\ \hline
+        \texttt{/rooms/public} & GET & None & Public & \parbox[t]{4.5cm}{Returns all vacant rooms for the public listing page.} \\ \hline
+        \texttt{/rooms} & GET & None & Authenticated & \parbox[t]{4.5cm}{Returns all rooms belonging to the authenticated landlord.} \\ \hline
+        \texttt{/rooms} & POST & \parbox[t]{3.5cm}{\texttt{roomNumber, floor,}\\\texttt{price, description}} & Landlord/Admin & \parbox[t]{4.5cm}{Creates a new room record.} \\ \hline
+        \texttt{/rooms/:id} & PATCH & Room fields to update & Landlord/Admin & \parbox[t]{4.5cm}{Updates existing room details.} \\ \hline
+        \texttt{/rooms/:id} & DELETE & None & Landlord/Admin & \parbox[t]{4.5cm}{Deletes a room and all related records.} \\ \hline
+        \texttt{/rooms/:id/images} & POST & \texttt{image file} & Landlord/Admin & \parbox[t]{4.5cm}{Uploads a room image to Cloudinary and saves the URL.} \\ \hline
+        \texttt{/rooms/:id/images} & DELETE & \texttt{imageUrl} & Landlord/Admin & \parbox[t]{4.5cm}{Removes a room image from Cloudinary and the database.} \\ \hline
+    \end{tabular}}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Tenant Service API Specification}
+    \label{tab:tenant_api}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|l|c|l|l|l|}
+        \hline
+        \textbf{Endpoint} & \textbf{Method} & \textbf{Request Body} & \textbf{Role Required} & \textbf{Description} \\ \hline
+        \texttt{/tenants} & POST & \parbox[t]{3.5cm}{\texttt{userId, roomId}} & Landlord/Admin & \parbox[t]{4.5cm}{Registers a user as a tenant under this landlord.} \\ \hline
+        \texttt{/tenants} & GET & None & Landlord/Admin & \parbox[t]{4.5cm}{Returns all tenants belonging to the landlord.} \\ \hline
+        \texttt{/tenants/:id} & DELETE & None & Landlord/Admin & \parbox[t]{4.5cm}{Removes a tenant record.} \\ \hline
+        \texttt{/tenants/:id/status} & PATCH & \texttt{status} & Landlord/Admin & \parbox[t]{4.5cm}{Approves or rejects a tenant's account registration.} \\ \hline
+    \end{tabular}}
+\end{table}
 
 
 \section{Automation and Business Logic}
-This section describes the technical implementation of key business processes in the \textbf{backend}. To ensure data consistency and provide a good user experience, the system automates several workflows using database transactions, real-time messaging, and scheduled background tasks. These automated tasks include contract expiration checks, which run daily to return rooms to vacant status when leases end, and startup consistency checks, which automatically fix any room marked occupied that lacks an active contract.
+
+This section describes the technical implementation of the key business processes in the backend. To ensure data consistency and provide a reliable user experience, the system automates several workflows using database transactions, scheduled background tasks, and real-time WebSocket messaging.
 
 \subsection{Rental Contract Creation}
-Creating a new rental contract requires updating multiple records at the same time. As shown in the activity diagram (Figure \ref{fig:activity_create_contract}), when a landlord creates a contract, the system must verify room availability, save the contract details, and update the room status to occupied. To implement this safely, the \textbf{NestJS} backend uses a \textbf{Prisma} database transaction. This transaction guarantees that if any step fails (for example, if the tenant is invalid), the database rolls back to its previous state. This prevents bugs where a contract is created but the room remains vacant, or a room is marked occupied without an active contract.
+
+Creating a rental contract requires updating multiple database records atomically. The most critical requirement is that a room's status must change from \textbf{VACANT} to \textbf{OCCUPIED} at the exact same moment the contract record is saved. If these two operations are not atomic, a system crash between them could leave the database in an inconsistent state where a room is occupied but has no active contract, or a contract exists for a room that is still marked vacant.
+
+\textbf{Execution Workflow:}
+\begin{enumerate}
+    \item The landlord submits contract details (tenant, room, dates, deposit, and rental price) to \texttt{POST /contracts}.
+    \item The \textbf{ContractService} first validates that the selected room's \texttt{landlordId} matches the requesting landlord's ID, preventing a landlord from creating a contract for another landlord's room.
+    \item The service queries the \textbf{Room} table to confirm the room's current status is \textbf{VACANT}. If the room is already occupied, it throws a conflict exception and stops execution.
+    \item The service opens a \textbf{Prisma} interactive transaction. Inside the transaction, it executes two operations: (a) creating the new \textbf{Contract} record, and (b) updating the \textbf{Room} status to \textbf{OCCUPIED}.
+    \item If both operations succeed, the transaction is committed and the new contract is returned. If any operation throws an error, \textbf{Prisma} automatically rolls back both changes, leaving the database in its original clean state.
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -140,8 +287,43 @@ Creating a new rental contract requires updating multiple records at the same ti
     \label{fig:activity_create_contract}
 \end{figure}
 
+\textbf{Implementation Highlights:}
+\begin{itemize}
+    \item \textbf{Prisma Transactions:} The atomic update is implemented using \textbf{Prisma's} \texttt{\$transaction()} API. This API accepts an array of Prisma operations and executes them inside a single database transaction. This is the most reliable way to ensure that the contract and room status are always synchronized.
+    \item \textbf{Contract Expiration Cron Job:} A separate \textbf{NestJS} scheduled task runs every day at midnight using the \texttt{@Cron()} decorator. It queries all contracts whose \texttt{endDate} has passed and whose status is still \textbf{ACTIVE}. For each expired contract, it updates the contract status to \textbf{EXPIRED} and updates the associated room status back to \textbf{VACANT} inside another Prisma transaction.
+    \item \textbf{Startup Consistency Check:} When the backend application starts, a one-time bootstrap task runs to detect any rooms that are marked \textbf{OCCUPIED} but have no active contract (which could occur after an unexpected server crash). These rooms are automatically set back to \textbf{VACANT} to restore database consistency before the system begins serving requests.
+\end{itemize}
+
+\begin{table}[H]
+    \centering
+    \caption{Contract Service API Specification}
+    \label{tab:contract_api}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|l|c|l|l|l|}
+        \hline
+        \textbf{Endpoint} & \textbf{Method} & \textbf{Request Body} & \textbf{Role Required} & \textbf{Description} \\ \hline
+        \texttt{/contracts} & POST & \parbox[t]{3.5cm}{\texttt{tenantId, roomId,}\\\texttt{startDate, endDate,}\\\texttt{deposit, rentalPrice}} & Authenticated & \parbox[t]{4.5cm}{Creates a new contract and updates room status atomically.} \\ \hline
+        \texttt{/contracts} & GET & None & Authenticated & \parbox[t]{4.5cm}{Returns all contracts scoped to the authenticated user.} \\ \hline
+        \texttt{/contracts/:id/status} & PATCH & \texttt{status} & Authenticated & \parbox[t]{4.5cm}{Updates contract status (e.g., TERMINATED, EXPIRED).} \\ \hline
+        \texttt{/contracts/:id/autopay} & PATCH & \texttt{autoPayEnabled} & Authenticated & \parbox[t]{4.5cm}{Toggles automatic monthly invoice generation for the contract.} \\ \hline
+        \texttt{/contracts/:id} & DELETE & None & Authenticated & \parbox[t]{4.5cm}{Deletes a contract record.} \\ \hline
+    \end{tabular}}
+\end{table}
+
 \subsection{Invoice Payment and Verification}
-The monthly billing cycle is managed through automated invoice generation and a structured payment verification flow. At the beginning of each month, a \textbf{NestJS} cron job runs automatically to create unpaid invoices for all active contracts. As shown in the activity diagram (Figure \ref{fig:activity_invoice_payment_verification}), once an invoice is created, the tenant can view it and scan the generated \textbf{VietQR} code to make a bank transfer. After transferring the money, the tenant marks the invoice as paid in the portal, which immediately changes its status to \textbf{Paid} and records the payment timestamp. The backend simultaneously broadcasts a real-time \textbf{Socket.IO} notification to the landlord's dashboard. The landlord can then manually verify the bank transfer and, if necessary, adjust the invoice status through the administration panel.
+
+The monthly billing cycle is managed through two mechanisms: an automated cron job that creates invoices, and a structured tenant-initiated payment flow.
+
+\textbf{Execution Workflow:}
+\begin{enumerate}
+    \item At the beginning of each month, a \textbf{NestJS} \texttt{@Cron()} task runs automatically. It queries all \textbf{Contract} records with status \textbf{ACTIVE} and \texttt{autoPayEnabled = true} and creates a new \textbf{Invoice} record for each one, pre-filling the rental price and setting the due date to the end of the current month.
+    \item The tenant logs in to the portal and navigates to the invoice list. The frontend calls \texttt{GET /invoices} to fetch all invoices linked to the tenant's active contract.
+    \item The tenant clicks \textit{Pay} on an unpaid invoice. The frontend calls \texttt{GET /pdf/invoice/:id}, which triggers the backend to fetch the landlord's bank account details, call the \textbf{VietQR API} with the amount and account details, receive a QR code image in return, embed it into a \textbf{PDF} document, and return the file to the browser.
+    \item The tenant scans the \textbf{VietQR} code with their banking application and completes the bank transfer.
+    \item After transferring, the tenant clicks the \textit{Already Transferred} button. The frontend calls \texttt{POST /invoices/:id/pay}.
+    \item The \textbf{InvoiceService} updates the invoice status to \textbf{PAID} and records the current timestamp in the \texttt{paidDate} field.
+    \item Simultaneously, the backend emits a \textbf{Socket.IO} event to the landlord's WebSocket room, pushing a real-time notification to the landlord's dashboard so they are immediately informed of the payment.
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -150,8 +332,40 @@ The monthly billing cycle is managed through automated invoice generation and a 
     \label{fig:activity_invoice_payment_verification}
 \end{figure}
 
+\textbf{Implementation Highlights:}
+\begin{itemize}
+    \item \textbf{VietQR Code Generation:} The \textbf{VietQR} image API is called at PDF generation time with the landlord's bank name, account number, account holder name, and the exact invoice amount as query parameters. The API returns a PNG image of the QR code, which is then embedded into the PDF using the \textbf{PDFKit} library. The transfer memo is also pre-filled automatically with the tenant's name and the invoice month, so the landlord can identify payments in their bank statement without any manual cross-referencing.
+    \item \textbf{Socket.IO Notification Gateway:} The \textbf{NotificationGateway} is a \textbf{NestJS} WebSocket gateway decorated with \texttt{@WebSocketGateway()}. When a client connects, the gateway authenticates the connection by verifying the \textbf{JWT} token sent in the WebSocket handshake. It then adds the client's socket to a named room identified by the landlord's ID (e.g., \texttt{landlord-abc123}). When a payment event occurs, the backend emits directly to this room, ensuring the notification reaches only the correct landlord.
+    \item \textbf{Role-Gated Pay Endpoint:} The \texttt{POST /invoices/:id/pay} endpoint is restricted to the \textbf{TENANT} role using the \textbf{RolesGuard}. This prevents a landlord from accidentally marking their own invoices as paid from the admin panel. Landlords must use the \texttt{PATCH /invoices/:id/status} endpoint to update invoice status manually after verifying the bank transfer.
+\end{itemize}
+
+\begin{table}[H]
+    \centering
+    \caption{Invoice Service API Specification}
+    \label{tab:invoice_api}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|l|c|l|l|l|}
+        \hline
+        \textbf{Endpoint} & \textbf{Method} & \textbf{Request Body} & \textbf{Role Required} & \textbf{Description} \\ \hline
+        \texttt{/invoices} & POST & \parbox[t]{3.5cm}{\texttt{contractId, amount,}\\\texttt{dueDate, utilities}} & Landlord/Admin & \parbox[t]{4.5cm}{Manually creates a new invoice for a contract.} \\ \hline
+        \texttt{/invoices} & GET & None & Authenticated & \parbox[t]{4.5cm}{Returns all invoices filtered by the authenticated user's role.} \\ \hline
+        \texttt{/invoices/:id/status} & PATCH & \texttt{status} & Landlord/Admin & \parbox[t]{4.5cm}{Manually updates invoice status after bank transfer verification.} \\ \hline
+        \texttt{/invoices/:id/pay} & POST & None & Tenant & \parbox[t]{4.5cm}{Marks invoice as paid and emits a Socket.IO notification to the landlord.} \\ \hline
+    \end{tabular}}
+\end{table}
+
 \subsection{Tenant Incident Handling}
-Managing room repairs quickly requires close cooperation between tenants and landlords. As shown in the activity diagram (Figure \ref{fig:activity_tenant_incident_handling}), the process starts when a tenant submits a new incident report with a priority level. The \textbf{backend} saves the incident in the database with a pending status and immediately broadcasts a \textbf{WebSocket} event to the landlord's dashboard using \textbf{Socket.IO}. The landlord reviews the incident, assigns a technician, and updates the status to in-progress. Once the issue is fixed, the landlord marks it as resolved. The system updates the status in the database and sends a real-time message back to the tenant's portal to notify them.
+
+Managing room repair requests requires tight coordination between tenants and landlords. The incident workflow is designed so that the landlord is notified instantly when a new issue is reported, and the tenant is notified in real time when their issue is resolved.
+
+\textbf{Execution Workflow:}
+\begin{enumerate}
+    \item The tenant opens the incident report form in the portal and submits a title, description, and priority level (\textbf{LOW}, \textbf{MEDIUM}, or \textbf{HIGH}) to \texttt{POST /incidents}.
+    \item The \textbf{IncidentService} saves the new incident record to the database with status \textbf{PENDING} and associates it with the tenant's \texttt{landlordId}.
+    \item Immediately after saving, the service calls the \textbf{NotificationGateway} to emit a WebSocket event to the landlord's room, notifying the dashboard of the new incident in real time.
+    \item The landlord reviews the incident in the dashboard and calls \texttt{PATCH /incidents/:id/status} to update the status to \textbf{IN\_PROGRESS}, indicating that a technician has been assigned.
+    \item Once the issue is resolved, the landlord updates the status to \textbf{RESOLVED}. The backend emits another WebSocket event, this time to the tenant's portal session, informing them that their request has been closed.
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -160,12 +374,56 @@ Managing room repairs quickly requires close cooperation between tenants and lan
     \label{fig:activity_tenant_incident_handling}
 \end{figure}
 
+\textbf{Implementation Highlights:}
+\begin{itemize}
+    \item \textbf{Priority Levels:} The \texttt{priority} field accepts three enum values: \textbf{LOW}, \textbf{MEDIUM}, and \textbf{HIGH}. This allows landlords to sort and filter incidents by urgency in the dashboard, so high-priority repairs (such as a water leak) are addressed before low-priority ones (such as a broken light switch).
+    \item \textbf{Bidirectional Real-Time Notification:} Unlike invoice notifications, which only go from tenant to landlord, incident status updates flow in both directions. When the landlord updates the status, the backend checks whether the new status is \textbf{RESOLVED} and, if so, emits a notification event to the tenant's active WebSocket session as well.
+\end{itemize}
+
+The Incident Service and related operational services expose the following endpoints:
+
+\begin{table}[H]
+    \centering
+    \caption{Incident Service API Specification}
+    \label{tab:incident_api}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|l|c|l|l|l|}
+        \hline
+        \textbf{Endpoint} & \textbf{Method} & \textbf{Request Body} & \textbf{Role Required} & \textbf{Description} \\ \hline
+        \texttt{/incidents} & POST & \parbox[t]{3.5cm}{\texttt{title, description,}\\\texttt{priority, roomId}} & Authenticated & \parbox[t]{4.5cm}{Submits a new incident report and notifies the landlord via WebSocket.} \\ \hline
+        \texttt{/incidents} & GET & None & Authenticated & \parbox[t]{4.5cm}{Returns all incidents scoped to the authenticated user's landlord.} \\ \hline
+        \texttt{/incidents/:id/status} & PATCH & \texttt{status} & Authenticated & \parbox[t]{4.5cm}{Updates incident resolution status and notifies the relevant party.} \\ \hline
+    \end{tabular}}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Violations, Rent Requests, and Supporting Services API Specification}
+    \label{tab:supporting_api}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|l|c|l|l|l|}
+        \hline
+        \textbf{Endpoint} & \textbf{Method} & \textbf{Request Body / Params} & \textbf{Role Required} & \textbf{Description} \\ \hline
+        \texttt{/violations} & POST & \parbox[t]{3.5cm}{\texttt{tenantId, description}} & Landlord/Admin & \parbox[t]{4.5cm}{Records a new rule violation for a tenant.} \\ \hline
+        \texttt{/violations} & GET & None & Tenant & \parbox[t]{4.5cm}{Returns all violations visible to the current tenant.} \\ \hline
+        \texttt{/violations/tenant/:id} & GET & None & Landlord/Admin & \parbox[t]{4.5cm}{Returns all violations recorded for a specific tenant.} \\ \hline
+        \texttt{/violations/:id/resolve} & PATCH & None & Landlord/Admin & \parbox[t]{4.5cm}{Marks a violation as resolved.} \\ \hline
+        \texttt{/rent-requests} & POST & \parbox[t]{3.5cm}{\texttt{name, email, phone,}\\\texttt{message, roomId}} & Public & \parbox[t]{4.5cm}{Submits a room consultation request from a public visitor.} \\ \hline
+        \texttt{/rent-requests} & GET & None & Landlord/Admin & \parbox[t]{4.5cm}{Returns all rent consultation requests for the landlord.} \\ \hline
+        \texttt{/rent-requests/:id/status} & PATCH & \texttt{status} & Landlord/Admin & \parbox[t]{4.5cm}{Updates rent request status (CONTACTED or CANCELLED).} \\ \hline
+        \texttt{/pdf/invoice/:id} & GET & None & Authenticated & \parbox[t]{4.5cm}{Generates and returns the invoice PDF with the VietQR payment code.} \\ \hline
+        \texttt{/upload/image} & POST & \texttt{image file} & Authenticated & \parbox[t]{4.5cm}{Uploads an image to Cloudinary and returns the secure URL.} \\ \hline
+    \end{tabular}}
+\end{table}
+
 
 \section{AI Integration}
-The platform integrates advanced artificial intelligence and optical character recognition to automate administrative workflows and improve communication. This section describes how the AI assistant and the OCR utility meter reader are built and how they process data.
+
+The platform integrates \textbf{Google Gemini} to automate administrative writing tasks and to provide intelligent self-service assistants for both public visitors and registered tenants. The key design principle is that the AI model is never asked to guess or invent information — it is always given real, live data from the database as structured context before answering any question.
 
 \subsection{AI Assistant with Google Gemini}
-The \textbf{AI} service is built using the official \textbf{Google Generative AI} library and the \textbf{Gemini 3.1 Flash Lite} model. This model was chosen because it provides fast responses and is highly accurate for text processing. The system implements three distinct assistant modes to help different users, as summarized in Table \ref{tab:ai_modes}.
+
+The AI service is built using the official \textbf{Google Generative AI} Node.js library targeting the \textbf{Gemini 2.0 Flash Lite} model. This model is chosen because it has a very fast response time, making it suitable for real-time chat interactions. The service implements three distinct operating modes, each targeting a different user role and injecting different database context, as summarized in Table~\ref{tab:ai_modes}.
 
 \begin{table}[H]
     \centering
@@ -185,11 +443,15 @@ The \textbf{AI} service is built using the official \textbf{Google Generative AI
     \label{tab:ai_modes}
 \end{table}
 
-The first mode is notice generation for landlords. Landlords often need to send announcements to all tenants, which can take time to write politely. The landlord can type a simple request in the dashboard, and the \textbf{AI} service automatically generates a formal, polite, and clear announcement in Vietnamese, ready to be sent.
-
-The second mode is the public room consultation chatbot. When visitors browse the landing page, they can chat with an assistant named \textbf{RentBot}. To prevent the \textbf{AI} from making up incorrect information, the \textbf{backend} first queries the \textbf{PostgreSQL} database for actual room numbers, prices, and availability status. The system formats this room list as context and sends it along with the user's question to the \textbf{Gemini} model. This ensures that the assistant only gives accurate answers about vacant rooms and instructs visitors how to apply.
-
-The third mode is the contextual tenant portal assistant. Inside the tenant portal, renters can chat with a personal assistant. When a tenant opens the chat, the \textbf{backend} service queries the database for their specific active contract, invoice history, reported incidents, and open rule violations. It formats this personal data into a detailed system context for the \textbf{Gemini} model. Because the \textbf{AI} has this context, the tenant can ask personalized questions like when their rent is due, how much they owe, or if their reported incident is resolved. The \textbf{AI} answers using the real-time data, providing a personalized self-service experience. The flow of how this personalized prompt is constructed is shown in Figure \ref{fig:ai_prompt_flow}.
+\textbf{Execution Workflow — Tenant Personal Assistant:}
+\begin{enumerate}
+    \item The authenticated tenant sends a message to \texttt{POST /ai/tenant-chat}.
+    \item The \textbf{AiService} extracts the tenant's \texttt{userId} from the \textbf{JWT} token in the request.
+    \item It queries the database to fetch the tenant's active contract, their full invoice history, all open incidents, and any recorded violations.
+    \item The service formats this data into a structured plain-text system prompt block describing the tenant's rental situation.
+    \item It combines the system prompt with the tenant's chat message and sends the assembled prompt to the \textbf{Gemini} model via the \textbf{generateContent} API call.
+    \item The model generates a response based on the injected context, and the service returns the response text to the frontend, which displays it in the chat interface.
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -197,20 +459,40 @@ The third mode is the contextual tenant portal assistant. Inside the tenant port
         \draw[fill=gray!10, rounded corners] (0,3) rectangle (3,4) node[pos=.5, align=center] {Tenant Request \\ (User Question)};
         \draw[fill=gray!10, rounded corners] (0,1.5) rectangle (3,2.5) node[pos=.5, align=center] {Database Query \\ (Contracts, Invoices)};
         \draw[fill=gray!10, rounded corners] (0,0) rectangle (3,1) node[pos=.5, align=center] {System Instructions \\ (AI Rules)};
-        
+
         \draw[->, thick] (3,3.5) -- (5.0,2.3);
         \draw[->, thick] (3,2) -- (5.0,2);
         \draw[->, thick] (3,0.5) -- (5.0,1.7);
-        
+
         \draw[fill=blue!10, rounded corners] (5.0,1) rectangle (8.5,3) node[pos=.5, align=center] {Prompt Compiler \\ (Context Injection)};
         \draw[->, thick] (8.5,2) -- (10.0,2);
-        
-        \draw[fill=green!10, rounded corners] (10.0,1.2) rectangle (14.0,2.8) node[pos=.5, align=center] {Google Gemini API \\ (Gemini 3.1 Flash Lite)};
+
+        \draw[fill=green!10, rounded corners] (10.0,1.2) rectangle (14.0,2.8) node[pos=.5, align=center] {Google Gemini API \\ (Gemini 2.0 Flash Lite)};
     \end{tikzpicture}
     \caption{Contextual AI Prompt Construction Flowchart}
     \label{fig:ai_prompt_flow}
 \end{figure}
 
+\textbf{Implementation Highlights:}
+\begin{itemize}
+    \item \textbf{Context Injection to Prevent Hallucination:} The most important design decision in the AI integration is that all three assistant modes inject real database records as plain-text context into the system prompt before the user's question is passed to the model. This prevents the model from inventing room prices, contract terms, or billing amounts. For the RentBot public assistant, the backend fetches the current list of vacant rooms and formats it as a structured list. For the tenant assistant, it fetches the specific tenant's contract and invoice data. The model is instructed in the system prompt to answer only based on the provided context and to decline questions outside of its scope.
+    \item \textbf{Stateless Single-Turn Design:} The current implementation uses a stateless single-turn prompt model. Each API call sends the full context plus the current question, without maintaining a multi-turn conversation history. This keeps the implementation simple and avoids the cost of storing and retrieving conversation state between requests. It is sufficient for the current use cases, where each question is typically self-contained.
+    \item \textbf{Notice Generator Mode:} For landlord notice generation, no database context is injected. The landlord types a short informal instruction (for example, \textit{"remind tenants to pay by the 5th"}), and the system prompt instructs the model to rewrite it as a formal, polite Vietnamese boarding house announcement. This automates a task that previously required landlords to write formal notices manually.
+\end{itemize}
 
+The AI Service exposes the following endpoints for the three assistant modes:
 
-
+\begin{table}[H]
+    \centering
+    \caption{AI Service API Specification}
+    \label{tab:ai_api}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|l|c|l|l|l|}
+        \hline
+        \textbf{Endpoint} & \textbf{Method} & \textbf{Request Body} & \textbf{Role Required} & \textbf{Description} \\ \hline
+        \texttt{/ai/generate-notice} & POST & \texttt{prompt} & Authenticated & \parbox[t]{4.5cm}{Generates a formal Vietnamese announcement from a short landlord note.} \\ \hline
+        \texttt{/ai/public-chat} & POST & \texttt{message} & Public & \parbox[t]{4.5cm}{RentBot answers visitor questions using live vacant room data as context.} \\ \hline
+        \texttt{/ai/tenant-chat} & POST & \texttt{message} & Authenticated & \parbox[t]{4.5cm}{Personal assistant answers tenant questions using their contract and invoice data.} \\ \hline
+        \texttt{/ai/chat} & POST & \texttt{message} & Authenticated & \parbox[t]{4.5cm}{General AI chat endpoint for landlord operational queries.} \\ \hline
+    \end{tabular}}
+\end{table}
