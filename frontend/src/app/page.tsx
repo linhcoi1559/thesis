@@ -282,52 +282,52 @@ export default function LandingPage() {
         style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', flexDirection: 'column' }}
       >
         <div className="lp-nav-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 48px', width: '100%' }}>
-        {/* Logo */}
-        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(124,58,237,0.5)' }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" style={{ width: 18, height: 18 }}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
-            </svg>
+          {/* Logo */}
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(124,58,237,0.5)' }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" style={{ width: 18, height: 18 }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
+              </svg>
+            </div>
+            <span style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-light-main)', letterSpacing: '-0.03em' }}>
+              SaaS<span style={{ color: '#a78bfa' }}> Rent</span>
+            </span>
+          </a>
+
+          {/* Nav Links */}
+          <nav className="lp-nav-links" style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            {[
+              { label: 'Tính năng', href: '#features' },
+              { label: 'Phòng trống', href: '#rooms' },
+              { label: 'Liên hệ', href: '#contact' },
+            ].map(item => (
+              <a key={item.label} href={item.href} style={{ padding: '8px 14px', color: 'var(--text-light-muted)', fontSize: '0.9rem', fontWeight: 600, borderRadius: 8, textDecoration: 'none', transition: 'color 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--text-light-main)'}
+                onMouseLeave={e => e.currentTarget.style.color = 'var(--text-light-muted)'}
+              >{item.label}</a>
+            ))}
+          </nav>
+
+          {/* CTA */}
+          <div className="lp-nav-cta" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            {user ? (
+              <>
+                <span style={{ color: 'var(--text-light-muted)', fontSize: '0.88rem' }}>Hi, <strong style={{ color: 'var(--text-light-main)' }}>{user.name}</strong></span>
+                {(user.role === 'ADMIN' || user.role === 'LANDLORD') && <Link href="/admin" className="btn-lp-primary" style={{ padding: '9px 18px', fontSize: '0.88rem' }}>Dashboard</Link>}
+                {user.role === 'TENANT' && <Link href="/tenant" className="btn-lp-primary" style={{ padding: '9px 18px', fontSize: '0.88rem' }}>Phòng Của Tôi</Link>}
+                <button onClick={logout} style={{ padding: '9px 16px', background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, cursor: 'pointer', fontSize: '0.88rem', fontFamily: 'inherit', fontWeight: 600, transition: 'all 0.2s' }}>Đăng Xuất</button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" style={{ padding: '9px 18px', color: 'var(--text-light-muted)', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none', borderRadius: 10, transition: 'color 0.2s' }}
+                  onMouseLeave={e => (e.currentTarget as any).style.color = 'rgba(255,255,255,0.7)'}
+                >Đăng Nhập</Link>
+                <button onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} className="btn-lp-primary" style={{ padding: '9px 20px', fontSize: '0.9rem' }}>
+                  Đăng Ký Thuê →
+                </button>
+              </>
+            )}
           </div>
-          <span style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-light-main)', letterSpacing: '-0.03em' }}>
-            SaaS<span style={{ color: '#a78bfa' }}> Rent</span>
-          </span>
-        </a>
-
-        {/* Nav Links */}
-        <nav className="lp-nav-links" style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          {[
-            { label: 'Tính năng', href: '#features' },
-            { label: 'Phòng trống', href: '#rooms' },
-            { label: 'Liên hệ', href: '#contact' },
-          ].map(item => (
-            <a key={item.label} href={item.href} style={{ padding: '8px 14px', color: 'var(--text-light-muted)', fontSize: '0.9rem', fontWeight: 600, borderRadius: 8, textDecoration: 'none', transition: 'color 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.color = 'var(--text-light-main)'}
-              onMouseLeave={e => e.currentTarget.style.color = 'var(--text-light-muted)'}
-            >{item.label}</a>
-          ))}
-        </nav>
-
-        {/* CTA */}
-        <div className="lp-nav-cta" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          {user ? (
-            <>
-              <span style={{ color: 'var(--text-light-muted)', fontSize: '0.88rem' }}>Hi, <strong style={{ color: 'var(--text-light-main)' }}>{user.name}</strong></span>
-              {(user.role === 'ADMIN' || user.role === 'LANDLORD') && <Link href="/admin" className="btn-lp-primary" style={{ padding: '9px 18px', fontSize: '0.88rem' }}>Dashboard</Link>}
-              {user.role === 'TENANT' && <Link href="/tenant" className="btn-lp-primary" style={{ padding: '9px 18px', fontSize: '0.88rem' }}>Phòng Của Tôi</Link>}
-              <button onClick={logout} style={{ padding: '9px 16px', background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, cursor: 'pointer', fontSize: '0.88rem', fontFamily: 'inherit', fontWeight: 600, transition: 'all 0.2s' }}>Đăng Xuất</button>
-            </>
-          ) : (
-            <>
-              <Link href="/login" style={{ padding: '9px 18px', color: 'var(--text-light-muted)', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none', borderRadius: 10, transition: 'color 0.2s' }}
-                onMouseLeave={e => (e.currentTarget as any).style.color = 'rgba(255,255,255,0.7)'}
-              >Đăng Nhập</Link>
-              <button onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} className="btn-lp-primary" style={{ padding: '9px 20px', fontSize: '0.9rem' }}>
-                Đăng Ký Thuê →
-              </button>
-            </>
-          )}
-        </div>
         </div>
 
         {/* Bottom Decorative Line */}
@@ -336,7 +336,7 @@ export default function LandingPage() {
 
       {/* ── Hero Section ─────────────────────────────────────────────── */}
       <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: 'var(--bg-light-base)' }}>
-        
+
         <div className="grid-pattern" />
 
         <div className="hero-grid" style={{ maxWidth: 1280, margin: '0 auto', padding: '100px 48px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', position: 'relative', zIndex: 1, width: '100%' }}>
@@ -480,7 +480,8 @@ export default function LandingPage() {
                     {/* Gradient overlay */}
                     <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', background: 'linear-gradient(transparent, rgba(255,255,255,0.95))' }} />
                     {/* Status badge */}
-                    <div style={{ position: 'absolute', top: 14, right: 14, padding: '5px 12px', borderRadius: 999, fontSize: '0.75rem', fontWeight: 700, backdropFilter: 'blur(12px)',
+                    <div style={{
+                      position: 'absolute', top: 14, right: 14, padding: '5px 12px', borderRadius: 999, fontSize: '0.75rem', fontWeight: 700, backdropFilter: 'blur(12px)',
                       background: room.status === 'VACANT' ? 'rgba(34,197,94,0.2)' : room.status === 'OCCUPIED' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)',
                       color: room.status === 'VACANT' ? '#4ade80' : room.status === 'OCCUPIED' ? '#f87171' : '#fbbf24',
                       border: `1px solid ${room.status === 'VACANT' ? 'rgba(34,197,94,0.4)' : room.status === 'OCCUPIED' ? 'rgba(239,68,68,0.4)' : 'rgba(245,158,11,0.4)'}`,
@@ -507,7 +508,8 @@ export default function LandingPage() {
                     <button
                       onClick={() => handleSelectRoom(room.id)}
                       disabled={room.status !== 'VACANT'}
-                      style={{ width: '100%', padding: '13px', borderRadius: 12, border: 'none', cursor: room.status === 'VACANT' ? 'pointer' : 'not-allowed', fontFamily: 'inherit', fontWeight: 700, fontSize: '0.92rem', transition: 'all 0.25s',
+                      style={{
+                        width: '100%', padding: '13px', borderRadius: 12, border: 'none', cursor: room.status === 'VACANT' ? 'pointer' : 'not-allowed', fontFamily: 'inherit', fontWeight: 700, fontSize: '0.92rem', transition: 'all 0.25s',
                         background: room.status === 'VACANT' ? 'linear-gradient(135deg,#7c3aed,#4f46e5)' : 'var(--bg-light-surface-alt)',
                         color: room.status === 'VACANT' ? 'white' : 'var(--text-light-muted)',
                         boxShadow: room.status === 'VACANT' ? '0 4px 20px rgba(124,58,237,0.35)' : 'none',
@@ -659,24 +661,30 @@ export default function LandingPage() {
 
           {/* Links */}
           {[
-            { title: 'Sản phẩm', links: [
-              { label: 'Tính năng', href: '#features' }, 
-              { label: 'Giá cả', href: '#' }, 
-              { label: 'Phòng trống', href: '#rooms' }, 
-              { label: 'API', href: '#' }
-            ]},
-            { title: 'Hỗ trợ', links: [
-              { label: 'Câu hỏi thường gặp', href: '#' }, 
-              { label: 'Liên hệ', href: '#contact' }, 
-              { label: 'Điều khoản', href: '#' }, 
-              { label: 'Bảo mật', href: '#' }
-            ]},
-            { title: 'Liên kết', links: [
-              { label: 'Đăng nhập', href: '/login' }, 
-              { label: 'Đăng ký thuê', href: '#contact' }, 
-              { label: 'Tư vấn miễn phí', href: '#contact' }, 
-              { label: 'Blog', href: '#' }
-            ]},
+            {
+              title: 'Sản phẩm', links: [
+                { label: 'Tính năng', href: '#features' },
+                { label: 'Giá cả', href: '#' },
+                { label: 'Phòng trống', href: '#rooms' },
+                { label: 'API', href: '#' }
+              ]
+            },
+            {
+              title: 'Hỗ trợ', links: [
+                { label: 'Câu hỏi thường gặp', href: '#' },
+                { label: 'Liên hệ', href: '#contact' },
+                { label: 'Điều khoản', href: '#' },
+                { label: 'Bảo mật', href: '#' }
+              ]
+            },
+            {
+              title: 'Liên kết', links: [
+                { label: 'Đăng nhập', href: '/login' },
+                { label: 'Đăng ký thuê', href: '#contact' },
+                { label: 'Tư vấn miễn phí', href: '#contact' },
+                { label: 'Blog', href: '#' }
+              ]
+            },
           ].map((col, i) => (
             <div key={i}>
               <div style={{ fontWeight: 700, color: 'var(--text-light-main)', fontSize: '0.88rem', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{col.title}</div>

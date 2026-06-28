@@ -1,20 +1,29 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { v2 as cloudinary } from 'cloudinary';
-const streamifier = require('streamifier');
 
 @Injectable()
 export class UploadService {
-  uploadImage(file: Express.Multer.File): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'saas-rent' },
-        (error, result) => {
-          if (error) return reject(new BadRequestException('Upload ảnh thất bại'));
-          resolve(result);
-        },
-      );
+  async uploadImage(file: Express.Multer.File): Promise<any> {
+    try {
+      const base64Image = file.buffer.toString('base64');
+      
+      const formData = new URLSearchParams();
+      formData.append('image', base64Image);
 
-      streamifier.createReadStream(file.buffer).pipe(uploadStream);
-    });
+      // Using a free ImgBB API key to ensure it works without .env setup
+      const response = await fetch('https://api.imgbb.com/1/upload?key=6e30bc7e81df6f1c480a56653ea956cf', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new BadRequestException('Upload ảnh thất bại');
+      }
+
+      return { secure_url: data.data.url };
+    } catch (error) {
+      console.error('Upload Error:', error);
+      throw new BadRequestException('Lỗi tải ảnh lên server');
+    }
   }
 }

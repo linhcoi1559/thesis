@@ -12,7 +12,6 @@ import { TasksModule } from './core/use-cases/tasks/tasks.module';
 import { IncidentModule } from './core/use-cases/incident/incident.module';
 import { NotificationGateway } from './core/use-cases/notification/notification.gateway';
 import { NotificationModule } from './core/use-cases/notification/notification.module';
-import { OcrModule } from './core/use-cases/ocr/ocr.module';
 import { UploadModule } from './core/use-cases/upload/upload.module';
 import { PdfModule } from './core/use-cases/pdf/pdf.module';
 import { AiModule } from './core/use-cases/ai/ai.module';
@@ -34,7 +33,6 @@ import { ViolationModule } from './core/use-cases/violation/violation.module';
     TasksModule,
     IncidentModule,
     NotificationModule,
-    OcrModule,
     UploadModule,
     PdfModule,
     AiModule,

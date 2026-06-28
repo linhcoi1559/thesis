@@ -2,25 +2,14 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseIntercepto
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RoomService } from '../../core/use-cases/room/room.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { diskStorage } from 'multer';
-import * as path from 'path';
-
-const storage = diskStorage({
-  destination: (req, file, cb) => {
-    // Save to frontend/public/images/rooms
-    const dest = path.join(process.cwd(), '../frontend/public/images/rooms');
-    cb(null, dest);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `room-${uniqueSuffix}${ext}`);
-  }
-});
+import { UploadService } from '../../core/use-cases/upload/upload.service';
 
 @Controller('rooms')
 export class RoomController {
-  constructor(private readonly roomService: RoomService) {}
+  constructor(
+    private readonly roomService: RoomService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @Get('public')
   async getPublicRooms() {
@@ -70,7 +59,7 @@ export class RoomController {
   }
 
   @Post(':id/images')
-  @UseInterceptors(FileInterceptor('file', { storage }))
+  @UseInterceptors(FileInterceptor('file'))
   async uploadImage(
     @Param('id') id: string,
     @Body('landlordId') landlordId: string,
@@ -79,7 +68,8 @@ export class RoomController {
     if (!file) throw new BadRequestException('File is required');
     if (!landlordId) throw new BadRequestException('landlordId is required');
     
-    const imageUrl = `/images/rooms/${file.filename}`;
+    const result = await this.uploadService.uploadImage(file);
+    const imageUrl = result.secure_url;
     return this.roomService.addImage(id, landlordId, imageUrl);
   }
 
