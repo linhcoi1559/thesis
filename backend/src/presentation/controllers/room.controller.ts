@@ -2,13 +2,11 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseIntercepto
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RoomService } from '../../core/use-cases/room/room.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { UploadService } from '../../core/use-cases/upload/upload.service';
 
 @Controller('rooms')
 export class RoomController {
   constructor(
     private readonly roomService: RoomService,
-    private readonly uploadService: UploadService,
   ) {}
 
   @Get('public')
@@ -68,9 +66,9 @@ export class RoomController {
     if (!file) throw new BadRequestException('File is required');
     if (!landlordId) throw new BadRequestException('landlordId is required');
     
-    const result = await this.uploadService.uploadImage(file);
-    const imageUrl = result.secure_url;
-    return this.roomService.addImage(id, landlordId, imageUrl);
+    // Convert the image buffer directly to a base64 Data URL to bypass third-party API limits
+    const base64Image = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+    return this.roomService.addImage(id, landlordId, base64Image);
   }
 
   @Delete(':id/images')
