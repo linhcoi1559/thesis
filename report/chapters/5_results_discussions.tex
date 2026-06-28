@@ -1,0 +1,125 @@
+\chapter{RESULTS AND DISCUSSION}
+
+This chapter presents the results of implementing the \textit{\textbf{Smart Boarding House Management System}} by examining the actual working prototype. Each section discusses a core feature through its real user interface, describing what was built, how it works from the user's perspective, and how it connects to the technical components described in Chapter 4.
+
+\section{Landlord Administration Dashboard and Room Management}
+
+The landlord administration dashboard is the central control point for property managers. After logging in, landlords are directed to the room management page, which provides an immediate summary of their entire property portfolio. As shown in Figure \ref{fig:landlord_room_management}, the top of the page displays four statistics cards that give an instant overview of the property state: the total number of rooms, rooms that are currently available for rent, rooms that are currently occupied by active tenants, and rooms under maintenance. In the example shown, the landlord manages eight rooms in total, with four rooms available, four rooms occupied, and zero rooms under maintenance. A progress bar beneath the statistics shows the occupancy rate at fifty percent.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{landlord_room_management.png}
+    \caption{Landlord Administration Dashboard — Room Management Overview}
+    \label{fig:landlord_room_management}
+\end{figure}
+
+Below the statistics, the room list is displayed as a grid of cards. Each card shows the room number, the monthly rental price, and the current room status label. The status label uses colour-coded tags so that landlords can identify available and occupied rooms at a glance without reading individual details. A filter bar above the grid allows landlords to switch between viewing all rooms, only vacant rooms, only occupied rooms, or only rooms under maintenance. This filter makes it faster to locate specific rooms, especially when managing a large number of properties.
+
+Each room card also contains quick-action buttons so that landlords can navigate directly to that room's detail, edit its information, or perform other operations without returning to the main menu. A prominent \textit{Thêm phòng mới} (Add New Room) button is placed in the top-right corner of the page, allowing landlords to register a new room at any time. When a landlord creates or updates a room, the system validates all required fields on the backend before saving. Room images are uploaded to the \textbf{Cloudinary} cloud service and the secure image URLs are stored in the \textbf{PostgreSQL} database, which ensures that room photos load quickly for public visitors without consuming local server storage.
+
+\section{Public Room Listing and RentBot AI Chatbot}
+
+The public-facing listing page is the entry point for people searching for a room to rent. This page is accessible without any login and is designed to attract potential tenants by presenting available rooms clearly. As shown in Figure \ref{fig:public_listing_rentbot}, the listing page displays a grid of room cards, each showing the room number, the monthly rental price in Vietnamese dong, and a \textit{CÒN TRỐNG} (Available) tag that confirms the room is currently unoccupied. In the example, three rooms are visible: Phòng 103 at 2{,}500{,}000 VND, Phòng 104 at 3{,}000{,}000 VND, and Phòng 203 at 3{,}500{,}000 VND. Each card has a \textit{Đăng ký phòng ngay} (Register for this room now) button that leads visitors to the room application form.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{public_listing_rentbot.png}
+    \caption{Public Room Listing Page with RentBot AI Chatbot}
+    \label{fig:public_listing_rentbot}
+\end{figure}
+
+The most notable feature on this page is the \textbf{RentBot} chatbot widget, visible as a floating panel on the right side of the screen. RentBot is a context-aware \textbf{AI} assistant powered by the \textbf{Google Gemini} model. When a visitor opens the chatbot, the backend first queries the \textbf{PostgreSQL} database to fetch the current list of available rooms, including their room numbers, prices, floors, and descriptions. This real-time room data is then inserted into the system prompt as context before the visitor's question is sent to the \textbf{Gemini} model. As demonstrated in the screenshot, RentBot successfully responds to the visitor by listing the available rooms with their correct prices and advising the visitor to use the registration button to apply. Because the assistant reads from live database records, it can never provide incorrect or outdated room information. This approach directly addresses the common problem of prospective tenants receiving inconsistent room availability information.
+
+\section{Tenant Portal and Personal AI Assistant}
+
+Once a tenant has been registered by a landlord and logs in to the system, they are directed to the tenant portal. The tenant portal is a private space where each tenant can monitor all aspects of their rental relationship. As shown in Figure \ref{fig:tenant_portal_dashboard}, the portal greets the tenant by name and displays the current date at the top of the page, providing a personalized and welcoming experience.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{tenant_portal_dashboard.png}
+    \caption{Tenant Portal Dashboard with Contract Summary and Personal AI Assistant}
+    \label{fig:tenant_portal_dashboard}
+\end{figure}
+
+The left section of the portal displays the tenant's current active contract in a summary card labelled \textit{Hợp đồng hiện tại} (Current Contract). This card shows the contract status, the room number the tenant is renting (Room 101 in this example), the rental start and end dates, and the number of days remaining on the contract. In the example shown, the tenant has a contract running from 24 June 2025 to 24 June 2027, with 363 days remaining. The tenant can also see the deposit amount and the monthly rental fee at a glance. Below the contract summary, the portal displays a list of recent invoices. Each invoice entry shows the invoice reference number, its payment status (such as \textit{Chờ thanh toán} meaning Pending, or \textit{Đã thanh toán} meaning Paid), and the invoice amount. This gives tenants a complete, up-to-date view of their billing history without needing to contact the landlord.
+
+On the right side of the portal, a summary panel shows the tenant's activity counts, including the number of invoices already paid and the number of reported incidents that have been resolved. Two action buttons are placed prominently in the top-right corner: a \textit{Báo cáo sự cố} (Report Incident) button for submitting maintenance requests, and the \textit{Trợ lý cá nhân} (Personal Assistant) button that opens the AI chatbot.
+
+The personal AI assistant is the most advanced feature of the tenant portal. When the tenant clicks the assistant button, the backend service queries the database to retrieve the tenant's active contract details, their full invoice history, any open incidents, and any recorded violations. All of this personal data is formatted as a structured system context and sent to the \textbf{Google Gemini} model together with the tenant's question. As demonstrated in the screenshot, the assistant can answer specific questions about the tenant's rental situation, such as informing the tenant about upcoming payment deadlines, explaining the amount still owed, or confirming whether an incident has been resolved. This level of personalization allows tenants to get precise, factual answers without calling or messaging the landlord directly.
+
+\section{Invoice Payment with VietQR Integration}
+
+The invoice payment workflow is one of the most practically important features of the system for both landlords and tenants. When a tenant views a pending invoice and clicks the payment button, the system opens a dedicated payment modal, as shown in Figure \ref{fig:invoice_payment_modal}. This modal presents all the information a tenant needs to complete a bank transfer, without requiring them to search for the landlord's bank details manually.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{invoice_payment_modal.png}
+    \caption{Invoice Payment Modal with VietQR Code and Bank Transfer Details}
+    \label{fig:invoice_payment_modal}
+\end{figure}
+
+At the top of the modal, the exact amount to be paid is displayed in large text, making it immediately clear to the tenant. In the example, the tenant must pay 2{,}200{,}000 VND for the current month. Below the amount, the modal shows the complete bank transfer details: the bank name (Techcombank, abbreviated as TCB), the bank account number (8888885580), and the account holder name (NGUYEN VAN LINH). These details are retrieved from the landlord's profile stored in the database.
+
+The most significant element of the payment modal is the automatically generated \textbf{VietQR} code displayed in the centre. This QR code is produced dynamically by the \textbf{VietQR} image API using the landlord's bank account information and the specific invoice amount. The transfer memo (Nội dung CK) is also pre-filled automatically to include the tenant's name and the invoice month, so the landlord can easily identify which payment belongs to which tenant and which month. In the example, the memo reads \textit{nguyễn văn linh chuyển tiền trợ tháng 7} (Nguyen Van Linh transfers rent for month 7). The tenant only needs to open their mobile banking application and scan this QR code to complete the full bank transfer in seconds.
+
+After transferring the money, the tenant clicks the \textit{Đã chuyển khoản} (Already Transferred) button at the bottom of the modal. This action sends a request to the backend, which immediately updates the invoice status to \textbf{Paid} and records the payment timestamp in the database. Simultaneously, the backend broadcasts a real-time \textbf{Socket.IO} WebSocket notification to the landlord's active dashboard session, informing them that a payment has been submitted. The landlord can then open their bank application separately to verify that the transfer was received, and manually confirm or adjust the invoice status if necessary. Table \ref{tab:implemented_features} provides a full summary of all core features implemented in the prototype.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|l|p{7cm}|}
+        \hline
+        \textbf{Feature} & \textbf{Status} & \textbf{Result} \\
+        \hline
+        Room CRUD and image upload & Implemented & Landlords manage room records with photos stored on Cloudinary. \\
+        \hline
+        Public room listing & Implemented & Vacant rooms are shown on the public page for prospective tenants. \\
+        \hline
+        RentBot public chatbot & Implemented & AI assistant answers room availability questions using live database context. \\
+        \hline
+        Contract creation & Implemented & Contracts are created with atomic room status synchronization. \\
+        \hline
+        Monthly invoice generation & Implemented & Scheduled cron task creates unpaid invoices for all active contracts. \\
+        \hline
+        VietQR payment modal & Implemented & Payment modal displays bank details and a dynamically generated QR code. \\
+        \hline
+        Invoice payment tracking & Implemented & Tenants mark invoices paid; landlords receive real-time notifications. \\
+        \hline
+        Tenant portal dashboard & Implemented & Tenants view their contract summary, invoice history, and incident status. \\
+        \hline
+        Personal AI assistant & Implemented & AI assistant answers tenant questions using personal contract and invoice data. \\
+        \hline
+        Incident reporting & Implemented & Tenants submit repair requests; landlords manage and resolve them. \\
+        \hline
+        Real-time notifications & Implemented & Socket.IO broadcasts events to the landlord dashboard without page reload. \\
+        \hline
+    \end{tabular}
+    \caption{Summary of Implemented System Features}
+    \label{tab:implemented_features}
+\end{table}
+
+\section{Difficulties and Limitations}
+
+Although the prototype successfully implements all planned core features, several limitations must be acknowledged before the system can be considered ready for production deployment.
+
+\textbf{Lack of automated testing.} The current codebase does not include comprehensive unit tests or integration tests. Automated testing is especially important for verifying complex business workflows such as the contract creation transaction, the monthly invoice generation cron job, and the multi-tenant authorization filters. Without these tests, adding new features in the future carries a higher risk of accidentally breaking existing behaviour.
+
+\textbf{Manual payment verification.} The invoice payment workflow requires the landlord to verify bank transfers manually by checking their bank application separately. Because the system is not connected to a live banking webhook or an open banking API, it cannot automatically detect and confirm incoming payments. The tenant must click the \textit{Already Transferred} button to update the invoice status, and the landlord must independently confirm the transfer. This introduces a risk of human error and delays in payment confirmation.
+
+\textbf{Dependency on external AI service.} All three \textbf{AI} assistant features — the notice generator, the public RentBot, and the personal tenant assistant — depend entirely on the external \textbf{Google Gemini} API. If the Google service is temporarily unavailable, rate-limited, or slow, the chatbot features will fail or respond with significant delays, directly reducing the reliability of the system for users who depend on it.
+
+\textbf{Multi-tenant security relies on application-level filtering.} Data privacy between landlords is enforced by filtering every database query using the landlord identification code extracted from the \textbf{JWT} token. While this approach works correctly in the current implementation, a production-grade SaaS platform should also implement database-level row security policies and audit logging to guard against potential code-level mistakes that could expose one landlord's data to another.
+
+\textbf{No mobile application.} The platform is built as a responsive web application accessible through a browser. However, tenants and landlords in Vietnam predominantly use smartphones for day-to-day activities, and a dedicated mobile application would provide a significantly smoother experience, especially for scanning QR codes and receiving push notifications.
+
+\section{Discussion}
+
+The results of this project demonstrate that a fully integrated web-based boarding house management platform can be built using modern open-source technologies and cloud services within the scope of a single undergraduate thesis project. By combining a modular \textbf{NestJS} backend, a server-rendered \textbf{Next.js} frontend, a \textbf{PostgreSQL} relational database, and the \textbf{Google Gemini} AI model, the system delivers a coherent set of features that directly address the real-world problems described in Chapter 1.
+
+The most significant technical achievement is the integration of multiple system components into seamless end-to-end workflows. For example, the room status in the database changes automatically when a contract is created, expires, or is terminated. Monthly invoices are generated without any manual intervention from the landlord through the scheduled cron job. When a tenant submits payment confirmation, the landlord's dashboard is updated instantly through the \textbf{Socket.IO} WebSocket connection without requiring a page refresh. These automated workflows eliminate manual data entry, reduce the chance of human error, and save considerable time for landlords managing multiple rooms simultaneously.
+
+The \textbf{AI} integration proves to be one of the most practical additions to the system. The public \textbf{RentBot} reduces the number of repetitive inquiries that landlords must answer by allowing visitors to ask questions about available rooms directly on the listing page. The personal tenant assistant gives tenants a self-service channel for checking their contract terms, outstanding bills, and incident status at any time, without needing to contact the landlord. Both assistants use live data from the database rather than static scripts, which ensures that the answers are always accurate and up-to-date.
+
+The multi-tenant architecture design ensures that the platform can serve multiple landlords from a single deployed instance without any risk of data leakage between users. Each landlord's rooms, tenants, contracts, and invoices are fully isolated through consistent use of the landlord identification code as a query filter on every database operation. This design is scalable and aligns with the SaaS business model described in the objectives of this thesis.
+
+In conclusion, the implemented prototype successfully validates the design decisions made in Chapter 4 and fulfills the functional requirements defined in Chapter 3. The limitations identified — particularly the absence of automated tests, manual payment verification, and external AI dependency — are well-understood trade-offs that are appropriate for a prototype at this stage. Addressing these limitations through automated testing, open banking API integration, and AI fallback strategies would be the natural next steps for transforming this prototype into a production-ready product.

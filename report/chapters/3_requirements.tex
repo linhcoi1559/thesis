@@ -1,0 +1,379 @@
+\chapter{REQUIREMENTS ANALYSIS}
+
+\section{Overall System Requirements}
+The system is designed around three access contexts: \textbf{public visitors}, \textbf{landlords}, and \textbf{tenants}. Each context has different permissions and workflows.
+
+\subsection{Public Visitor Requirements}
+\textbf{Public visitors} do not need to log in. They must be able to browse vacant rooms, view room information, submit consultation requests, and ask basic questions through the public \textbf{AI} assistant.
+
+\subsection{Landlord Requirements}
+\textbf{Landlords} must authenticate before accessing the \textbf{administration dashboard}. For landlords, the system requires several core features. First, landlords need room management to create, update, delete, list, and upload images of rooms. Rooms can have status like \textbf{vacant}, \textbf{occupied}, or \textbf{maintenance}. Second, landlords need tenant management to view tenants, approve or reject tenant registration requests, and connect tenants with rooms. Third, contract management is necessary to create rental contracts, record rental price and deposit, and update contract status. Fourth, invoice management allows landlords to create bills, review payment history, check payment status, and export invoices to \textbf{PDF} files. Fifth, operational support helps landlords review room incidents, track tenant violations, and receive real-time notifications. Finally, landlords can use \textbf{AI} assistance to generate announcements and notices for tenants quickly.
+
+\subsection{Tenant Requirements}
+\textbf{Tenants} must authenticate before accessing private rental information. For tenants, the system requires access to private rental data after they log in. Tenants must be able to view their active and past contracts, check invoices, and see if they have paid. They also need to mark invoices as paid so that the landlord can check and confirm their payment. If there is a problem in the room, tenants must be able to report incidents. Additionally, they can see violation notices and ask questions to the \textbf{AI} assistant about their contract or bills.
+
+\section{Use Cases}
+
+\subsection{Landlord Use Case}
+The landlord actor manages the boarding house operation through the administration dashboard. The main workflow groups are room management, tenant management, contract and invoice processing, rent request handling, and operational support.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{landlord_usecase.png}
+    \caption{Use Case Diagram - Landlord Administration Dashboard}
+    \label{fig:landlord_usecase}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|l|p{8cm}|}
+        \hline
+        \textbf{ID} & \textbf{Use Case Name} & \textbf{Description} \\
+        \hline
+        UC-LAN-01 & Manage rooms & Create, edit, delete, and update room availability. \\
+        \hline
+        UC-LAN-02 & Manage tenants & Review tenant accounts and tenant information. \\
+        \hline
+        UC-LAN-03 & Manage contracts & Create and update rental contracts. \\
+        \hline
+        UC-LAN-04 & Manage invoices & Create invoices, update payment status, and export invoice PDFs. \\
+        \hline
+        UC-LAN-05 & Handle incidents & Review and update tenant-reported maintenance requests. \\
+        \hline
+        UC-LAN-06 & Track violations & Record and resolve tenant violations. \\
+        \hline
+        UC-LAN-07 & Use AI assistance & Generate formal announcements and notices for tenants using the AI service. \\
+        \hline
+    \end{tabular}
+    \caption{Summary of Landlord Use Cases}
+    \label{tab:uc_summary_landlord}
+\end{table}
+
+\subsection{Tenant Use Case}
+The tenant actor uses the portal to monitor their rental relationship with the landlord, especially contract and payment information.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{tenant_usecase.png}
+    \caption{Use Case Diagram - Tenant Portal}
+    \label{fig:tenant_usecase}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|l|p{8cm}|}
+        \hline
+        \textbf{ID} & \textbf{Use Case Name} & \textbf{Description} \\
+        \hline
+        UC-TEN-01 & Log in & Authenticate and access the tenant portal. \\
+        \hline
+        UC-TEN-02 & View contract & Review active rental contract information. \\
+        \hline
+        UC-TEN-03 & View invoices & Track invoices, due dates, and payment status. \\
+        \hline
+        UC-TEN-04 & Report incident & Submit a repair or support request for the rented room. \\
+        \hline
+        UC-TEN-05 & Use AI assistant & Ask contextual questions based on contract and invoice data. \\
+        \hline
+    \end{tabular}
+    \caption{Summary of Tenant Use Cases}
+    \label{tab:uc_summary_tenant}
+\end{table}
+
+\section{Use Case Specifications}
+This section provides a detailed description of the execution operations for specific Use Cases, outlining the interaction steps between the user and the system components.
+
+\subsection{Tenant Portal Use Cases}
+
+\subsubsection{Tenant Log in}
+\textbf{Goal:} To allow tenants and landlords to log in to their account.
+
+\noindent \textbf{Primary Actor:} Tenant or Landlord
+
+\noindent \textbf{Pre-conditions:} The user has registered an account with a valid email and password, and has a device connected to the internet.
+
+\noindent \textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item The user enters their email and password into the input fields.
+    \item The user clicks the "Log In" button.
+    \item The frontend validates the input format.
+    \item The system sends a request to the backend auth service.
+    \item The backend validates the credentials against the database.
+    \item The system generates a JWT token and returns it to the user.
+    \item The user is redirected to their dashboard page.
+\end{enumerate}
+
+\noindent \textbf{Alternative Flows:}
+If the email or password is wrong, the system shows an incorrect password error and prompts the user to enter again. If there is a network error, the app displays a connection failure message.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{seq_tenant_login.png}
+    \caption{Sequence Diagram - Tenant Log in}
+    \label{fig:seq_tenant_login}
+\end{figure}
+
+\subsubsection{View Contract}
+\textbf{Goal:} To allow the tenant to review their current rental contract details.
+
+\noindent \textbf{Primary Actor:} Tenant
+
+\noindent \textbf{Pre-conditions:} The tenant is logged in.
+
+\noindent \textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item The tenant clicks the contract tab in the portal.
+    \item The frontend sends a request with the JWT token to the backend.
+    \item The backend fetches the contract details from the database.
+    \item The system displays the start date, end date, rental price, and deposit.
+\end{enumerate}
+
+\noindent \textbf{Alternative Flows:}
+If the contract is not found or has expired, the system shows a message that there is no active contract.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{seq_tenant_view_contract.png}
+    \caption{Sequence Diagram - View Contract}
+    \label{fig:seq_tenant_view_contract}
+\end{figure}
+
+\subsubsection{View Invoices}
+\textbf{Goal:} To check invoice history and payment status.
+
+\noindent \textbf{Primary Actor:} Tenant
+
+\noindent \textbf{Pre-conditions:} The tenant is logged in.
+
+\noindent \textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item The tenant clicks on the billing section.
+    \item The frontend sends a request with the JWT token to the backend.
+    \item The backend queries the database for all invoices related to the tenant's contract.
+    \item The system displays the list of invoices with their status like unpaid, paid, or overdue.
+\end{enumerate}
+
+\noindent \textbf{Alternative Flows:}
+If the tenant has no invoices yet, the page shows an empty list.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{seq_tenant_view_invoices.png}
+    \caption{Sequence Diagram - View Invoices}
+    \label{fig:seq_tenant_view_invoices}
+\end{figure}
+
+\subsubsection{Report Incident}
+\textbf{Goal:} To submit a room maintenance issue to the landlord.
+
+\noindent \textbf{Primary Actor:} Tenant
+
+\noindent \textbf{Pre-conditions:} The tenant is logged in.
+
+\noindent \textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item The tenant opens the incident report form.
+    \item The tenant enters the title, description, and selects the priority level.
+    \item The tenant submits the form.
+    \item The system saves the incident in the database and updates the status to pending.
+    \item The system notifies the landlord in real time.
+\end{enumerate}
+
+\noindent \textbf{Alternative Flows:}
+If the description is empty, the system prevents the submission and shows a validation error.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{seq_tenant_report_incident.png}
+    \caption{Sequence Diagram - Report Incident}
+    \label{fig:seq_tenant_report_incident}
+\end{figure}
+
+\subsubsection{Use AI Assistant}
+\textbf{Goal:} To chat with an AI assistant that knows the tenant's rental details.
+
+\noindent \textbf{Primary Actor:} Tenant
+
+\noindent \textbf{Pre-conditions:} The tenant is logged in.
+
+\noindent \textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item The tenant opens the AI assistant chat box.
+    \item The tenant writes a question about their rental terms.
+    \item The backend fetches the tenant's contract and invoice data.
+    \item The backend sends the question and the fetched data to the Google Gemini model.
+    \item The model generates a response, and the system displays it to the tenant.
+\end{enumerate}
+
+\noindent \textbf{Alternative Flows:}
+If the AI service is busy or not working, the system returns a message asking the user to try again later.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{seq_tenant_ai_assistant.png}
+    \caption{Sequence Diagram - Use AI Assistant}
+    \label{fig:seq_tenant_ai_assistant}
+\end{figure}
+
+
+\subsection{Landlord Dashboard Use Cases}
+
+\subsubsection{Manage Rooms}
+\textbf{Goal:} To create, update, or delete room listings.
+
+\noindent \textbf{Primary Actor:} Landlord
+
+\noindent \textbf{Pre-conditions:} The landlord is logged in.
+
+\noindent \textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item The landlord clicks on the room management menu.
+    \item The landlord enters room details like room number, floor, price, description, and uploads images.
+    \item The landlord clicks "Save".
+    \item The backend saves the room information and uploads images to Cloudinary.
+    \item The updated room list is displayed.
+\end{enumerate}
+
+\noindent \textbf{Alternative Flows:}
+If the room number already exists, the system returns a validation error.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{seq_landlord_manage_rooms.png}
+    \caption{Sequence Diagram - Manage Rooms}
+    \label{fig:seq_landlord_manage_rooms}
+\end{figure}
+
+\subsubsection{Manage Tenants}
+\textbf{Goal:} To approve and manage tenant accounts.
+
+\noindent \textbf{Primary Actor:} Landlord
+
+\noindent \textbf{Pre-conditions:} The landlord is logged in.
+
+\noindent \textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item The landlord opens the tenant management page.
+    \item The landlord reviews the list of registered tenants and registration requests.
+    \item The landlord approves a tenant.
+    \item The system updates the tenant status in the database.
+\end{enumerate}
+
+\noindent \textbf{Alternative Flows:}
+If the tenant's information is incomplete, the landlord can reject or suspend the account.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{seq_landlord_manage_tenants.png}
+    \caption{Sequence Diagram - Manage Tenants}
+    \label{fig:seq_landlord_manage_tenants}
+\end{figure}
+
+\subsubsection{Manage Contracts}
+\textbf{Goal:} To create a rental contract between a tenant and a room.
+
+\noindent \textbf{Primary Actor:} Landlord
+
+\noindent \textbf{Pre-conditions:} The landlord is logged in. The room must be vacant, and the tenant must be approved.
+
+\noindent \textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item The landlord enters contract details like tenant, room, dates, deposit, and rental price.
+    \item The landlord clicks "Save".
+    \item The backend validates tenant ownership and room status.
+    \item The system creates the contract inside a transaction.
+    \item The room status is updated to occupied.
+    \item The contract is shown in the dashboard.
+\end{enumerate}
+
+\noindent \textbf{Alternative Flows:}
+If the room is occupied, the system rejects the request. If the tenant does not belong to this landlord, the system returns a validation error.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{seq_landlord_manage_contracts.png}
+    \caption{Sequence Diagram - Manage Contracts}
+    \label{fig:seq_landlord_manage_contracts}
+\end{figure}
+
+\subsubsection{Manage Invoices}
+\textbf{Goal:} To create invoices, check payments, and export PDF bills.
+
+\noindent \textbf{Primary Actor:} Landlord
+
+\noindent \textbf{Pre-conditions:} The landlord is logged in, and an active contract exists.
+
+\noindent \textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item The landlord goes to the billing section.
+    \item The landlord enters details like monthly price, electric usage, and water usage.
+    \item The landlord saves the invoice.
+    \item The system calculates the total amount, saves the invoice, and creates a PDF file.
+    \item The landlord can view the PDF invoice with a VietQR code.
+\end{enumerate}
+
+\noindent \textbf{Alternative Flows:}
+If the invoice details contain invalid values, the system returns an error.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{seq_landlord_manage_invoices.png}
+    \caption{Sequence Diagram - Manage Invoices}
+    \label{fig:seq_landlord_manage_invoices}
+\end{figure}
+
+\subsubsection{Handle Incidents}
+\textbf{Goal:} To review and solve tenant-reported incidents.
+
+\noindent \textbf{Primary Actor:} Landlord
+
+\noindent \textbf{Pre-conditions:} The landlord is logged in.
+
+\noindent \textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item The landlord opens the incident management list.
+    \item The landlord reviews the pending issues reported by tenants.
+    \item The landlord updates the incident status to "In Progress" or "Resolved".
+    \item The system saves the status in the database and notifies the tenant in real time.
+\end{enumerate}
+
+\noindent \textbf{Alternative Flows:}
+If the incident has already been resolved by another admin, the system prevents duplicate actions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{seq_landlord_handle_incidents.png}
+    \caption{Sequence Diagram - Handle Incidents}
+    \label{fig:seq_landlord_handle_incidents}
+\end{figure}
+
+\subsubsection{Track Violations}
+\textbf{Goal:} To record rules violations for tenants.
+
+\noindent \textbf{Primary Actor:} Landlord
+
+\noindent \textbf{Pre-conditions:} The landlord is logged in.
+
+\noindent \textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item The landlord opens the violations page.
+    \item The landlord enters a description of a rule violation for a tenant.
+    \item The landlord clicks "Add".
+    \item The system saves the violation record and makes it visible to the tenant.
+\end{enumerate}
+
+\noindent \textbf{Alternative Flows:}
+If the target tenant does not exist or has left, the system returns an error.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{seq_landlord_track_violations.png}
+    \caption{Sequence Diagram - Track Violations}
+    \label{fig:seq_landlord_track_violations}
+\end{figure}
+
+
+\section{Data Requirements}
+The core database model uses a relational structure. The main entities are users, landlords, rooms, contracts, invoices, rent requests, incidents, and violations. Each record is scoped by a landlord identification code. This keeps the data private for each landlord. Main status fields include room availability, contract status, invoice payment status, user registration status, and incident resolution status.

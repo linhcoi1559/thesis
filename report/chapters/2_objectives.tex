@@ -1,0 +1,22 @@
+\chapter{OBJECTIVES}
+
+\section{Desired Features}
+The main goal of this project is to build a website for managing rental houses. The website helps manage everything from showing vacant rooms to the public, adding tenants, writing contracts, creating monthly bills, tracking payments, reporting issues, and helping landlords and tenants communicate easily.
+
+\subsection{Public Rental Interface}
+The public page allows people who want to rent a room to look at available rooms and send requests for consultation. It only shows vacant rooms and gives details like the price, room status, and description. In addition, a smart \textbf{AI} helper can answer common questions from users by using the room data in the database.
+
+\subsection{Landlord Administration Dashboard}
+The \textbf{landlord dashboard} is the main control center of the website. It gives \textbf{landlords} tools to manage rooms, add new tenants, write rental contracts, create monthly invoices, update payment status, manage room issues, track violations, and read room requests. The dashboard also keeps data private. This means each landlord can only see their own rooms, tenants, contracts, and invoices, and cannot see information from other landlords.
+
+\subsection{Tenant Portal}
+The \textbf{tenant portal} is a personal page for renters. Tenants can log in to check their contracts, see past bills, report issues in their rooms, read violation notices, mark invoices as paid, and get support from an \textbf{AI} assistant. This makes the rental process transparent and helps landlords and tenants save time because they do not have to ask the same questions repeatedly.
+
+\section{Project Scope}
+This project is designed for small and medium boarding houses, not for large real-estate companies. The main features in this project include user login with different roles for \textbf{landlords} and \textbf{tenants}, and keeping data private for each landlord. It also allows landlords to manage rooms and upload images, manage tenant accounts, and track contract status. In addition, the system can create monthly invoices automatically, export \textbf{PDF} bills, and show \textbf{VietQR} codes based on the landlord's bank account. Landlords can also track room incidents or tenant violations. Finally, the system sends real-time notifications to users and uses an \textbf{AI} assistant to support tenants and help landlords write notices.
+
+\section{Engineering Goals}
+Apart from building the application features, this project aims to achieve several engineering goals. First, the backend uses \textbf{Clean Architecture} rules and is built with \textbf{NestJS}. Second, the frontend is built with \textbf{Next.js} and has private pages. Third, \textbf{PostgreSQL} database with \textbf{Prisma} is used to keep all data consistent. The system also uses \textbf{JWT} and security guards to protect the API routes. Moreover, scheduled cron jobs are used to create monthly invoices and check expired contracts automatically. Finally, the system connects with third-party services like \textbf{Cloudinary} for image upload, \textbf{Google Generative AI} for the assistant, and \textbf{Socket.IO} for real-time messages.
+
+\section{Expected Outcomes}
+The expected result is a working prototype of a rental \textbf{SaaS} platform. This prototype can be a good foundation to build a complete boarding house management system in the future. For \textbf{landlords}, the system will reduce manual paperwork and make it easier to see how their business is running. For \textbf{tenants}, the system will help them check their bills, payment status, and get support easily and quickly.

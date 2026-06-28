@@ -1,0 +1,81 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{ABSTRACT}{i}{chapter*.1}%
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{TABLE OF CONTENTS}{iv}{chapter*.2}%
+\contentsline {chapter}{LIST OF FIGURES}{v}{chapter*.3}%
+\contentsline {chapter}{LIST OF TABLES}{vi}{chapter*.4}%
+\contentsline {chapter}{LIST OF ABBREVIATIONS}{1}{chapter*.5}%
+\contentsline {chapter}{\numberline {1}INTRODUCTION}{2}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Context and Motivation}{2}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Project Overview}{2}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Report Structure}{3}{section.1.3}%
+\contentsline {chapter}{\numberline {2}OBJECTIVES}{4}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Desired Features}{4}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Public Rental Interface}{4}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Landlord Administration Dashboard}{4}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Tenant Portal}{4}{subsection.2.1.3}%
+\contentsline {section}{\numberline {2.2}Project Scope}{5}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Engineering Goals}{5}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Expected Outcomes}{5}{section.2.4}%
+\contentsline {chapter}{\numberline {3}REQUIREMENTS ANALYSIS}{6}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Overall System Requirements}{6}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Public Visitor Requirements}{6}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Landlord Requirements}{6}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.1.3}Tenant Requirements}{6}{subsection.3.1.3}%
+\contentsline {section}{\numberline {3.2}Use Cases}{7}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Landlord Use Case}{7}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Tenant Use Case}{8}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}Use Case Specifications}{9}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Tenant Portal Use Cases}{10}{subsection.3.3.1}%
+\contentsline {subsubsection}{Tenant Log in}{10}{subsection.3.3.1}%
+\contentsline {subsubsection}{View Contract}{11}{figure.3.3}%
+\contentsline {subsubsection}{View Invoices}{12}{figure.3.4}%
+\contentsline {subsubsection}{Report Incident}{13}{figure.3.5}%
+\contentsline {subsubsection}{Use AI Assistant}{14}{figure.3.6}%
+\contentsline {subsection}{\numberline {3.3.2}Landlord Dashboard Use Cases}{15}{subsection.3.3.2}%
+\contentsline {subsubsection}{Manage Rooms}{15}{subsection.3.3.2}%
+\contentsline {subsubsection}{Manage Tenants}{16}{figure.3.8}%
+\contentsline {subsubsection}{Manage Contracts}{18}{figure.3.9}%
+\contentsline {subsubsection}{Manage Invoices}{19}{figure.3.10}%
+\contentsline {subsubsection}{Handle Incidents}{20}{figure.3.11}%
+\contentsline {subsubsection}{Track Violations}{21}{figure.3.12}%
+\contentsline {section}{\numberline {3.4}Data Requirements}{22}{section.3.4}%
+\contentsline {chapter}{\numberline {4}METHODOLOGY}{24}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Tools and Techniques}{24}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Backend Services}{24}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Frontend Portal}{24}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Supporting Services and Integrations}{25}{subsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.1.4}Infrastructure and Deployment}{25}{subsection.4.1.4}%
+\contentsline {section}{\numberline {4.2}System Architecture}{25}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Overall System Structure}{25}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Layered Design}{26}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Database Design}{27}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Entity-Relationship Diagram}{27}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Core Database Tables}{28}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Multi-Tenant Data Privacy}{29}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}Authentication and Authorization}{29}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}User Authentication with JWT}{29}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}API Protection with Auth Guards}{30}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Multi-Tenant Authorization Filter}{30}{subsection.4.4.3}%
+\contentsline {section}{\numberline {4.5}Automation and Business Logic}{31}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Rental Contract Creation}{31}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Invoice Payment and Verification}{33}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Tenant Incident Handling}{35}{subsection.4.5.3}%
+\contentsline {section}{\numberline {4.6}AI Integration}{37}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}AI Assistant with Google Gemini}{37}{subsection.4.6.1}%
+\contentsline {chapter}{\numberline {5}RESULTS AND DISCUSSION}{39}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Landlord Administration Dashboard and Room Management}{39}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Public Room Listing and RentBot AI Chatbot}{40}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Tenant Portal and Personal AI Assistant}{41}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Invoice Payment with VietQR Integration}{43}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Difficulties and Limitations}{44}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Discussion}{45}{section.5.6}%
+\contentsline {chapter}{\numberline {6}CONCLUSION AND FUTURE WORK}{47}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Conclusion}{47}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Future Work}{47}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Production Payment Integration}{47}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}Advanced Utility Billing}{48}{subsection.6.2.2}%
+\contentsline {subsection}{\numberline {6.2.3}Stronger Multi-Tenant Security}{48}{subsection.6.2.3}%
+\contentsline {subsection}{\numberline {6.2.4}Mobile Tenant Experience}{48}{subsection.6.2.4}%
+\contentsline {subsection}{\numberline {6.2.5}Analytics and Forecasting}{48}{subsection.6.2.5}%
+\contentsline {subsection}{\numberline {6.2.6}Document and Contract Management}{48}{subsection.6.2.6}%

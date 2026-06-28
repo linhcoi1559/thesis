@@ -1,0 +1,29 @@
+\chapter{CONCLUSION AND FUTURE WORK}
+
+This chapter summarizes the final results of this bachelor thesis and outlines the main future directions to improve the system.
+
+\section{Conclusion}
+The \textit{\textbf{Smart Boarding House Management System}} successfully provides a practical foundation for digitizing rental property operations. The project solves common problems in boarding house management by centralizing room details, tenant registration, contracts, invoices, payment tracking, incidents, violations, rent requests, notifications, and AI support in a single \textbf{SaaS} platform.
+
+From a software engineering perspective, the project demonstrates that combining modular design with clean architecture rules makes codebases highly maintainable. The backend built with \textbf{NestJS} and \textbf{Prisma ORM} ensures that database operations in \textbf{PostgreSQL} are secure and consistent. The use of custom guards like the \textbf{JwtAuthGuard} and \textbf{RolesGuard} protects private API endpoints. On the frontend, \textbf{Next.js} and \textbf{Zustand} provide a modular portal interface. The integration of supporting services like \textbf{Socket.IO} for notifications, \textbf{Cloudinary} for uploads, and \textbf{Google Gemini} for AI chat completes a modern development package. This prototype represents a secure, maintainable, and solid base for a commercial rental application.
+
+\section{Future Work}
+Although the prototype works successfully, several technical improvements can be added in future versions to make it ready for production.
+
+\subsection{Production Payment Integration}
+The current payment verification process is manual. To automate this, the system should integrate payment gateway APIs such as \textbf{PayOS}, \textbf{MoMo}, or \textbf{VNPay} and listen to secure database webhooks. When a tenant scans the \textbf{VietQR} code and transfers money, the payment provider will automatically send a secure HTTP post request to the backend. The backend will parse the webhook, verify the invoice ID, update the invoice status to paid, and send an instant notification to both the landlord and tenant, eliminating manual verification.
+
+\subsection{Advanced Utility Billing}
+The utility billing module can be improved by tracking consumption history. Future versions should save previous and current meter readings in the database, allowing the system to calculate the difference between readings and automatically compute the electricity or water cost. The system can also run consistency checks to warn the landlord if a room has abnormally high consumption compared to previous months.
+
+\subsection{Stronger Multi-Tenant Security}
+To prepare for large-scale SaaS deployment, database-level security must be hardened. Future work should implement **Row-Level Security (RLS)** in \textbf{PostgreSQL} to enforce isolation at the database layer. Additionally, the backend should include security auditing logs to record database queries, rate limiters using the NestJS throttler module to prevent automated attacks, and strict origin checks on WebSockets to secure real-time connections.
+
+\subsection{Mobile Tenant Experience}
+Tenants primarily use mobile phones to interact with the boarding house system. Developing a native mobile application using \textbf{React Native} or \textbf{Flutter}, or converting the frontend into a \textbf{Progressive Web App (PWA)}, will make it much easier for tenants to view bills and report incidents. This will also allow the system to send mobile push notifications directly to the tenant's lock screen when a new invoice is created.
+
+\subsection{Analytics and Forecasting}
+The landlord dashboard can be expanded with analytics to track business performance. The system can calculate metrics like monthly recurring revenue, overall occupancy rate, average repair resolution times, and outstanding debts. Furthermore, machine learning models or Gemini forecasting can analyze historical data to help landlords predict vacancy risks and manage cash flow.
+
+\subsection{Document and Contract Management}
+The document management features can be expanded to include paperless contract signing. The backend can generate PDF lease documents dynamically and integrate electronic signature services like \textbf{DocuSign} or local digital signature certificates. This will allow landlords and tenants to sign contracts digitally, making them legally binding and securely stored in the system.

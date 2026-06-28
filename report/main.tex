@@ -1,0 +1,116 @@
+\documentclass[12pt,a4paper]{report}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+\usepackage[vietnamese,english]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{mathptmx}
+\usepackage{float}
+\usepackage[utf8]{vietnam}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{rotating}
+
+\addto\captionsenglish{%
+  \renewcommand{\contentsname}{TABLE OF CONTENTS}
+  \renewcommand{\listfigurename}{LIST OF FIGURES}
+  \renewcommand{\listtablename}{LIST OF TABLES}
+  \renewcommand{\bibname}{REFERENCES}
+  \renewcommand{\figurename}{Figure}
+  \renewcommand{\tablename}{Table}
+}
+
+% Page setup
+\geometry{
+    a4paper,
+    left=30mm,
+    right=20mm,
+    top=25mm,
+    bottom=25mm
+}
+
+\graphicspath{{images/}}
+\onehalfspacing
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+\lhead{Smart Boarding House Management System}
+
+\begin{document}
+
+\newgeometry{left=25mm,right=25mm,top=25mm,bottom=25mm}
+\begin{titlepage}
+    \centering
+    {\large \textbf{UNIVERSITY OF SCIENCE AND TECHNOLOGY OF HANOI} \par}
+    \vspace{3cm}
+    \includegraphics[width=0.4\textwidth]{usth.png} \par
+    \vspace{2cm}
+    {\huge \textbf{SMART BOARDING HOUSE MANAGEMENT SYSTEM} \par}
+    \vspace{0.5cm}
+    {\Large \textbf{BACHELOR THESIS REPORT} \par}
+    \vspace{0.5cm}
+    {\Large \textbf{RENTAL SAAS PLATFORM} \par}
+
+    \vfill
+
+    {\large \textbf{Student} \par}
+    \vspace{0.5cm}
+    {\large Đỗ Duy Toàn (22BI13420) \par}
+
+    \vfill
+
+    {\large \textbf{Supervisor:} Supervisor Name \par}
+    \vspace{1.5cm}
+    {\large Hanoi, 2026 \par}
+    \thispagestyle{empty}
+\end{titlepage}
+\restoregeometry
+
+\pagenumbering{roman}
+
+\chapter*{ABSTRACT}
+\addcontentsline{toc}{chapter}{ABSTRACT}
+\selectlanguage{english}
+This project is about building a website called Smart Boarding House Management System. It is a SaaS platform that helps landlords and tenants manage their rental activities together. The system solves common problems in boarding houses, such as different room information, writing contracts by hand, delay in calculating monthly bills, lack of communication between landlords and tenants, and difficulties in tracking room issues or tenant rules violations.
+
+To build this website, NestJS is used for the backend and Next.js for the frontend. PostgreSQL with Prisma is used to store main information like rooms and contracts. MongoDB is also used to keep activity logs, and Socket.IO to send real-time notifications to users. The platform has private zones for landlords and tenants. It includes many features: managing rooms and tenants, keeping track of contracts, generating monthly invoices automatically, checking payment status, exporting PDF bills with VietQR payment codes, reporting room problems, tracking tenant violations, and using a smart AI assistant to chat with tenants or write notifications.
+
+The result of the project is a helpful system that saves time for landlords. It also gives tenants an easy way to check their contracts, bills, payments, and to report problems. This project is a great way to learn clean coding architecture, modular frontend design, user access security, automated tasks, and how to connect AI helper to a real business system.
+
+\newpage
+\tableofcontents
+\addcontentsline{toc}{chapter}{TABLE OF CONTENTS}
+\newpage
+\listoffigures
+\addcontentsline{toc}{chapter}{LIST OF FIGURES}
+\newpage
+\listoftables
+\addcontentsline{toc}{chapter}{LIST OF TABLES}
+\newpage
+\input{chapters/abbreviations}
+
+\pagenumbering{arabic}
+
+\input{chapters/1_introduction}
+\input{chapters/2_objectives}
+\input{chapters/3_requirements}
+\input{chapters/4_methodology}
+\input{chapters/5_results_discussions}
+\input{chapters/6_conclusion_future_work}
+
+\bibliographystyle{plainurl}
+\bibliography{references}
+\nocite{*}
+
+\end{document}

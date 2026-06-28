@@ -1,0 +1,45 @@
+\begin{thebibliography}{1}
+
+\bibitem{rfc7519}
+M.~Jones, J.~Bradley, and N.~Sakimura.
+\newblock Json web token (jwt).
+\newblock RFC 7519, RFC Editor, 2015.
+\newblock URL: \url{https://www.rfc-editor.org/rfc/rfc7519}.
+
+\bibitem{martin2017clean}
+Robert~C. Martin.
+\newblock {\em Clean Architecture: A Craftsman's Guide to Software Structure
+  and Design}.
+\newblock Prentice Hall, 2017.
+
+\bibitem{nestjs2026}
+{NestJS}.
+\newblock Nestjs documentation, 2026.
+\newblock Accessed: 2026-06-27.
+\newblock URL: \url{https://docs.nestjs.com/}.
+
+\bibitem{prisma2026}
+{Prisma}.
+\newblock Prisma documentation, 2026.
+\newblock Accessed: 2026-06-27.
+\newblock URL: \url{https://www.prisma.io/docs}.
+
+\bibitem{socketio2026}
+{Socket.IO}.
+\newblock Socket.io documentation, 2026.
+\newblock Accessed: 2026-06-27.
+\newblock URL: \url{https://socket.io/docs/}.
+
+\bibitem{tesseractjs2026}
+{Tesseract.js}.
+\newblock Tesseract.js documentation, 2026.
+\newblock Accessed: 2026-06-27.
+\newblock URL: \url{https://tesseract.projectnaptha.com/}.
+
+\bibitem{nextjs2026}
+{Vercel}.
+\newblock Next.js documentation, 2026.
+\newblock Accessed: 2026-06-27.
+\newblock URL: \url{https://nextjs.org/docs}.
+
+\end{thebibliography}
