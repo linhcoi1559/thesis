@@ -1,4 +1,16 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
+
+\bibitem{cloudinary2026}
+{Cloudinary}.
+\newblock Cloudinary documentation, 2026.
+\newblock Accessed: 2026-06-27.
+\newblock URL: \url{https://cloudinary.com/documentation}.
+
+\bibitem{gemini2026}
+{Google DeepMind}.
+\newblock Gemini models documentation, 2026.
+\newblock Accessed: 2026-06-27.
+\newblock URL: \url{https://ai.google.dev/gemini-api/docs}.
 
 \bibitem{rfc7519}
 M.~Jones, J.~Bradley, and N.~Sakimura.
@@ -12,6 +24,12 @@ Robert~C. Martin.
   and Design}.
 \newblock Prentice Hall, 2017.
 
+\bibitem{neon2026}
+{Neon, Inc.}
+\newblock Neon: Serverless postgres, 2026.
+\newblock Accessed: 2026-06-27.
+\newblock URL: \url{https://neon.tech/docs}.
+
 \bibitem{nestjs2026}
 {NestJS}.
 \newblock Nestjs documentation, 2026.
@@ -24,22 +42,28 @@ Robert~C. Martin.
 \newblock Accessed: 2026-06-27.
 \newblock URL: \url{https://www.prisma.io/docs}.
 
+\bibitem{render2026}
+{Render}.
+\newblock Render cloud hosting documentation, 2026.
+\newblock Accessed: 2026-06-27.
+\newblock URL: \url{https://docs.render.com/}.
+
 \bibitem{socketio2026}
 {Socket.IO}.
 \newblock Socket.io documentation, 2026.
 \newblock Accessed: 2026-06-27.
 \newblock URL: \url{https://socket.io/docs/}.
 
-\bibitem{tesseractjs2026}
-{Tesseract.js}.
-\newblock Tesseract.js documentation, 2026.
-\newblock Accessed: 2026-06-27.
-\newblock URL: \url{https://tesseract.projectnaptha.com/}.
-
 \bibitem{nextjs2026}
 {Vercel}.
 \newblock Next.js documentation, 2026.
 \newblock Accessed: 2026-06-27.
 \newblock URL: \url{https://nextjs.org/docs}.
+
+\bibitem{vercel2026}
+{Vercel}.
+\newblock Vercel documentation, 2026.
+\newblock Accessed: 2026-06-27.
+\newblock URL: \url{https://vercel.com/docs}.
 
 \end{thebibliography}
