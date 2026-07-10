@@ -5,7 +5,7 @@ export class UploadService {
   async uploadImage(file: any): Promise<any> {
     try {
       const base64Image = file.buffer.toString('base64');
-      
+
       const formData = new URLSearchParams();
       formData.append('image', base64Image);
 
