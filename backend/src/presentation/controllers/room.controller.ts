@@ -68,10 +68,9 @@ export class RoomController {
     if (!file) throw new BadRequestException('File is required');
     if (!landlordId) throw new BadRequestException('landlordId is required');
 
-    // Upload image to ImgBB and get a real HTTPS URL
-    const uploadResult = await this.uploadService.uploadImage(file);
-    const imageUrl = uploadResult.secure_url;
-    return this.roomService.addImage(id, landlordId, imageUrl);
+    // Convert the image buffer directly to a base64 Data URL to bypass third-party API limits
+    const base64Image = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+    return this.roomService.addImage(id, landlordId, base64Image);
   }
 
   @Delete(':id/images')

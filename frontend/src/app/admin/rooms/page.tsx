@@ -139,8 +139,9 @@ export default function AdminRoomsPage() {
     if (!e.target.files || !selectedRoom) return;
     const file = e.target.files[0];
     const fd = new FormData();
-    fd.append('file', file);
+    // Non-file fields MUST be appended before file fields when using Multer
     fd.append('landlordId', landlordId);
+    fd.append('file', file);
     setUploadingImage(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/rooms/${selectedRoom.id}/images`, { method: 'POST', cache: 'no-store', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
