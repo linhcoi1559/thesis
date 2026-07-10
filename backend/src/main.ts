@@ -17,7 +17,7 @@ async function seedDemoData() {
   if (!landlordExists) {
     console.log('Seeding demo landlord data...');
     const hashedPassword = await bcrypt.hash('password123', 10);
-    
+
     try {
       await prisma.$transaction(async (tx) => {
         await tx.user.create({
@@ -48,6 +48,51 @@ async function seedDemoData() {
       console.error('Failed to seed demo landlord:', e);
     }
   }
+
+  // Bắt đầu seed thêm Chủ Trọ B để test Multi-Tenancy
+  const landlordBId = 'b29d665b-efbe-40b3-bb66-df30bd5e8bfb';
+  const userBId = 'b1b28d08-d2e8-46dc-a05e-bb123456789b';
+
+  const landlordBExists = await prisma.landlord.findUnique({
+    where: { id: landlordBId },
+  });
+
+  if (!landlordBExists) {
+    console.log('Seeding Chủ Trọ B data...');
+    const hashedPassword = await bcrypt.hash('password123', 10);
+
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.user.create({
+          data: {
+            id: userBId,
+            email: 'landlordb@test.com',
+            password: hashedPassword,
+            name: 'Chủ Trọ B',
+            role: 'LANDLORD',
+          },
+        });
+
+        await tx.landlord.create({
+          data: {
+            id: landlordBId,
+            name: 'Nhà Trọ B',
+            ownerId: userBId,
+          },
+        });
+
+        await tx.user.update({
+          where: { id: userBId },
+          data: { landlordId: landlordBId },
+        });
+      });
+      console.log('Chủ Trọ B seeded successfully!');
+    } catch (e) {
+      console.error('Failed to seed Chủ Trọ B:', e);
+    }
+  }
+  // Kết thúc seed Chủ Trọ B
+
   await prisma.$disconnect();
 }
 

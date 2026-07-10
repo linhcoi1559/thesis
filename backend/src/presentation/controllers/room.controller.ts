@@ -1,13 +1,15 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseInterceptors, UploadedFile, BadRequestException, UseGuards, Req } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RoomService } from '../../core/use-cases/room/room.service';
+import { UploadService } from '../../core/use-cases/upload/upload.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('rooms')
 export class RoomController {
   constructor(
     private readonly roomService: RoomService,
-  ) {}
+    private readonly uploadService: UploadService,
+  ) { }
 
   @Get('public')
   async getPublicRooms() {
@@ -30,7 +32,7 @@ export class RoomController {
     // In a real app, landlordId comes from JWT
     const { landlordId, ...data } = body;
     if (!landlordId) throw new BadRequestException('landlordId is required');
-    
+
     // Ensure price is a number
     if (data.price) {
       data.price = Number(data.price);
@@ -65,10 +67,11 @@ export class RoomController {
   ) {
     if (!file) throw new BadRequestException('File is required');
     if (!landlordId) throw new BadRequestException('landlordId is required');
-    
-    // Convert the image buffer directly to a base64 Data URL to bypass third-party API limits
-    const base64Image = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
-    return this.roomService.addImage(id, landlordId, base64Image);
+
+    // Upload image to ImgBB and get a real HTTPS URL
+    const uploadResult = await this.uploadService.uploadImage(file);
+    const imageUrl = uploadResult.secure_url;
+    return this.roomService.addImage(id, landlordId, imageUrl);
   }
 
   @Delete(':id/images')
